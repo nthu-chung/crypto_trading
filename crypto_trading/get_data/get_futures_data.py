@@ -187,11 +187,11 @@ def get_and_save_futures_klines(
 if __name__ == "__main__":
     # 示例用法
     # 查询 BTCUSDT 期货合约最近30条1分钟K线数据
-    symbol = "BTCUSDT"
+    symbol = "ETHUSDT"
     get_and_save_futures_klines(
         symbol=symbol,
-        interval="1m",
-        limit=30,
+        interval="1d",
+        limit=365*3,
         output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_futures"
     )
     
