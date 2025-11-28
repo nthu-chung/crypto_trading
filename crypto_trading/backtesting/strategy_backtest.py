@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from typing import Callable, Optional, Dict, List, Tuple
 from datetime import datetime
 import json
+import os
 
 
 class StrategyBacktester:
@@ -64,7 +65,7 @@ class StrategyBacktester:
     
     def backtest(
         self,
-        signal_func: Callable[[pd.DataFrame, int], str],
+        signal_func: Callable,
         min_periods: int = 0,
         position_size: float = 1.0,
         take_profit: Optional[float] = None,
@@ -75,19 +76,23 @@ class StrategyBacktester:
         执行回测
         
         Args:
-            signal_func: 信号生成函数，接受 (data, index) 作为参数，返回信号
+            signal_func: 信号生成函数，必须接受以下参数：
+                        (data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str
                         - data: 完整的DataFrame
                         - index: 当前数据点的索引
+                        - position: 当前持仓数量（如果没有持仓则为0）
+                        - entry_price: 入场价格（如果没有持仓则为0）
+                        - entry_index: 入场索引（如果没有持仓则为-1）
+                        - take_profit: 止盈比例（例如：0.1 表示 10%）
+                        - stop_loss: 止损比例（例如：0.1 表示 10%）
+                        - check_periods: 检查未来多少个周期
                         - 返回: 'buy'（买入）, 'sell'（卖出）, 'hold'（持有）或 None
+                        策略函数可以根据持仓信息自行决定是否止盈止损
             min_periods: 最小需要的周期数（用于计算信号时）
             position_size: 每次交易的仓位大小（相对于可用资金的比例，0-1之间）
-            take_profit: 止盈比例（例如：0.1 表示 10%）
-                        止盈检查未来周期内的 high_price，如果 high_price >= entry_price * (1 + take_profit) 则卖出
-            stop_loss: 止损比例（例如：0.1 表示 10%）
-                      止损检查未来周期内的 low_price，如果 low_price <= entry_price * (1 - stop_loss) 则卖出
-                      如果某一天同时触发止盈和止损，则优先执行止损
-            check_periods: 检查未来多少个周期（默认1，即只检查当前周期）
-                          例如：check_periods=3 表示检查当前周期和未来2个周期
+            take_profit: 止盈比例（传递给策略函数，由策略决定是否使用）
+            stop_loss: 止损比例（传递给策略函数，由策略决定是否使用）
+            check_periods: 检查未来多少个周期（传递给策略函数，由策略决定是否使用）
         
         Returns:
             包含回测结果的字典：
@@ -119,120 +124,66 @@ class StrategyBacktester:
                 current_price = self.data.iloc[i]['close_price']
                 current_time = self.data.iloc[i]['datetime']
                 
-                # 如果有持仓，先检查止盈止损
-                stop_triggered = False
-                if position > 0 and entry_price > 0:
-                    # 计算止盈和止损价格
-                    take_profit_price = entry_price * (1 + take_profit) if take_profit is not None else None
-                    stop_loss_price = entry_price * (1 - stop_loss) if stop_loss is not None else None
-                    
-                    # 检查当前周期和未来 check_periods 个周期
-                    # 优先查找止损（因为止损优先），如果找到止损就立即退出
-                    # 如果没有找到止损，再查找止盈
-                    trigger_reason = None
-                    trigger_index = None
-                    trigger_price = None
-                    
-                    # 先查找所有周期中的止损（优先）
-                    for check_idx in range(i, min(i + check_periods, len(self.data))):
-                        check_low = self.data.iloc[check_idx]['low_price']
-                        check_high = self.data.iloc[check_idx]['high_price']
-
-                        if stop_loss_price is not None and check_low <= stop_loss_price:
-                            trigger_reason = 'stop_loss'
-                            trigger_index = check_idx
-                            trigger_price = stop_loss_price  # 使用止损价格卖出
-                            break  # 找到止损就立即退出
-                        
-                        if take_profit_price is not None and check_high >= take_profit_price:
-                            trigger_reason = 'take_profit'
-                            trigger_index = check_idx
-                            trigger_price = take_profit_price  # 使用止盈价格卖出
-                            break  # 找到第一个止盈就退出
-
-
-
-                    
-                    # 如果触发了止盈或止损，执行卖出
-                    if trigger_reason is not None:
-                        # 使用触发价格卖出
-                        trade_amount = position * trigger_price
-                        commission = trade_amount * self.commission_rate
-                        capital = capital + trade_amount - commission
-                        
-                        # 计算盈亏
-                        pnl = (trigger_price - entry_price) / entry_price
-                        pnl_amount = trade_amount - (position * entry_price) - commission
-                        
-                        # 记录交易：使用当前周期的日期（因为我们在当前周期执行卖出）
-                        # 但价格使用触发价格
-                        trades.append({
-                            'type': 'sell',
-                            'reason': trigger_reason,
-                            'datetime': current_time,
-                            'index': i,
-                            'trigger_index': trigger_index,  # 记录实际触发的周期
-                            'price': float(trigger_price),
-                            'entry_price': float(entry_price),
-                            'pnl': float(pnl),
-                            'pnl_amount': float(pnl_amount),
-                            'capital': float(capital)
-                        })
-                        
-                        position = 0
-                        entry_price = 0
-                        entry_index = -1
-                        stop_triggered = True
+                # 生成信号：调用策略函数，传入所有持仓信息
+                signal = signal_func(
+                    self.data, i, position, entry_price, entry_index,
+                    take_profit, stop_loss, check_periods
+                )
                 
-                # 如果没有触发止盈止损，才处理信号
-                if not stop_triggered:
-                    # 生成信号
-                    signal = signal_func(self.data, i)
+                # 处理信号
+                if signal == 'buy' and position == 0:
+                    # 买入
+                    trade_amount = capital * position_size
+                    position = trade_amount / current_price
+                    commission = trade_amount * self.commission_rate
+                    capital = capital - trade_amount - commission
+                    entry_price = current_price
+                    entry_index = i
                     
-                    # 处理信号
-                    if signal == 'buy' and position == 0:
-                        # 买入
-                        trade_amount = capital * position_size
-                        position = trade_amount / current_price
-                        commission = trade_amount * self.commission_rate
-                        capital = capital - trade_amount - commission
-                        entry_price = current_price
-                        entry_index = i
-                        
-                        trades.append({
-                            'type': 'buy',
-                            'datetime': current_time,
-                            'index': i,
-                            'price': float(current_price),
-                            'position': float(position),
-                            'capital': float(capital)
-                        })
+                    trades.append({
+                        'type': 'buy',
+                        'datetime': current_time,
+                        'index': i,
+                        'price': float(current_price),
+                        'position': float(position),
+                        'capital': float(capital)
+                    })
+                
+                elif signal == 'sell' and position > 0:
+                    # 卖出（由策略函数决定，可能是策略信号、止盈或止损）
+                    # 策略函数已经检查了止盈止损条件，回测器只执行卖出
+                    trade_amount = position * current_price
+                    commission = trade_amount * self.commission_rate
+                    capital = capital + trade_amount - commission
                     
-                    elif signal == 'sell' and position > 0:
-                        # 卖出（信号触发）
-                        trade_amount = position * current_price
-                        commission = trade_amount * self.commission_rate
-                        capital = capital + trade_amount - commission
-                        
-                        # 计算盈亏
-                        pnl = (current_price - entry_price) / entry_price
-                        pnl_amount = trade_amount - (position * entry_price) - commission
-                        
-                        trades.append({
-                            'type': 'sell',
-                            'reason': 'signal',
-                            'datetime': current_time,
-                            'index': i,
-                            'price': float(current_price),
-                            'entry_price': float(entry_price),
-                            'pnl': float(pnl),
-                            'pnl_amount': float(pnl_amount),
-                            'capital': float(capital)
-                        })
-                        
-                        position = 0
-                        entry_price = 0
-                        entry_index = -1
+                    # 计算盈亏
+                    pnl = (current_price - entry_price) / entry_price if entry_price > 0 else 0
+                    pnl_amount = trade_amount - (position * entry_price) - commission if entry_price > 0 else 0
+                    
+                    # 根据价格变化判断卖出原因（用于记录，策略函数已经决定了是否卖出）
+                    reason = 'signal'
+                    if entry_price > 0:
+                        price_change = (current_price - entry_price) / entry_price
+                        if take_profit is not None and price_change >= take_profit:
+                            reason = 'take_profit'
+                        elif stop_loss is not None and price_change <= -stop_loss:
+                            reason = 'stop_loss'
+                    
+                    trades.append({
+                        'type': 'sell',
+                        'reason': reason,
+                        'datetime': current_time,
+                        'index': i,
+                        'price': float(current_price),
+                        'entry_price': float(entry_price),
+                        'pnl': float(pnl),
+                        'pnl_amount': float(pnl_amount),
+                        'capital': float(capital)
+                    })
+                    
+                    position = 0
+                    entry_price = 0
+                    entry_index = -1
                 
                 # 计算当前总资产（现金 + 持仓市值）
                 current_equity = capital + (position * current_price if position > 0 else 0)
@@ -321,15 +272,91 @@ class StrategyBacktester:
         
         return results
     
-    def plot_results(self, results: Dict, figsize: Tuple[int, int] = (14, 10)):
+    def plot_results(
+        self, 
+        results: Dict, 
+        figsize: Tuple[int, int] = (14, 10),
+        save_image: Optional[str] = None,
+        save_json: Optional[str] = None,
+        strategy_name: Optional[str] = None,
+        data_name: Optional[str] = None,
+        save_dir: Optional[str] = None,
+        source_start_str: Optional[str] = None,
+        source_end_str: Optional[str] = None
+    ):
         """
         绘制回测结果
         
         Args:
             results: backtest返回的结果字典
             figsize: 图形大小
+            save_image: 图片保存路径（如果提供，将保存图片，优先级高于自动生成）
+            save_json: JSON结果保存路径（如果提供，将保存JSON，优先级高于自动生成）
+            strategy_name: 策略名称（用于自动生成文件名）
+            data_name: 数据名称（用于自动生成文件名）
+            save_dir: 保存目录（如果提供strategy_name和data_name，将在此目录下保存文件）
+            source_start_str: 源数据的开始日期字符串（格式：YYYYMMDD），如果提供则优先使用
+            source_end_str: 源数据的结束日期字符串（格式：YYYYMMDD），如果提供则优先使用
         """
         equity_df = results['equity_curve']
+        
+        # 如果提供了策略名称和数据名称，自动生成文件名
+        if strategy_name and data_name:
+            # 清理名称，移除特殊字符，用于文件名
+            clean_strategy_name = strategy_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+            clean_data_name = data_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+            
+            # 优先使用源数据的时间范围，如果没有则从equity_curve中提取
+            start_str = source_start_str or ""
+            end_str = source_end_str or ""
+            
+            if not start_str or not end_str:
+                # 从equity_curve中提取测试时间段
+                if not equity_df.empty and 'datetime' in equity_df.columns:
+                    try:
+                        start_time = equity_df['datetime'].min()
+                        end_time = equity_df['datetime'].max()
+                        
+                        # 转换为datetime对象（如果还不是）
+                        if not isinstance(start_time, (pd.Timestamp, datetime)):
+                            start_time = pd.to_datetime(start_time)
+                            end_time = pd.to_datetime(end_time)
+                        
+                        # 格式化时间为 YYYYMMDD
+                        start_str = start_time.strftime('%Y%m%d')
+                        end_str = end_time.strftime('%Y%m%d')
+                    except Exception:
+                        # 如果时间提取失败，使用空字符串
+                        pass
+            
+            # 确定保存目录结构
+            if save_dir:
+                # 根据数据名称和开始结束日期创建子文件夹
+                if start_str and end_str:
+                    # 子文件夹格式：{数据名称}_{开始日期}_{结束日期}
+                    subfolder_name = f"{clean_data_name}_{start_str}_{end_str}"
+                    final_save_dir = os.path.join(save_dir, subfolder_name)
+                else:
+                    # 如果没有时间段，只使用数据名称
+                    final_save_dir = os.path.join(save_dir, clean_data_name)
+                
+                # 确保目录存在
+                os.makedirs(final_save_dir, exist_ok=True)
+                
+                # 文件名只包含策略名称
+                base_filename = f"{clean_strategy_name}_backtest"
+                base_path = os.path.join(final_save_dir, base_filename)
+            else:
+                # 如果没有提供保存目录，使用原来的逻辑（文件名包含所有信息）
+                time_period_str = f"_{start_str}_{end_str}" if (start_str and end_str) else ""
+                base_filename = f"{clean_strategy_name}_{clean_data_name}{time_period_str}_backtest"
+                base_path = base_filename
+            
+            # 如果未明确指定路径，使用自动生成的路径
+            if save_image is None:
+                save_image = f"{base_path}.png"
+            if save_json is None:
+                save_json = f"{base_path}.json"
         
         # Set default font (no need for Chinese fonts)
         plt.rcParams['axes.unicode_minus'] = False
@@ -382,10 +409,20 @@ class StrategyBacktester:
         ax3.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.show()
+        
+        # 保存图片
+        if save_image:
+            plt.savefig(save_image, dpi=300, bbox_inches='tight')
+            print(f"图片已保存到: {save_image}")
+        
+        # plt.show()
+        
+        # 保存JSON结果
+        if save_json:
+            self.save_results(results, save_json)
         
         # 打印统计信息
-        self.print_results(results)
+        # self.print_results(results)
     
     def print_results(self, results: Dict):
         """

@@ -9,6 +9,7 @@ import numpy as np
 from typing import Callable, Optional, Dict, List, Tuple
 from datetime import datetime, timedelta
 import json
+import os
 
 
 class FactorTester:
@@ -139,7 +140,7 @@ class FactorTester:
                     # 看多信号：只要未来 n 个周期内存在任一价格高于当前价格，即认为获胜
                     signal_type = 'long'
                     results['long_signals'] += 1
-                    is_win = np.any(future_prices > current_price)
+                    is_win = bool(np.any(future_prices > current_price))
                     if is_win:
                         long_wins += 1
                     long_returns.append(future_return)
@@ -148,7 +149,7 @@ class FactorTester:
                     # 看空信号：只要未来 n 个周期内存在任一价格低于当前价格，即认为获胜
                     signal_type = 'short'
                     results['short_signals'] += 1
-                    is_win = np.any(future_prices < current_price)
+                    is_win = bool(np.any(future_prices < current_price))
                     if is_win:
                         short_wins += 1
                     short_returns.append(future_return)
@@ -192,12 +193,27 @@ class FactorTester:
         
         return results
     
-    def print_results(self, results: Dict):
+    def print_results(
+        self, 
+        results: Dict,
+        save_dir: Optional[str] = None,
+        factor_name: Optional[str] = None,
+        data_name: Optional[str] = None,
+        save_json: Optional[str] = None,
+        source_start_str: Optional[str] = None,
+        source_end_str: Optional[str] = None
+    ):
         """
         打印测试结果
         
         Args:
             results: test_factor返回的结果字典
+            save_dir: 保存目录（如果提供factor_name和data_name，将在此目录下保存文件）
+            factor_name: 因子名称（用于自动生成文件名，如果为None，从results中获取）
+            data_name: 数据名称（用于自动生成文件名）
+            save_json: JSON结果保存路径（如果提供，将保存JSON，优先级高于自动生成）
+            source_start_str: 源数据的开始日期字符串（格式：YYYYMMDD），如果提供则优先使用
+            source_end_str: 源数据的结束日期字符串（格式：YYYYMMDD），如果提供则优先使用
         """
         print(f"\n{'='*60}")
         print(f"因子测试结果: {results['factor_name']}")
@@ -212,6 +228,63 @@ class FactorTester:
         print(f"看空信号次日平均收益率: {results['short_avg_return']:.4%}")
         print(f"\n总体胜率: {results['overall_win_rate']:.2%}")
         print(f"{'='*60}\n")
+        
+        # 自动保存JSON结果
+        if save_dir and (factor_name or results.get('factor_name')) and data_name:
+            # 获取因子名称
+            if factor_name is None:
+                factor_name = results.get('factor_name', 'factor')
+            
+            # 清理名称，移除特殊字符，用于文件名
+            clean_factor_name = factor_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+            clean_data_name = data_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+            
+            # 优先使用源数据的时间范围，如果没有则从数据中提取测试时间段
+            start_str = source_start_str or ""
+            end_str = source_end_str or ""
+            
+            if not start_str or not end_str:
+                # 从数据中提取测试时间段
+                if not self.data.empty and 'datetime' in self.data.columns:
+                    try:
+                        start_time = self.data['datetime'].min()
+                        end_time = self.data['datetime'].max()
+                        
+                        # 转换为datetime对象（如果还不是）
+                        if not isinstance(start_time, (pd.Timestamp, datetime)):
+                            start_time = pd.to_datetime(start_time)
+                            end_time = pd.to_datetime(end_time)
+                        
+                        # 格式化时间为 YYYYMMDD
+                        start_str = start_time.strftime('%Y%m%d')
+                        end_str = end_time.strftime('%Y%m%d')
+                    except Exception:
+                        # 如果时间提取失败，使用空字符串
+                        pass
+            
+            # 确定保存目录结构
+            if start_str and end_str:
+                # 子文件夹格式：{数据名称}_{开始日期}_{结束日期}
+                subfolder_name = f"{clean_data_name}_{start_str}_{end_str}"
+                final_save_dir = os.path.join(save_dir, subfolder_name)
+            else:
+                # 如果没有时间段，只使用数据名称
+                final_save_dir = os.path.join(save_dir, clean_data_name)
+            
+            # 确保目录存在
+            os.makedirs(final_save_dir, exist_ok=True)
+            
+            # 文件名只包含因子名称
+            base_filename = f"{clean_factor_name}_factor"
+            base_path = os.path.join(final_save_dir, base_filename)
+            
+            # 如果未明确指定路径，使用自动生成的路径
+            if save_json is None:
+                save_json = f"{base_path}.json"
+        
+        # 保存JSON结果
+        if save_json:
+            self.save_results(results, save_json)
     
     def save_results(self, results: Dict, filepath: str):
         """
@@ -226,6 +299,27 @@ class FactorTester:
         for detail in output['details']:
             if isinstance(detail['datetime'], (pd.Timestamp, datetime)):
                 detail['datetime'] = detail['datetime'].isoformat()
+            # 转换numpy类型为Python原生类型
+            if 'is_win' in detail:
+                detail['is_win'] = bool(detail['is_win'])
+            if 'factor_value' in detail:
+                detail['factor_value'] = float(detail['factor_value'])
+            if 'current_price' in detail:
+                detail['current_price'] = float(detail['current_price'])
+            if 'future_price' in detail:
+                detail['future_price'] = float(detail['future_price'])
+            if 'future_return' in detail:
+                detail['future_return'] = float(detail['future_return'])
+        
+        # 转换统计指标中的numpy类型
+        for key in ['long_win_rate', 'short_win_rate', 'overall_win_rate', 
+                   'long_avg_return', 'short_avg_return']:
+            if key in output:
+                value = output[key]
+                if isinstance(value, (np.integer, np.floating)):
+                    output[key] = float(value)
+                elif isinstance(value, np.bool_):
+                    output[key] = bool(value)
         
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
