@@ -8,14 +8,12 @@ import pandas as pd
 
 
 def ma_signal(
-    data: 'pd.DataFrame', 
-    index: int, 
+    data_slice: 'pd.DataFrame', 
     position: float, 
     entry_price: float, 
     entry_index: int,
     take_profit: float,
     stop_loss: float,
-    check_periods: int,
     period: int = 5
 ) -> str:
     """
@@ -24,27 +22,32 @@ def ma_signal(
     当价格上穿MA时买入，下穿MA时卖出
     同时检查止盈止损条件
     
+    注意：只使用当前周期的数据生成信号，不使用未来数据（无预知功能）
+    
     Args:
-        data: 完整的DataFrame
-        index: 当前数据点的索引
+        data_slice: 数据切片，必须包含至少 period+1 行数据
+                   最后一行是当前数据点，前面 period+1 行是历史数据
         position: 当前持仓数量（如果没有持仓则为0）
         entry_price: 入场价格（如果没有持仓则为0）
-        entry_index: 入场索引（如果没有持仓则为-1）
+        entry_index: 入场索引（如果没有持仓则为-1，保留用于兼容性）
         take_profit: 止盈比例（例如：0.1 表示 10%）
         stop_loss: 止损比例（例如：0.1 表示 10%）
-        check_periods: 检查未来多少个周期
         period: 移动平均周期（默认5）
     
     Returns:
         'buy', 'sell' 或 'hold'
     """
-    if index < period:
+    if len(data_slice) < period + 1:
         return 'hold'
     
-    current_price = data.iloc[index]['close_price']
-    ma = data.iloc[index-period:index]['close_price'].mean()
-    prev_price = data.iloc[index-1]['close_price']
-    prev_ma = data.iloc[index-period-1:index-1]['close_price'].mean()
+    # 最后一行是当前数据点
+    current_price = data_slice.iloc[-1]['close_price']
+    # 前period行是历史数据（不包括最后一行）
+    ma = data_slice.iloc[-period-1:-1]['close_price'].mean()
+    # 倒数第二行是上一周期的价格
+    prev_price = data_slice.iloc[-2]['close_price']
+    # 上一周期的MA（使用倒数第二行之前的数据）
+    prev_ma = data_slice.iloc[-period-2:-2]['close_price'].mean()
     
     # 如果有持仓，先检查止盈止损
     if position > 0 and entry_price > 0:
@@ -52,19 +55,17 @@ def ma_signal(
         take_profit_price = entry_price * (1 + take_profit) if take_profit is not None else None
         stop_loss_price = entry_price * (1 - stop_loss) if stop_loss is not None else None
         
-        # 检查当前周期和未来 check_periods 个周期
-        # 优先查找止损（因为止损优先），如果找到止损就立即返回卖出
-        for check_idx in range(index, min(index + check_periods, len(data))):
-            check_low = data.iloc[check_idx]['low_price']
-            check_high = data.iloc[check_idx]['high_price']
-            
-            # 优先检查止损
-            if stop_loss_price is not None and check_low <= stop_loss_price:
-                return 'sell'  # 触发止损
-            
-            # 检查止盈
-            if take_profit_price is not None and check_high >= take_profit_price:
-                return 'sell'  # 触发止盈
+        # 只检查当前周期的数据，不检查未来数据
+        current_low = data_slice.iloc[-1]['low_price']
+        current_high = data_slice.iloc[-1]['high_price']
+        
+        # 优先检查止损
+        if stop_loss_price is not None and current_low <= stop_loss_price:
+            return 'sell'  # 触发止损
+        
+        # 检查止盈
+        if take_profit_price is not None and current_high >= take_profit_price:
+            return 'sell'  # 触发止盈
         
         # 如果没有触发止盈止损，检查策略信号
         # 下穿：之前价格在MA上方，现在在MA下方
@@ -83,8 +84,7 @@ def ma_signal(
 
 
 def ma_cross_signal(
-    data: 'pd.DataFrame', 
-    index: int, 
+    data_slice: 'pd.DataFrame', 
     position: float, 
     entry_price: float, 
     entry_index: int,
@@ -100,31 +100,33 @@ def ma_cross_signal(
     当短期均线上穿长期均线时买入，下穿时卖出
     同时检查止盈止损条件
     
+    注意：只使用当前周期的数据生成信号，不使用未来数据（无预知功能）
+    
     Args:
-        data: 完整的DataFrame
-        index: 当前数据点的索引
+        data_slice: 数据切片，必须包含至少 long_period+2 行数据
+                   最后一行是当前数据点，前面 long_period+1 行是历史数据
         position: 当前持仓数量（如果没有持仓则为0）
         entry_price: 入场价格（如果没有持仓则为0）
-        entry_index: 入场索引（如果没有持仓则为-1）
+        entry_index: 入场索引（如果没有持仓则为-1，保留用于兼容性）
         take_profit: 止盈比例（例如：0.1 表示 10%）
         stop_loss: 止损比例（例如：0.1 表示 10%）
-        check_periods: 检查未来多少个周期
+        check_periods: 已弃用，不再使用（保留以保持向后兼容性）
         short_period: 短期均线周期（默认5）
         long_period: 长期均线周期（默认20）
     
     Returns:
         'buy', 'sell' 或 'hold'
     """
-    if index < long_period:
+    if len(data_slice) < long_period + 2:
         return 'hold'
     
-    # 计算当前周期的均线
-    short_ma_current = data.iloc[index-short_period:index]['close_price'].mean()
-    long_ma_current = data.iloc[index-long_period:index]['close_price'].mean()
+    # 计算当前周期的均线（使用最后period行数据，不包括最后一行）
+    short_ma_current = data_slice.iloc[-short_period-1:-1]['close_price'].mean()
+    long_ma_current = data_slice.iloc[-long_period-1:-1]['close_price'].mean()
     
-    # 计算上一周期的均线
-    short_ma_prev = data.iloc[index-short_period-1:index-1]['close_price'].mean()
-    long_ma_prev = data.iloc[index-long_period-1:index-1]['close_price'].mean()
+    # 计算上一周期的均线（使用倒数第二行之前的数据）
+    short_ma_prev = data_slice.iloc[-short_period-2:-2]['close_price'].mean()
+    long_ma_prev = data_slice.iloc[-long_period-2:-2]['close_price'].mean()
     
     # 如果有持仓，先检查止盈止损
     if position > 0 and entry_price > 0:
@@ -132,18 +134,17 @@ def ma_cross_signal(
         take_profit_price = entry_price * (1 + take_profit) if take_profit is not None else None
         stop_loss_price = entry_price * (1 - stop_loss) if stop_loss is not None else None
         
-        # 检查当前周期和未来 check_periods 个周期
-        for check_idx in range(index, min(index + check_periods, len(data))):
-            check_low = data.iloc[check_idx]['low_price']
-            check_high = data.iloc[check_idx]['high_price']
-            
-            # 优先检查止损
-            if stop_loss_price is not None and check_low <= stop_loss_price:
-                return 'sell'  # 触发止损
-            
-            # 检查止盈
-            if take_profit_price is not None and check_high >= take_profit_price:
-                return 'sell'  # 触发止盈
+        # 只检查当前周期的数据，不检查未来数据
+        current_low = data_slice.iloc[-1]['low_price']
+        current_high = data_slice.iloc[-1]['high_price']
+        
+        # 优先检查止损
+        if stop_loss_price is not None and current_low <= stop_loss_price:
+            return 'sell'  # 触发止损
+        
+        # 检查止盈
+        if take_profit_price is not None and current_high >= take_profit_price:
+            return 'sell'  # 触发止盈
         
         # 如果没有触发止盈止损，检查策略信号
         # 下穿：之前短期均线在长期均线上方，现在在下方

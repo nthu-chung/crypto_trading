@@ -2,6 +2,7 @@ import os
 import logging
 import csv
 import json
+import time
 from datetime import datetime
 from typing import Optional, Union
 
@@ -20,6 +21,36 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+
+def _get_interval_duration_ms(interval: str) -> int:
+    """
+    获取时间间隔对应的毫秒数
+    
+    Args:
+        interval: 时间间隔字符串，例如 '1m', '1h', '1d'
+    
+    Returns:
+        对应的毫秒数
+    """
+    interval_durations = {
+        "1m": 60 * 1000,
+        "3m": 3 * 60 * 1000,
+        "5m": 5 * 60 * 1000,
+        "15m": 15 * 60 * 1000,
+        "30m": 30 * 60 * 1000,
+        "1h": 60 * 60 * 1000,
+        "2h": 2 * 60 * 60 * 1000,
+        "4h": 4 * 60 * 60 * 1000,
+        "6h": 6 * 60 * 60 * 1000,
+        "8h": 8 * 60 * 60 * 1000,
+        "12h": 12 * 60 * 60 * 1000,
+        "1d": 24 * 60 * 60 * 1000,
+        "3d": 3 * 24 * 60 * 60 * 1000,
+        "1w": 7 * 24 * 60 * 60 * 1000,
+        "1M": 30 * 24 * 60 * 60 * 1000,  # 近似值，实际月份天数不同
+    }
+    return interval_durations.get(interval, 60 * 1000)
 
 
 def _convert_to_timestamp_ms(time_input: Union[datetime, str, int, None]) -> Optional[int]:
@@ -103,7 +134,8 @@ def get_and_save_futures_klines(
         - 如果 start_time 和 end_time 都不指定，返回最近的 limit 条数据
         - 如果只指定 start_time，返回从 start_time 开始的 limit 条数据
         - 如果只指定 end_time，返回 end_time 之前的 limit 条数据
-        - 如果同时指定 start_time 和 end_time，返回该时间范围内的数据（最多 limit 条）
+        - 如果同时指定 start_time 和 end_time，会自动进行分页请求（每次最多1000条），
+          获取整个时间范围内的所有数据，不受 limit 参数限制
     """
     try:
         # 创建配置（公开API，不需要认证）
@@ -157,24 +189,106 @@ def get_and_save_futures_klines(
             time_info.append(f"结束时间: {end_str}")
         time_info_str = ", ".join(time_info) if time_info else "最近数据"
         
-        # 查询数据
-        logging.info(f"正在查询 {symbol} 的期货合约K线数据，间隔: {interval}, 数量: {limit}, {time_info_str}")
-        response = client.rest_api.kline_candlestick_data(
-            symbol=symbol,
-            interval=interval_enum,
-            start_time=start_time_ms,
-            end_time=end_time_ms,
-            limit=limit
-        )
-        
-        # 获取数据
-        klines_data = response.data()
-        
-        if not klines_data:
-            logging.warning("未获取到数据")
-            return None
-        
-        logging.info(f"成功获取 {len(klines_data)} 条数据")
+        # 如果同时指定了 start_time 和 end_time，进行分页请求
+        all_klines_data = []
+        if start_time_ms is not None and end_time_ms is not None:
+            logging.info(f"检测到时间范围，将自动分页获取数据: {symbol}, 间隔: {interval}, {time_info_str}")
+            
+            current_start_time = start_time_ms
+            request_count = 0
+            max_requests = 1000  # 防止无限循环
+            
+            while current_start_time < end_time_ms and request_count < max_requests:
+                request_count += 1
+                # 每次请求最多 1000 条
+                current_limit = 1000
+                
+                logging.info(f"第 {request_count} 次请求: 从 {datetime.fromtimestamp(current_start_time / 1000).strftime('%Y-%m-%d %H:%M:%S')} 开始")
+                
+                try:
+                    response = client.rest_api.kline_candlestick_data(
+                        symbol=symbol,
+                        interval=interval_enum,
+                        start_time=current_start_time,
+                        end_time=end_time_ms,
+                        limit=current_limit
+                    )
+                    
+                    batch_data = response.data()
+                    
+                    if not batch_data:
+                        logging.info("本次请求未获取到数据，可能已到达结束时间")
+                        break
+                    
+                    # 过滤掉超过 end_time 的数据
+                    filtered_data = []
+                    for kline in batch_data:
+                        close_time = int(kline[6]) if isinstance(kline[6], str) else kline[6]
+                        if close_time <= end_time_ms:
+                            filtered_data.append(kline)
+                        else:
+                            break
+                    
+                    if not filtered_data:
+                        logging.info("过滤后无有效数据，已到达结束时间")
+                        break
+                    
+                    all_klines_data.extend(filtered_data)
+                    logging.info(f"本次获取 {len(filtered_data)} 条数据，累计 {len(all_klines_data)} 条")
+                    
+                    # 获取最后一条数据的 close_time，作为下一次请求的 start_time
+                    last_kline = filtered_data[-1]
+                    last_close_time = int(last_kline[6]) if isinstance(last_kline[6], str) else last_kline[6]
+                    
+                    # 如果返回的数据少于 limit，说明已经到达结束时间或没有更多数据
+                    if len(filtered_data) < current_limit:
+                        logging.info("返回数据少于限制数量，已获取完所有数据")
+                        break
+                    
+                    # 如果最后一条数据的 close_time 已经达到或超过 end_time，停止请求
+                    if last_close_time >= end_time_ms:
+                        logging.info("已到达结束时间")
+                        break
+                    
+                    # 下一次请求从最后一条数据的 close_time + 1 开始（避免重复）
+                    current_start_time = last_close_time + 1
+                    
+                    # 添加短暂延迟，避免请求过快
+                    time.sleep(0.5)
+                    
+                except Exception as e:
+                    logging.error(f"第 {request_count} 次请求出错: {e}")
+                    break
+            
+            if request_count >= max_requests:
+                logging.warning(f"达到最大请求次数限制 ({max_requests})，停止请求")
+            
+            klines_data = all_klines_data
+            
+            if not klines_data:
+                logging.warning("未获取到任何数据")
+                return None
+            
+            logging.info(f"分页请求完成，共请求 {request_count} 次，总计获取 {len(klines_data)} 条数据")
+        else:
+            # 单次请求模式（原有逻辑）
+            logging.info(f"正在查询 {symbol} 的期货合约K线数据，间隔: {interval}, 数量: {limit}, {time_info_str}")
+            response = client.rest_api.kline_candlestick_data(
+                symbol=symbol,
+                interval=interval_enum,
+                start_time=start_time_ms,
+                end_time=end_time_ms,
+                limit=limit
+            )
+            
+            # 获取数据
+            klines_data = response.data()
+            
+            if not klines_data:
+                logging.warning("未获取到数据")
+                return None
+            
+            logging.info(f"成功获取 {len(klines_data)} 条数据")
         
         # 创建输出目录
         if not os.path.exists(output_dir):
@@ -191,7 +305,9 @@ def get_and_save_futures_klines(
             if end_time_ms:
                 end_str = datetime.fromtimestamp(end_time_ms / 1000).strftime("%Y%m%d_%H%M%S")
                 time_range_str += f"_{end_str}"
-        base_filename = f"{symbol}_{interval}_{limit}{time_range_str}_{timestamp}"
+        # 如果进行了分页请求，在文件名中显示实际数据条数而不是 limit
+        data_count = len(klines_data)
+        base_filename = f"{symbol}_{interval}_{data_count}{time_range_str}_{timestamp}"
         
         # 保存为 CSV
         if save_csv:
@@ -251,7 +367,7 @@ def get_and_save_futures_klines(
             metadata = {
                 'symbol': symbol,
                 'interval': interval,
-                'limit': limit,
+                'request_limit': limit,  # 原始请求的 limit
                 'data_count': len(formatted_data),
                 'timestamp': timestamp,
             }
@@ -263,6 +379,11 @@ def get_and_save_futures_klines(
             if end_time_ms:
                 metadata['end_time'] = end_time_ms
                 metadata['end_time_str'] = datetime.fromtimestamp(end_time_ms / 1000).strftime('%Y-%m-%d %H:%M:%S')
+            
+            # 如果进行了分页请求，添加相关信息
+            if start_time_ms is not None and end_time_ms is not None:
+                metadata['pagination_used'] = True
+                metadata['note'] = '数据通过分页请求获取，每次请求最多1000条'
             
             metadata['data'] = formatted_data
             
@@ -283,26 +404,31 @@ def get_and_save_futures_klines(
 if __name__ == "__main__":
     # 示例用法
     
-    # 示例1: 查询最近的数据（不指定时间范围）
-    symbol = "TRUMPUSDT"
-    get_and_save_futures_klines(
-        symbol=symbol,
-        interval="1d",
-        limit=365*3,
-        output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_futures"
-    )
-    
-    # 示例2: 使用字符串格式指定时间范围
+    # 示例1: 查询最近的数据（不指定时间范围，单次请求）
+    symbol = "BTCUSDT"
     # get_and_save_futures_klines(
-    #     symbol="BTCUSDT",
-    #     interval="1d",
-    #     start_time="2023-01-01 00:00:00",
-    #     end_time="2023-12-31 23:59:59",
-    #     limit=1000,
-    #     output_dir="data"
+    #     symbol=symbol,
+    #     interval="3m",
+    #     limit=365*3,
+    #     output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_futures"
     # )
     
-    # 示例3: 使用 datetime 对象指定时间范围
+    # 示例2: 使用字符串格式指定时间范围（自动分页，获取所有数据）
+    # 当同时指定 start_time 和 end_time 时，会自动进行分页请求
+    # 每次请求最多1000条，直到获取完整个时间范围的数据
+    symbol_list = ["BTCUSDT", "ETHUSDT", "TRUMPUSDT", "币安人生USDT", "SOLUSDT", "PIPPINUSDT", "ZECUSDT", "XRPUSDT", "XRPUSDT", "DOGEUSDT", "GIGGLEUSDT", "TRADOORUSDT", "MONUSDT"]
+
+    for symbol in symbol_list:
+        get_and_save_futures_klines(
+            symbol=symbol,
+            interval="1d",
+            start_time="2024-01-01 00:00:00",
+            end_time="2025-11-30 23:59:59",
+            limit=1000,  # 每次请求的 limit，实际会分页获取所有数据
+            output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_futures"
+        )
+    
+    # 示例3: 使用 datetime 对象指定时间范围（自动分页）
     # from datetime import datetime
     # start = datetime(2023, 1, 1)
     # end = datetime(2023, 12, 31)
@@ -311,26 +437,36 @@ if __name__ == "__main__":
     #     interval="1h",
     #     start_time=start,
     #     end_time=end,
-    #     limit=1000,
+    #     limit=1000,  # 每次请求的 limit
     #     output_dir="data"
     # )
     
-    # 示例4: 使用时间戳（毫秒）
+    # 示例4: 使用时间戳（毫秒）指定时间范围（自动分页）
     # get_and_save_futures_klines(
     #     symbol="BTCUSDT",
     #     interval="1d",
     #     start_time=1672531200000,  # 2023-01-01 00:00:00 的毫秒时间戳
     #     end_time=1704067199000,    # 2023-12-31 23:59:59 的毫秒时间戳
-    #     limit=1000,
+    #     limit=1000,  # 每次请求的 limit
     #     output_dir="data"
     # )
     
-    # 示例5: 只指定开始时间
+    # 示例5: 只指定开始时间（单次请求，不会分页）
     # get_and_save_futures_klines(
     #     symbol="ETHUSDT",
     #     interval="1d",
     #     start_time="2023-01-01",
     #     limit=365,
+    #     output_dir="data"
+    # )
+    
+    # 示例6: 获取更长时间范围的数据（自动分页）
+    # get_and_save_futures_klines(
+    #     symbol="BTCUSDT",
+    #     interval="3m",
+    #     start_time="2022-01-01 00:00:00",
+    #     end_time="2024-12-31 23:59:59",
+    #     limit=1000,  # 会自动分页获取所有数据
     #     output_dir="data"
     # )
 

@@ -52,14 +52,14 @@ def example_1_use_factor():
     print("=" * 60)
     
     # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/TRUMPUSDT_futures/TRUMPUSDT_1d_1095_20251127_174403.json'
+    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
     
     framework = BacktestFramework(data_path=data_path)
     
     # 使用factor中的ma_factor进行测试
-    # 注意：需要创建一个包装函数，因为ma_factor需要period参数
-    def ma_factor_wrapper(data, index):
-        return ma_factor(data, index, period=5)
+    # 注意：ma_factor现在接收数据切片，不需要包装函数
+    def ma_factor_wrapper(data_slice):
+        return ma_factor(data_slice, period=3)
     
     factor_results = framework.test_factor(
         factor_func=ma_factor_wrapper,
@@ -84,16 +84,18 @@ def example_2_use_signal():
     print("=" * 60)
     
     # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/TRUMPUSDT_futures/TRUMPUSDT_1d_1095_20251127_174403.json'
+    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
     
     framework = BacktestFramework(data_path=data_path)
     
     # 使用signal中的ma_signal进行回测
     # 注意：需要创建一个包装函数，因为ma_signal需要period参数
-    def ma_signal_wrapper(data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
+    # 使用闭包来捕获period值
+    period = 3
+    def ma_signal_wrapper(data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
         return ma_signal(
-            data, index, position, entry_price, entry_index, 
-            take_profit, stop_loss, check_periods, period=5
+            data_slice, position, entry_price, entry_index, 
+            take_profit, stop_loss, period=period
         )
     
     backtest_results = framework.backtest_strategy(
@@ -102,10 +104,9 @@ def example_2_use_signal():
         position_size=0.2,
         initial_capital=10000.0,
         commission_rate=0.00001,
-        take_profit=0.1,
-        stop_loss=0.5,
-        check_periods=7,
-        strategy_name="MA5策略（来自signal模块）"
+        take_profit=0.03,
+        stop_loss=0.1,
+        strategy_name="MA3策略（来自signal模块）"
     )
     
     framework.print_backtest_results(backtest_results)
@@ -132,11 +133,11 @@ def example_3_factor_in_signal():
     
     # 使用factor_based_signal，它内部会使用factor中的因子
     # 创建一个包装函数，传入ma_factor作为因子函数
-    def factor_signal_wrapper(data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
+    def factor_signal_wrapper(data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
         # 使用factor中的ma_factor
-        factor_func = lambda d, i: ma_factor(d, i, period=5)
+        factor_func = lambda d: ma_factor(d, period=5)
         return factor_based_signal(
-            data, index, position, entry_price, entry_index,
+            data_slice, position, entry_price, entry_index,
             take_profit, stop_loss, check_periods,
             factor_func=factor_func
         )
@@ -176,16 +177,16 @@ def example_4_multi_factor():
     framework = BacktestFramework(data_path=data_path)
     
     # 使用multi_factor_signal，组合多个因子
-    def multi_factor_signal_wrapper(data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
+    def multi_factor_signal_wrapper(data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
         # 组合ma_factor和rsi_factor
         factor_funcs = [
-            lambda d, i: ma_factor(d, i, period=5),
-            lambda d, i: rsi_factor(d, i, period=14)
+            lambda d: ma_factor(d, period=5),
+            lambda d: rsi_factor(d, period=14)
         ]
         weights = [0.6, 0.4]  # MA因子权重0.6，RSI因子权重0.4
         
         return multi_factor_signal(
-            data, index, position, entry_price, entry_index,
+            data_slice, position, entry_price, entry_index,
             take_profit, stop_loss, check_periods,
             factor_funcs=factor_funcs,
             weights=weights
@@ -219,8 +220,8 @@ def main():
     # 取消注释想要运行的示例
     example_1_use_factor()
     example_2_use_signal()
-    example_3_factor_in_signal()
-    example_4_multi_factor()
+    # example_3_factor_in_signal()
+    # example_4_multi_factor()
     
     # print("\n提示：")
     # print("  - 取消注释example_usage.py中的示例函数来运行测试")

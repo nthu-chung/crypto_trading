@@ -131,7 +131,8 @@ class BacktestFramework:
         测试单因子胜率
         
         Args:
-            factor_func: 因子计算函数
+            factor_func: 因子计算函数，接受数据切片作为参数
+                        (data_slice: pd.DataFrame) -> float
             forward_periods: 向前看的周期数
             min_periods: 最小需要的周期数
             factor_name: 因子名称
@@ -163,7 +164,14 @@ class BacktestFramework:
         
         Args:
             signal_func: 信号生成函数，必须接受以下参数：
-                        (data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str
+                        (data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str
+                        - data_slice: 数据切片（包含历史数据和当前数据点）
+                        - position: 当前持仓数量
+                        - entry_price: 入场价格
+                        - entry_index: 入场索引
+                        - take_profit: 止盈比例
+                        - stop_loss: 止损比例
+                        - check_periods: 检查未来多少个周期
                         策略函数可以根据持仓信息自行决定是否止盈止损
             min_periods: 最小需要的周期数
             position_size: 每次交易的仓位大小
