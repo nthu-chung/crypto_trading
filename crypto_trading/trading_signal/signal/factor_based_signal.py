@@ -13,8 +13,7 @@ from ..factor.rsi_factor import rsi_factor
 
 
 def factor_based_signal(
-    data: 'pd.DataFrame', 
-    index: int, 
+    data_slice: 'pd.DataFrame', 
     position: float, 
     entry_price: float, 
     entry_index: int,
@@ -31,15 +30,16 @@ def factor_based_signal(
     当因子值从负转正时买入，从正转负时卖出
     
     Args:
-        data: 完整的DataFrame
-        index: 当前数据点的索引
+        data_slice: 数据切片，必须包含足够的历史数据用于计算因子
+                   以及未来check_periods个周期用于检查止盈止损
+                   最后一行是当前数据点，前面是历史数据，后面是未来数据（如果有）
         position: 当前持仓数量（如果没有持仓则为0）
         entry_price: 入场价格（如果没有持仓则为0）
-        entry_index: 入场索引（如果没有持仓则为-1）
+        entry_index: 入场索引（如果没有持仓则为-1，保留用于兼容性）
         take_profit: 止盈比例（例如：0.1 表示 10%）
         stop_loss: 止损比例（例如：0.1 表示 10%）
-        check_periods: 检查未来多少个周期
-        factor_func: 因子函数（如果为None，默认使用ma_factor）
+        check_periods: 检查未来多少个周期（用于止盈止损检查）
+        factor_func: 因子函数，接受数据切片作为参数（如果为None，默认使用ma_factor）
         factor_period: 因子计算周期（用于某些因子）
     
     Returns:
@@ -47,23 +47,31 @@ def factor_based_signal(
     """
     # 默认使用ma_factor
     if factor_func is None:
-        factor_func = lambda d, i: ma_factor(d, i, period=factor_period)
+        factor_func = lambda d: ma_factor(d, period=factor_period)
     
-    # 计算当前因子值
+    # 计算当前因子值（使用最后一行之前的数据）
+    # 需要至少factor_period+1行数据来计算当前因子
+    if len(data_slice) < factor_period + 1:
+        return 'hold'
+    
     try:
-        current_factor = factor_func(data, index)
+        # 当前数据切片：最后一行是当前数据点，前面是历史数据
+        current_slice = data_slice.iloc[-(factor_period+1):]
+        current_factor = factor_func(current_slice)
     except Exception:
         return 'hold'
     
     # 如果数据不足，返回hold
-    if current_factor == 0 and index > 0:
+    if current_factor == 0 and len(data_slice) > 1:
         return 'hold'
     
     # 计算上一周期的因子值
     prev_factor = 0.0
-    if index > 0:
+    if len(data_slice) > factor_period + 1:
         try:
-            prev_factor = factor_func(data, index - 1)
+            # 上一周期的数据切片：倒数第二行是上一周期的数据点
+            prev_slice = data_slice.iloc[-(factor_period+2):-1]
+            prev_factor = factor_func(prev_slice)
         except Exception:
             prev_factor = 0.0
     
@@ -74,9 +82,21 @@ def factor_based_signal(
         stop_loss_price = entry_price * (1 - stop_loss) if stop_loss is not None else None
         
         # 检查当前周期和未来 check_periods 个周期
-        for check_idx in range(index, min(index + check_periods, len(data))):
-            check_low = data.iloc[check_idx]['low_price']
-            check_high = data.iloc[check_idx]['high_price']
+        # 当前周期是最后一行，未来周期在data_slice中（如果有）
+        # 注意：如果check_periods > 1，data_slice应该包含未来数据
+        check_end = min(check_periods, len(data_slice))
+        for i in range(check_end):
+            # 从最后一行开始，向前检查（如果data_slice包含未来数据）
+            # 或者只检查当前周期（最后一行）
+            if i == 0:
+                # 当前周期（最后一行）
+                check_low = data_slice.iloc[-1]['low_price']
+                check_high = data_slice.iloc[-1]['high_price']
+            else:
+                # 未来周期（如果data_slice包含未来数据，应该从最后一行之后开始）
+                # 但根据设计，data_slice应该只包含历史+当前，不包含未来
+                # 所以这里只检查当前周期
+                continue
             
             # 优先检查止损
             if stop_loss_price is not None and check_low <= stop_loss_price:
@@ -103,8 +123,7 @@ def factor_based_signal(
 
 
 def multi_factor_signal(
-    data: 'pd.DataFrame', 
-    index: int, 
+    data_slice: 'pd.DataFrame', 
     position: float, 
     entry_price: float, 
     entry_index: int,
@@ -120,15 +139,17 @@ def multi_factor_signal(
     组合多个因子，加权求和后生成交易信号
     
     Args:
-        data: 完整的DataFrame
-        index: 当前数据点的索引
+        data_slice: 数据切片，必须包含足够的历史数据用于计算因子
+                   以及未来check_periods个周期用于检查止盈止损
+                   最后一行是当前数据点，前面是历史数据，后面是未来数据（如果有）
         position: 当前持仓数量（如果没有持仓则为0）
         entry_price: 入场价格（如果没有持仓则为0）
-        entry_index: 入场索引（如果没有持仓则为-1）
+        entry_index: 入场索引（如果没有持仓则为-1，保留用于兼容性）
         take_profit: 止盈比例（例如：0.1 表示 10%）
         stop_loss: 止损比例（例如：0.1 表示 10%）
-        check_periods: 检查未来多少个周期
-        factor_funcs: 因子函数列表（如果为None，默认使用[ma_factor, rsi_factor]）
+        check_periods: 检查未来多少个周期（用于止盈止损检查）
+        factor_funcs: 因子函数列表，每个函数接受数据切片作为参数
+                     （如果为None，默认使用[ma_factor, rsi_factor]）
         weights: 因子权重列表（如果为None，默认等权重）
     
     Returns:
@@ -137,8 +158,8 @@ def multi_factor_signal(
     # 默认使用ma_factor和rsi_factor
     if factor_funcs is None:
         factor_funcs = [
-            lambda d, i: ma_factor(d, i, period=5),
-            lambda d, i: rsi_factor(d, i, period=14)
+            lambda d: ma_factor(d, period=5),
+            lambda d: rsi_factor(d, period=14)
         ]
     
     # 默认等权重
@@ -149,22 +170,32 @@ def multi_factor_signal(
     if len(weights) != len(factor_funcs):
         weights = [1.0 / len(factor_funcs)] * len(factor_funcs)
     
+    # 需要至少max_period+1行数据来计算因子
+    # 假设最长的因子周期是20（ma_cross_factor的long_period）
+    max_period = 20
+    if len(data_slice) < max_period + 1:
+        return 'hold'
+    
     # 计算加权因子值
     try:
+        # 当前数据切片：最后一行是当前数据点，前面是历史数据
+        current_slice = data_slice.iloc[-(max_period+1):]
         combined_factor = 0.0
         for factor_func, weight in zip(factor_funcs, weights):
-            factor_value = factor_func(data, index)
-            if factor_value is not None and not (isinstance(factor_value, float) and factor_value == 0 and index == 0):
+            factor_value = factor_func(current_slice)
+            if factor_value is not None and not (isinstance(factor_value, float) and factor_value == 0 and len(data_slice) == 1):
                 combined_factor += factor_value * weight
     except Exception:
         return 'hold'
     
     # 计算上一周期的组合因子值
     prev_combined_factor = 0.0
-    if index > 0:
+    if len(data_slice) > max_period + 1:
         try:
+            # 上一周期的数据切片：倒数第二行是上一周期的数据点
+            prev_slice = data_slice.iloc[-(max_period+2):-1]
             for factor_func, weight in zip(factor_funcs, weights):
-                factor_value = factor_func(data, index - 1)
+                factor_value = factor_func(prev_slice)
                 if factor_value is not None:
                     prev_combined_factor += factor_value * weight
         except Exception:
@@ -176,18 +207,17 @@ def multi_factor_signal(
         take_profit_price = entry_price * (1 + take_profit) if take_profit is not None else None
         stop_loss_price = entry_price * (1 - stop_loss) if stop_loss is not None else None
         
-        # 检查当前周期和未来 check_periods 个周期
-        for check_idx in range(index, min(index + check_periods, len(data))):
-            check_low = data.iloc[check_idx]['low_price']
-            check_high = data.iloc[check_idx]['high_price']
-            
-            # 优先检查止损
-            if stop_loss_price is not None and check_low <= stop_loss_price:
-                return 'sell'  # 触发止损
-            
-            # 检查止盈
-            if take_profit_price is not None and check_high >= take_profit_price:
-                return 'sell'  # 触发止盈
+        # 检查当前周期（最后一行）
+        check_low = data_slice.iloc[-1]['low_price']
+        check_high = data_slice.iloc[-1]['high_price']
+        
+        # 优先检查止损
+        if stop_loss_price is not None and check_low <= stop_loss_price:
+            return 'sell'  # 触发止损
+        
+        # 检查止盈
+        if take_profit_price is not None and check_high >= take_profit_price:
+            return 'sell'  # 触发止盈
         
         # 如果没有触发止盈止损，检查策略信号
         # 组合因子从正转负：卖出

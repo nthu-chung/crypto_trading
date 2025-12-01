@@ -77,9 +77,8 @@ class StrategyBacktester:
         
         Args:
             signal_func: 信号生成函数，必须接受以下参数：
-                        (data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str
-                        - data: 完整的DataFrame
-                        - index: 当前数据点的索引
+                        (data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str
+                        - data_slice: 数据切片（包含历史数据和当前数据点）
                         - position: 当前持仓数量（如果没有持仓则为0）
                         - entry_price: 入场价格（如果没有持仓则为0）
                         - entry_index: 入场索引（如果没有持仓则为-1）
@@ -124,9 +123,15 @@ class StrategyBacktester:
                 current_price = self.data.iloc[i]['close_price']
                 current_time = self.data.iloc[i]['datetime']
                 
-                # 生成信号：调用策略函数，传入所有持仓信息
+                # 生成信号：调用策略函数，传入数据切片而不是整个data和index
+                # 需要确定信号函数需要多少历史数据
+                # 为了兼容性，传递足够的数据切片（假设最多需要50个周期）
+                max_period = 50
+                start_idx = max(0, i - max_period)
+                data_slice = self.data.iloc[start_idx:i+1].copy()
+                
                 signal = signal_func(
-                    self.data, i, position, entry_price, entry_index,
+                    data_slice, position, entry_price, entry_index,
                     take_profit, stop_loss, check_periods
                 )
                 

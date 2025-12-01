@@ -8,15 +8,15 @@ import pandas as pd
 import numpy as np
 
 
-def rsi_factor(data: 'pd.DataFrame', index: int, period: int = 14, oversold: float = 30.0, overbought: float = 70.0) -> float:
+def rsi_factor(data_slice: 'pd.DataFrame', period: int = 14, oversold: float = 30.0, overbought: float = 70.0) -> float:
     """
     RSI因子
     
     当RSI低于oversold时看多，高于overbought时看空
     
     Args:
-        data: 完整的DataFrame
-        index: 当前数据点的索引
+        data_slice: 数据切片，必须包含至少 period+1 行数据
+                   最后一行是当前数据点，前面 period 行是历史数据
         period: RSI计算周期（默认14）
         oversold: 超卖阈值（默认30）
         overbought: 超买阈值（默认70）
@@ -24,11 +24,11 @@ def rsi_factor(data: 'pd.DataFrame', index: int, period: int = 14, oversold: flo
     Returns:
         因子值：1.0（看多）、-1.0（看空）或 0（数据不足或中性）
     """
-    if index < period:
+    if len(data_slice) < period + 1:
         return 0.0
     
-    # 计算价格变化
-    prices = data.iloc[index-period:index+1]['close_price'].values
+    # 计算价格变化（使用最后period+1行数据）
+    prices = data_slice.iloc[-period-1:]['close_price'].values
     deltas = np.diff(prices)
     
     # 分离上涨和下跌

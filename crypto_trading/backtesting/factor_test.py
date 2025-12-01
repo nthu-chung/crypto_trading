@@ -49,7 +49,7 @@ class FactorTester:
     
     def test_factor(
         self,
-        factor_func: Callable[[pd.DataFrame, int], float],
+        factor_func: Callable[[pd.DataFrame], float],
         forward_periods: int = 7,
         min_periods: int = 0,
         factor_name: str = "factor"
@@ -58,9 +58,8 @@ class FactorTester:
         测试单因子的胜率
         
         Args:
-            factor_func: 因子计算函数，接受 (data, index) 作为参数，返回因子值
-                        - data: 完整的DataFrame
-                        - index: 当前数据点的索引
+            factor_func: 因子计算函数，接受数据切片作为参数，返回因子值
+                        - data_slice: 数据切片（包含历史数据和当前数据点）
                         - 返回: 因子值（正数表示看多，负数表示看空，0表示中性）
             forward_periods: 向前看的周期数（例如：7表示未来7个周期）
             min_periods: 最小需要的周期数（用于计算因子时）
@@ -102,8 +101,13 @@ class FactorTester:
         # 遍历每个时间点（确保有足够的数据向前看）
         for i in range(min_periods, len(self.data) - forward_periods):
             try:
-                # 计算因子值
-                factor_value = factor_func(self.data, i)
+                # 计算因子值：传递数据切片而不是整个data和index
+                # 需要确定因子函数需要多少历史数据
+                # 为了兼容性，传递足够的数据切片（假设最多需要50个周期）
+                max_period = 50
+                start_idx = max(0, i - max_period)
+                data_slice = self.data.iloc[start_idx:i+1].copy()
+                factor_value = factor_func(data_slice)
                 
                 if factor_value is None or np.isnan(factor_value):
                     continue
