@@ -71,6 +71,8 @@ signal_func(
 ) -> str
 ```
 
+- **参数说明**：
+  - `check_periods`: 检查未来多少个周期（**只能为1**，因为实际使用时无法看到今天之后的数据）
 - **返回值**：
   - `'buy'`: 买入信号
   - `'sell'`: 卖出信号
@@ -181,7 +183,7 @@ backtest_results = framework.backtest_strategy(
     commission_rate=0.00001,
     take_profit=0.1,
     stop_loss=0.5,
-    check_periods=7,
+    check_periods=1,  # 只能为1，因为实际使用时无法看到未来数据
     strategy_name="MA5策略"
 )
 
@@ -218,7 +220,7 @@ backtest_results = framework.backtest_strategy(
     commission_rate=0.00001,
     take_profit=0.1,
     stop_loss=0.5,
-    check_periods=7,
+    check_periods=1,  # 只能为1，因为实际使用时无法看到未来数据
     strategy_name="基于MA因子的策略"
 )
 

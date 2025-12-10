@@ -84,14 +84,15 @@ class StrategyBacktester:
                         - entry_index: 入场索引（如果没有持仓则为-1）
                         - take_profit: 止盈比例（例如：0.1 表示 10%）
                         - stop_loss: 止损比例（例如：0.1 表示 10%）
-                        - check_periods: 检查未来多少个周期
+                        - check_periods: 检查未来多少个周期（只能为1，因为实际使用时无法看到未来数据）
                         - 返回: 'buy'（买入）, 'sell'（卖出）, 'hold'（持有）或 None
                         策略函数可以根据持仓信息自行决定是否止盈止损
             min_periods: 最小需要的周期数（用于计算信号时）
             position_size: 每次交易的仓位大小（相对于可用资金的比例，0-1之间）
             take_profit: 止盈比例（传递给策略函数，由策略决定是否使用）
             stop_loss: 止损比例（传递给策略函数，由策略决定是否使用）
-            check_periods: 检查未来多少个周期（传递给策略函数，由策略决定是否使用）
+            check_periods: 检查未来多少个周期（只能为1，默认1，即只检查当前周期）
+                          注意：回测时只能为1，因为实际交易中无法看到今天之后的数据
         
         Returns:
             包含回测结果的字典：
@@ -362,6 +363,24 @@ class StrategyBacktester:
                 save_image = f"{base_path}.png"
             if save_json is None:
                 save_json = f"{base_path}.json"
+        elif save_dir:
+            # 如果提供了save_dir但没有strategy_name或data_name，使用默认文件名
+            # 确保目录存在
+            os.makedirs(save_dir, exist_ok=True)
+            
+            # 使用默认文件名
+            default_name = "backtest_result"
+            if strategy_name:
+                default_name = strategy_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+            elif data_name:
+                default_name = data_name.replace(' ', '_').replace('/', '_').replace('\\', '_')
+            
+            base_path = os.path.join(save_dir, default_name)
+            
+            if save_image is None:
+                save_image = f"{base_path}.png"
+            if save_json is None:
+                save_json = f"{base_path}.json"
         
         # Set default font (no need for Chinese fonts)
         plt.rcParams['axes.unicode_minus'] = False
@@ -420,7 +439,7 @@ class StrategyBacktester:
             plt.savefig(save_image, dpi=300, bbox_inches='tight')
             print(f"图片已保存到: {save_image}")
         
-        # plt.show()
+        plt.show()
         
         # 保存JSON结果
         if save_json:

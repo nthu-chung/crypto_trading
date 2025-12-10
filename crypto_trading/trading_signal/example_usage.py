@@ -33,6 +33,7 @@ try:
         factor_based_signal,
         multi_factor_signal
     )
+    from crypto_trading.trading_signal.selected_alpha import alpha1_factor
 except ImportError as e:
     print(f"导入错误: {e}")
     print("\n提示：请使用以下方式运行：")
@@ -43,16 +44,13 @@ except ImportError as e:
     sys.exit(1)
 
 
-def example_1_use_factor():
+def example_1_use_factor(data_path):
     """
     示例1: 使用factor中的因子进行因子测试
     """
     print("=" * 60)
     print("示例1: 使用factor中的因子进行因子测试")
     print("=" * 60)
-    
-    # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
     
     framework = BacktestFramework(data_path=data_path)
     
@@ -75,17 +73,14 @@ def example_1_use_factor():
     )
 
 
-def example_2_use_signal():
+def example_2_use_signal(data_path):
     """
     示例2: 使用signal中的信号策略进行回测
     """
     print("\n" + "=" * 60)
     print("示例2: 使用signal中的信号策略进行回测")
     print("=" * 60)
-    
-    # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
-    
+
     framework = BacktestFramework(data_path=data_path)
     
     # 使用signal中的ma_signal进行回测
@@ -118,17 +113,14 @@ def example_2_use_signal():
     )
 
 
-def example_3_factor_in_signal():
+def example_3_factor_in_signal(data_path):
     """
     示例3: 在signal中使用factor中的因子
     """
     print("\n" + "=" * 60)
     print("示例3: 在signal中使用factor中的因子")
     print("=" * 60)
-    
-    # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/TRUMPUSDT_futures/TRUMPUSDT_1d_1095_20251127_174403.json'
-    
+
     framework = BacktestFramework(data_path=data_path)
     
     # 使用factor_based_signal，它内部会使用factor中的因子
@@ -144,13 +136,13 @@ def example_3_factor_in_signal():
     
     backtest_results = framework.backtest_strategy(
         signal_func=factor_signal_wrapper,
-        min_periods=10,
+        min_periods=35,  # 至少需要35个周期，确保factor_based_signal有足够的数据（30+2+缓冲）
         position_size=0.2,
         initial_capital=10000.0,
         commission_rate=0.00001,
         take_profit=0.1,
         stop_loss=0.5,
-        check_periods=7,
+        check_periods=1,  # 只能为1，因为实际使用时无法看到未来数据
         strategy_name="基于MA因子的策略"
     )
     
@@ -163,16 +155,13 @@ def example_3_factor_in_signal():
     )
 
 
-def example_4_multi_factor():
+def example_4_multi_factor(data_path):
     """
     示例4: 使用多因子组合策略
     """
     print("\n" + "=" * 60)
     print("示例4: 使用多因子组合策略")
     print("=" * 60)
-    
-    # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/TRUMPUSDT_futures/TRUMPUSDT_1d_1095_20251127_174403.json'
     
     framework = BacktestFramework(data_path=data_path)
     
@@ -200,7 +189,7 @@ def example_4_multi_factor():
         commission_rate=0.00001,
         take_profit=0.1,
         stop_loss=0.5,
-        check_periods=7,
+        check_periods=1,  # 只能为1，因为实际使用时无法看到未来数据
         strategy_name="多因子组合策略（MA+RSI）"
     )
     
@@ -213,15 +202,121 @@ def example_4_multi_factor():
     )
 
 
+def example_5_alpha1_factor(data_path):
+    """
+    示例5: 使用Alpha#1因子进行因子测试
+    """
+    print("\n" + "=" * 60)
+    print("示例5: 使用Alpha#1因子进行因子测试")
+    print("=" * 60)
+    print("\n因子说明：")
+    print("  - 公式: rank(Ts_ArgMax(SignedPower(((returns<0)?stddev(returns,20):close),2.),5))-0.5)")
+    print("  - 策略逻辑：对过去5天按照收盘价最高或下行波动率最高进行排名")
+    print("  - 下行波动率最高的一天离计算时间越近，越可以投资")
+    print("  - 收盘价最高离计算时间越近，越可以投资")
+    print("  - 标签：mean-reversion+momentum")
+    print()
+    
+    framework = BacktestFramework(data_path=data_path)
+    
+    # 使用Alpha#1因子进行测试
+    def alpha1_wrapper(data_slice):
+        """
+        Alpha#1 因子包装函数
+        
+        使用默认参数：lookback_days=5, stddev_period=20, power=2.0
+        """
+        return alpha1_factor(
+            data_slice,
+            lookback_days=5,
+            stddev_period=20,
+            power=2.0
+        )
+    
+    # 测试因子
+    print("开始测试 Alpha#1 因子...")
+    print(f"  回看天数: 5")
+    print(f"  标准差周期: 20")
+    print(f"  幂次: 2.0")
+    print(f"  向前看周期: 7")
+    print()
+    
+    factor_results = framework.test_factor(
+        factor_func=alpha1_wrapper,
+        forward_periods=7,  # 未来7个周期
+        min_periods=30,  # 至少需要30个周期（5+20+一些缓冲）
+        factor_name="Alpha#1因子"
+    )
+    
+    # 打印结果并保存
+    save_dir = '/Users/user/Desktop/repo/crypto_trading/result'
+    framework.print_factor_results(
+        factor_results,
+        save_dir=save_dir
+    )
+
+
+def example_6_alpha1_signal(data_path):
+    """
+    示例6: 使用基于Alpha#1因子的信号策略进行回测
+    """
+    print("\n" + "=" * 60)
+    print("示例6: 使用基于Alpha#1因子的信号策略进行回测")
+    print("=" * 60)
+
+    framework = BacktestFramework(data_path=data_path)
+    
+    # 创建使用 Alpha#1 因子的信号策略
+    def alpha1_signal_wrapper(data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
+        """
+        使用 Alpha#1 因子的信号策略
+        """
+        # 使用 Alpha#1 因子
+        factor_func = lambda d: alpha1_factor(d, lookback_days=5, stddev_period=20, power=2.0)
+        return factor_based_signal(
+            data_slice, position, entry_price, entry_index,
+            take_profit, stop_loss, check_periods,
+            factor_func=factor_func
+        )
+    
+    # 回测策略
+    print("开始回测基于 Alpha#1 因子的策略...")
+    backtest_results = framework.backtest_strategy(
+        signal_func=alpha1_signal_wrapper,
+        min_periods=30,  # 至少需要30个周期
+        position_size=0.2,  # 每次使用20%的资金
+        initial_capital=10000.0,
+        commission_rate=0.00001,  # 0.001%手续费
+        take_profit=0.1,  # 止盈10%
+        stop_loss=0.5,  # 止损50%
+        check_periods=1,  # 只能为1，因为实际使用时无法看到未来数据
+        strategy_name="基于Alpha#1因子的策略"
+    )
+    
+    # 打印结果
+    framework.print_backtest_results(backtest_results)
+    
+    # 绘制结果并保存
+    save_dir = '/Users/user/Desktop/repo/crypto_trading/result'
+    framework.plot_backtest_results(
+        backtest_results,
+        save_dir=save_dir
+    )
+
+
 def main():
     """
     主函数：运行所有示例
     """
     # 取消注释想要运行的示例
-    example_1_use_factor()
-    example_2_use_signal()
-    # example_3_factor_in_signal()
+    data_path = "/Users/user/Desktop/repo/crypto_trading/tmp/data/ZECUSDT_futures/ZECUSDT_1d_699_20240101_000000_20251130_235959_20251201_104825.json"
+    # example_1_use_factor()
+    example_2_use_signal(data_path)
     # example_4_multi_factor()
+    example_3_factor_in_signal(data_path)
+    # example_5_alpha1_factor()  # Alpha#1因子测试
+    example_6_alpha1_signal(data_path)  # 基于Alpha#1因子的策略回测
+    
     
     # print("\n提示：")
     # print("  - 取消注释example_usage.py中的示例函数来运行测试")

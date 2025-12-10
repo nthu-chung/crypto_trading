@@ -1331,7 +1331,7 @@ if __name__ == "__main__":
     # test_futures_buy_limit("BTCUSDT", 0.001, 50000.0)
     
     # 测试合约限价卖出
-    # test_futures_sell_limit("BTCUSDT", 0.001, 50000.0)
+    test_futures_sell_limit("BNBUSDT", 0.01, 1000.0)
     
     # 撤单功能示例
     # 查看当前挂单
@@ -1343,10 +1343,10 @@ if __name__ == "__main__":
     # print(f"订单ID列表: {order_ids}")
     
     # 或者显示并获取订单ID
-    order_ids = show_futures_open_orders("BNBUSDT")
-    if order_ids:
-        print(f"\n获取到的订单ID: {order_ids}")
-        cancel_futures_order("BNBUSDT", order_id=order_ids[0])
+    # order_ids = show_futures_open_orders("BNBUSDT")
+    # if order_ids:
+    #     print(f"\n获取到的订单ID: {order_ids}")
+    #     cancel_futures_order("BNBUSDT", order_id=order_ids[0])
 
     # 撤销现货订单（通过订单ID）
     # cancel_spot_order("BNBUSDT", order_id=order_ids[0])
