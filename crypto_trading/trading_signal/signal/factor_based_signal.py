@@ -48,29 +48,37 @@ def factor_based_signal(
     # 默认使用ma_factor
     if factor_func is None:
         factor_func = lambda d: ma_factor(d, period=factor_period)
+        # 当使用默认factor_func时，使用factor_period
+        min_required = factor_period
+    else:
+        # 当传入自定义factor_func时，使用保守估计值（30）
+        # 这样可以确保有足够的数据用于大多数因子计算（如MA5需要6行，RSI14需要15行，alpha1需要25+行）
+        min_required = 30
     
-    # 计算当前因子值（使用最后一行之前的数据）
-    # 需要至少factor_period+1行数据来计算当前因子
-    if len(data_slice) < factor_period + 1:
+    # 需要至少min_required+1行数据来计算当前因子，以及额外一行来计算上一周期的因子
+    if len(data_slice) < min_required + 2:
         return 'hold'
     
     try:
         # 当前数据切片：最后一行是当前数据点，前面是历史数据
-        current_slice = data_slice.iloc[-(factor_period+1):]
+        # 使用足够的数据切片（min_required+1行）以确保因子函数有足够的数据
+        current_slice = data_slice.iloc[-(min_required+1):]
         current_factor = factor_func(current_slice)
+        
+        # 如果因子返回0且数据足够，可能是数据不足导致的
+        if current_factor == 0 and len(data_slice) > min_required + 1:
+            # 不直接返回hold，继续尝试计算上一周期的因子
+            pass
     except Exception:
-        return 'hold'
-    
-    # 如果数据不足，返回hold
-    if current_factor == 0 and len(data_slice) > 1:
         return 'hold'
     
     # 计算上一周期的因子值
     prev_factor = 0.0
-    if len(data_slice) > factor_period + 1:
+    if len(data_slice) > min_required + 2:
         try:
             # 上一周期的数据切片：倒数第二行是上一周期的数据点
-            prev_slice = data_slice.iloc[-(factor_period+2):-1]
+            # 使用足够的数据切片（min_required+1行）
+            prev_slice = data_slice.iloc[-(min_required+2):-1]
             prev_factor = factor_func(prev_slice)
         except Exception:
             prev_factor = 0.0

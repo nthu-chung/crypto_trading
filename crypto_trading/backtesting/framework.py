@@ -171,7 +171,7 @@ class BacktestFramework:
                         - entry_index: 入场索引
                         - take_profit: 止盈比例
                         - stop_loss: 止损比例
-                        - check_periods: 检查未来多少个周期
+                        - check_periods: 检查未来多少个周期（只能为1，因为实际使用时无法看到未来数据）
                         策略函数可以根据持仓信息自行决定是否止盈止损
             min_periods: 最小需要的周期数
             position_size: 每次交易的仓位大小
@@ -179,13 +179,23 @@ class BacktestFramework:
             commission_rate: 手续费率
             take_profit: 止盈比例（例如：0.1 表示 10%），传递给策略函数，由策略决定是否使用
             stop_loss: 止损比例（例如：0.1 表示 10%），传递给策略函数，由策略决定是否使用
-            check_periods: 检查未来多少个周期（默认1，即只检查当前周期），传递给策略函数
-                          例如：check_periods=3 表示检查当前周期和未来2个周期
+            check_periods: 检查未来多少个周期（只能为1，默认1，即只检查当前周期）
+                          注意：回测时只能为1，因为实际交易中无法看到今天之后的数据
             strategy_name: 策略名称（用于保存结果时的文件命名）
         
         Returns:
             回测结果字典（包含 strategy_name 字段）
+        
+        Raises:
+            ValueError: 如果 check_periods 不等于 1
         """
+        # 验证 check_periods 只能为 1
+        if check_periods != 1:
+            raise ValueError(
+                f"回测策略时 check_periods 只能为 1，因为实际使用时无法看到今天之后的数据。"
+                f"当前值: {check_periods}"
+            )
+        
         # 更新初始资金和手续费率
         self.strategy_backtester.initial_capital = initial_capital
         self.strategy_backtester.commission_rate = commission_rate
@@ -230,6 +240,14 @@ class BacktestFramework:
         # 获取数据名称
         if data_name is None:
             data_name = self._extract_data_name()
+        
+        # 如果提供了save_dir但没有strategy_name或data_name，打印警告
+        if save_dir and (not strategy_name or not data_name):
+            if not strategy_name:
+                print(f"警告: 无法获取策略名称，将使用默认名称保存图片")
+            if not data_name:
+                print(f"警告: 无法从数据路径中提取数据名称，将使用默认名称保存图片")
+                print(f"  数据路径: {self.data_path}")
         
         # 获取源数据的时间范围
         source_start_str, source_end_str = self._get_source_time_range()
