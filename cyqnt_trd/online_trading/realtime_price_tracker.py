@@ -7,11 +7,11 @@
 使用方法：
     # 方式1: 作为模块运行（推荐）
     cd /Users/user/Desktop/repo/crypto_trading
-    python -m crypto_trading.test_script.realtime_price_tracker
+    python -m cyqnt_trd.online_trading.realtime_price_tracker
     
     # 方式2: 直接运行脚本
     cd /Users/user/Desktop/repo/crypto_trading
-    python crypto_trading/test_script/realtime_price_tracker.py
+    python cyqnt_trd/online_trading/realtime_price_tracker.py
 """
 
 import os
@@ -103,8 +103,8 @@ class RealtimePriceTracker:
         # 初始化 REST API 客户端（用于获取历史数据）
         if market_type == "futures":
             self.rest_config = ConfigurationRestAPI(
-                api_key=os.getenv("API_KEY", ""),
-                api_secret=os.getenv("API_SECRET", ""),
+                api_key=os.getenv("API_KEY", "KB6hxLqPAvkV8DBJq6xY1tnyXR7bLxPbCQMX6zjUMwQbrujdfKlShgJ9uGQqPsrn"),
+                api_secret=os.getenv("API_SECRET", "Gv7l5ht1nyfl3Npw4q4zaT4FWPGCAOiSw8EldeSTXdQUQrsxLlE22Yi5ttoj9eaD"),
                 base_path=os.getenv(
                     "BASE_PATH", DERIVATIVES_TRADING_USDS_FUTURES_REST_API_PROD_URL
                 ),
@@ -512,23 +512,32 @@ async def example_usage():
     import sys
     import os
     
-    # 添加项目路径以导入信号模块
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(os.path.dirname(current_dir))
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-    
-    # 导入信号函数
+    # 导入信号函数（优先尝试直接导入，适用于已安装的package）
     try:
-        from crypto_trading.trading_signal.signal.ma_signal import ma_signal, ma_cross_signal
-        from crypto_trading.trading_signal.signal.factor_based_signal import factor_based_signal
-        from crypto_trading.trading_signal.factor.ma_factor import ma_factor
-        from crypto_trading.trading_signal.factor.rsi_factor import rsi_factor
-        from crypto_trading.trading_signal.selected_alpha.alpha1 import alpha1_factor
-    except ImportError as e:
-        logging.error(f"导入信号模块失败: {e}")
-        logging.error("请确保项目路径正确")
-        return
+        from cyqnt_trd.trading_signal.signal.ma_signal import ma_signal, ma_cross_signal
+        from cyqnt_trd.trading_signal.signal.factor_based_signal import factor_based_signal
+        from cyqnt_trd.trading_signal.factor.ma_factor import ma_factor
+        from cyqnt_trd.trading_signal.factor.rsi_factor import rsi_factor
+        from cyqnt_trd.trading_signal.selected_alpha.alpha1 import alpha1_factor
+    except ImportError:
+        # 如果直接导入失败，尝试添加项目路径（用于开发模式）
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(os.path.dirname(current_dir))
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+        
+        # 再次尝试导入
+        try:
+            from cyqnt_trd.trading_signal.signal.ma_signal import ma_signal, ma_cross_signal
+            from cyqnt_trd.trading_signal.signal.factor_based_signal import factor_based_signal
+            from cyqnt_trd.trading_signal.factor.ma_factor import ma_factor
+            from cyqnt_trd.trading_signal.factor.rsi_factor import rsi_factor
+            from cyqnt_trd.trading_signal.selected_alpha.alpha1 import alpha1_factor
+        except ImportError as e:
+            logging.error(f"导入信号模块失败: {e}")
+            logging.error("请确保已安装 package 或项目路径正确")
+            logging.error("安装方式: pip install -e .")
+            return
     
     # 创建跟踪器
     # 如果遇到 SSL 证书验证错误，可以设置 ssl_verify=False（仅用于开发/测试）
@@ -554,32 +563,39 @@ async def example_usage():
     loss_trades = 0  # 亏损交易次数
     total_profit = 0.0  # 累计盈亏（金额）
     start_time = datetime.now()  # 程序开始时间
+    report_history = []  # 报告历史记录
     
-    # 信号计算函数
-    def calculate_and_display_signals(kline_dict, data_df):
-        """计算并显示所有信号"""
-        nonlocal position, entry_price, entry_index
-        nonlocal initial_capital, current_capital, completed_trades
-        nonlocal total_trades, win_trades, loss_trades, total_profit, start_time
+    def generate_trading_report(
+        current_price: float,
+        current_time: str,
+        position: float,
+        entry_price: float,
+        initial_capital: float,
+        current_capital: float,
+        completed_trades: list,
+        total_trades: int,
+        win_trades: int,
+        loss_trades: int,
+        total_profit: float,
+        start_time: datetime
+    ) -> Dict[str, Any]:
+        """
+        生成交易报告
         
-        if len(data_df) < 10:  # 确保有足够的数据
-            print(f"\n[{kline_dict['open_time_str']}] 数据不足，等待更多数据...")
-            return
-        
-        current_price = kline_dict['close_price']
-        current_time = kline_dict['open_time_str']
-        
-        # 使用足够的数据切片（最后30行，确保有足够的历史数据）
-        data_slice = data_df.iloc[-30:].copy() if len(data_df) >= 30 else data_df.copy()
-        
-        # 计算当前总资产（包括持仓价值）
+        Returns:
+            包含交易、持仓和盈亏信息的报告字典
+        """
+        # 计算持仓信息
         if position > 0:
             position_value = position * current_price
-            total_assets = current_capital + position_value
+            floating_profit = position_value - (position * entry_price)
             floating_profit_pct = (current_price - entry_price) / entry_price * 100
+            total_assets = current_capital + position_value
         else:
-            total_assets = current_capital
+            position_value = 0.0
+            floating_profit = 0.0
             floating_profit_pct = 0.0
+            total_assets = current_capital
         
         # 计算整体收益率
         total_return_pct = (total_assets - initial_capital) / initial_capital * 100
@@ -591,26 +607,146 @@ async def example_usage():
         # 计算胜率
         win_rate = (win_trades / total_trades * 100) if total_trades > 0 else 0.0
         
+        # 计算平均盈亏
+        avg_profit_per_trade = (total_profit / total_trades) if total_trades > 0 else 0.0
+        
+        # 最近5笔交易
+        recent_trades = completed_trades[-5:] if len(completed_trades) > 0 else []
+        
+        # 构建报告
+        report = {
+            "timestamp": current_time,
+            "price": current_price,
+            "position": {
+                "has_position": position > 0,
+                "quantity": position,
+                "entry_price": entry_price if position > 0 else None,
+                "current_price": current_price,
+                "position_value": position_value,
+                "floating_profit": floating_profit,
+                "floating_profit_pct": floating_profit_pct
+            },
+            "account": {
+                "initial_capital": initial_capital,
+                "current_capital": current_capital,
+                "position_value": position_value,
+                "total_assets": total_assets,
+                "total_profit": total_profit,
+                "total_return_pct": total_return_pct
+            },
+            "statistics": {
+                "total_trades": total_trades,
+                "win_trades": win_trades,
+                "loss_trades": loss_trades,
+                "win_rate": win_rate,
+                "avg_profit_per_trade": avg_profit_per_trade,
+                "runtime": runtime_str,
+                "start_time": start_time.strftime('%Y-%m-%d %H:%M:%S')
+            },
+            "recent_trades": recent_trades
+        }
+        
+        return report
+    
+    def print_trading_report(report: Dict[str, Any]):
+        """
+        打印交易报告
+        
+        Args:
+            report: 由 generate_trading_report 生成的报告字典
+        """
         print(f"\n{'='*80}")
-        print(f"📊 新 K 线数据")
+        print(f"📊 交易报告 - {report['timestamp']}")
         print(f"{'='*80}")
-        print(f"时间: {current_time}")
-        print(f"价格: {current_price:.2f}")
-        if position > 0:
-            print(f"持仓: {position:.4f} | 入场价: {entry_price:.2f} | 浮动盈亏: {floating_profit_pct:+.2f}%")
+        print(f"💰 当前价格: {report['price']:.2f}")
+        print(f"{'='*80}")
+        
+        # 持仓信息
+        print(f"📈 持仓信息:")
+        pos = report['position']
+        if pos['has_position']:
+            print(f"  持仓数量: {pos['quantity']:.4f}")
+            print(f"  入场价格: {pos['entry_price']:.2f}")
+            print(f"  当前价格: {pos['current_price']:.2f}")
+            print(f"  持仓价值: {pos['position_value']:.2f}")
+            print(f"  浮动盈亏: {pos['floating_profit']:+.2f} ({pos['floating_profit_pct']:+.2f}%)")
         else:
-            print(f"持仓: 无")
+            print(f"  当前无持仓")
         print(f"{'='*80}")
-        print(f"💰 账户统计:")
-        print(f"  初始资金: {initial_capital:.2f}")
-        print(f"  当前资金: {current_capital:.2f}")
-        if position > 0:
-            print(f"  持仓价值: {position_value:.2f}")
-        print(f"  总资产: {total_assets:.2f}")
-        print(f"  累计盈亏: {total_profit:+.2f} ({total_return_pct:+.2f}%)")
-        print(f"  运行时间: {runtime_str}")
-        print(f"  总交易次数: {total_trades} | 盈利: {win_trades} | 亏损: {loss_trades} | 胜率: {win_rate:.2f}%")
+        
+        # 账户信息
+        print(f"💵 账户信息:")
+        acc = report['account']
+        print(f"  初始资金: {acc['initial_capital']:.2f}")
+        print(f"  当前资金: {acc['current_capital']:.2f}")
+        if pos['has_position']:
+            print(f"  持仓价值: {acc['position_value']:.2f}")
+        print(f"  总资产: {acc['total_assets']:.2f}")
+        print(f"  累计盈亏: {acc['total_profit']:+.2f} ({acc['total_return_pct']:+.2f}%)")
         print(f"{'='*80}")
+        
+        # 交易统计
+        print(f"📊 交易统计:")
+        stats = report['statistics']
+        print(f"  总交易次数: {stats['total_trades']}")
+        print(f"  盈利次数: {stats['win_trades']}")
+        print(f"  亏损次数: {stats['loss_trades']}")
+        print(f"  胜率: {stats['win_rate']:.2f}%")
+        print(f"  平均每笔盈亏: {stats['avg_profit_per_trade']:+.2f}")
+        print(f"  运行时间: {stats['runtime']}")
+        print(f"{'='*80}")
+        
+        # 最近交易
+        if report['recent_trades']:
+            print(f"📋 最近交易记录:")
+            for i, trade in enumerate(report['recent_trades'], 1):
+                profit_emoji = "✅" if trade['profit_amount'] > 0 else "❌"
+                print(f"  {i}. {profit_emoji} {trade['entry_time']} -> {trade['exit_time']}")
+                print(f"     入场: {trade['entry_price']:.2f} | 出场: {trade['exit_price']:.2f}")
+                print(f"     数量: {trade['quantity']:.4f} | 盈亏: {trade['profit_amount']:+.2f} ({trade['profit_pct']:+.2f}%)")
+        print(f"{'='*80}\n")
+    
+    # 信号计算函数
+    def calculate_and_display_signals(kline_dict, data_df):
+        """计算并显示所有信号"""
+        nonlocal position, entry_price, entry_index
+        nonlocal initial_capital, current_capital, completed_trades
+        nonlocal total_trades, win_trades, loss_trades, total_profit, start_time
+        nonlocal report_history
+        
+        if len(data_df) < 10:  # 确保有足够的数据
+            print(f"\n[{kline_dict['open_time_str']}] 数据不足，等待更多数据...")
+            return
+        
+        current_price = kline_dict['close_price']
+        current_time = kline_dict['open_time_str']
+        
+        # 使用足够的数据切片（最后30行，确保有足够的历史数据）
+        data_slice = data_df.iloc[-30:].copy() if len(data_df) >= 30 else data_df.copy()
+        
+        # 生成并打印交易报告
+        report = generate_trading_report(
+            current_price=current_price,
+            current_time=current_time,
+            position=position,
+            entry_price=entry_price,
+            initial_capital=initial_capital,
+            current_capital=current_capital,
+            completed_trades=completed_trades,
+            total_trades=total_trades,
+            win_trades=win_trades,
+            loss_trades=loss_trades,
+            total_profit=total_profit,
+            start_time=start_time
+        )
+        # 保存报告到历史记录
+        report_history.append(report)
+        # 只保留最近100条报告
+        if len(report_history) > 100:
+            report_history.pop(0)
+        # 打印报告
+        print_trading_report(report)
+        
         print(f"📈 交易信号:")
         
         # 1. MA 信号（MA5）
@@ -764,6 +900,23 @@ async def example_usage():
                     print(f"  剩余资金: {current_capital:.2f}")
                     print(f"{'='*80}")
                     
+                    # 生成交易后的报告
+                    post_trade_report = generate_trading_report(
+                        current_price=current_price,
+                        current_time=current_time,
+                        position=position,
+                        entry_price=entry_price,
+                        initial_capital=initial_capital,
+                        current_capital=current_capital,
+                        completed_trades=completed_trades,
+                        total_trades=total_trades,
+                        win_trades=win_trades,
+                        loss_trades=loss_trades,
+                        total_profit=total_profit,
+                        start_time=start_time
+                    )
+                    print_trading_report(post_trade_report)
+                    
                 elif ma5_signal == 'sell' and position > 0:
                     # 卖出
                     sell_amount = position * current_price
@@ -804,9 +957,27 @@ async def example_usage():
                     print(f"{'='*80}")
                     
                     # 重置持仓
+                    old_position = position
                     position = 0.0
                     entry_price = 0.0
                     entry_index = -1
+                    
+                    # 生成交易后的报告
+                    post_trade_report = generate_trading_report(
+                        current_price=current_price,
+                        current_time=current_time,
+                        position=position,
+                        entry_price=entry_price,
+                        initial_capital=initial_capital,
+                        current_capital=current_capital,
+                        completed_trades=completed_trades,
+                        total_trades=total_trades,
+                        win_trades=win_trades,
+                        loss_trades=loss_trades,
+                        total_profit=total_profit,
+                        start_time=start_time
+                    )
+                    print_trading_report(post_trade_report)
             except Exception as e:
                 logging.debug(f"更新持仓状态时出错: {e}")
     

@@ -15,12 +15,12 @@
 
 ```bash
 # 方式1: 作为模块运行（推荐）
-cd /Users/user/Desktop/repo/crypto_trading
-python -m crypto_trading.test_script.get_symbols_by_volume
+cd /Users/user/Desktop/repo/cyqnt_trd
+python -m cyqnt_trd.test_script.get_symbols_by_volume
 
 # 方式2: 直接运行脚本
-cd /Users/user/Desktop/repo/crypto_trading
-python crypto_trading/test_script/get_symbols_by_volume.py
+cd /Users/user/Desktop/repo/cyqnt_trd
+python cyqnt_trd/test_script/get_symbols_by_volume.py
 ```
 
 ### 输出
@@ -75,12 +75,12 @@ python crypto_trading/test_script/get_symbols_by_volume.py
 
 ```bash
 # 方式1: 作为模块运行（推荐）
-cd /Users/user/Desktop/repo/crypto_trading
-python -m crypto_trading.test_script.test_order
+cd /Users/user/Desktop/repo/cyqnt_trd
+python -m cyqnt_trd.test_script.test_order
 
 # 方式2: 直接运行脚本
-cd /Users/user/Desktop/repo/crypto_trading
-python crypto_trading/test_script/test_order.py
+cd /Users/user/Desktop/repo/cyqnt_trd
+python cyqnt_trd/test_script/test_order.py
 ```
 
 ### 函数说明
@@ -128,7 +128,7 @@ python crypto_trading/test_script/test_order.py
 ### 使用示例
 
 ```python
-from crypto_trading.test_script.test_order import (
+from cyqnt_trd.test_script.test_order import (
     test_spot_buy_market,
     test_spot_sell_market,
     test_futures_buy_market,
@@ -148,7 +148,7 @@ result = test_futures_buy_market("BTCUSDT", 0.001)
 result = test_futures_sell_market("BTCUSDT", 0.001)
 
 # 查看当前挂单
-from crypto_trading.test_script.test_order import (
+from cyqnt_trd.test_script.test_order import (
     show_spot_open_orders,
     show_futures_open_orders
 )
@@ -157,7 +157,7 @@ show_spot_open_orders("BTCUSDT")  # 查看现货 BTCUSDT 的挂单
 show_futures_open_orders()  # 查看合约所有交易对的挂单
 
 # 撤销订单
-from crypto_trading.test_script.test_order import (
+from cyqnt_trd.test_script.test_order import (
     cancel_spot_order,
     cancel_futures_order,
     cancel_all_spot_orders
@@ -235,19 +235,19 @@ export BASE_PATH="https://api.binance.com"  # 可选，默认使用生产环境
 
 ```bash
 # 方式1: 作为模块运行（推荐）
-cd /Users/user/Desktop/repo/crypto_trading
-python -m crypto_trading.test_script.realtime_price_tracker
+cd /Users/user/Desktop/repo/cyqnt_trd
+python -m cyqnt_trd.test_script.realtime_price_tracker
 
 # 方式2: 直接运行脚本
-cd /Users/user/Desktop/repo/crypto_trading
-python crypto_trading/test_script/realtime_price_tracker.py
+cd /Users/user/Desktop/repo/cyqnt_trd
+python cyqnt_trd/test_script/realtime_price_tracker.py
 ```
 
 ### 基本用法
 
 ```python
 import asyncio
-from crypto_trading.test_script.realtime_price_tracker import RealtimePriceTracker
+from cyqnt_trd.test_script.realtime_price_tracker import RealtimePriceTracker
 
 async def main():
     # 创建跟踪器
@@ -274,8 +274,8 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from crypto_trading.test_script.realtime_price_tracker import RealtimePriceTracker
-from crypto_trading.trading_signal.signal.ma_signal import ma_signal
+from cyqnt_trd.test_script.realtime_price_tracker import RealtimePriceTracker
+from cyqnt_trd.trading_signal.signal.ma_signal import ma_signal
 
 async def main():
     tracker = RealtimePriceTracker(

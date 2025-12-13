@@ -33,7 +33,7 @@
 ```python
 import pandas as pd
 import json
-from crypto_trading.backtesting import BacktestFramework
+from cyqnt_trd.backtesting import BacktestFramework
 
 # 加载数据
 data_path = 'path/to/your/data.json'

@@ -5,12 +5,12 @@ K线数据查询测试脚本
 
 使用方法：
     # 方式1: 作为模块运行（推荐）
-    cd /Users/user/Desktop/repo/crypto_trading
-    python -m crypto_trading.test_script.test_kline_data
+    cd /Users/user/Desktop/repo/cyqnt_trd
+    python -m cyqnt_trd.test_script.test_kline_data
     
     # 方式2: 直接运行脚本
-    cd /Users/user/Desktop/repo/crypto_trading
-    python crypto_trading/test_script/test_kline_data.py
+    cd /Users/user/Desktop/repo/cyqnt_trd
+    python cyqnt_trd/test_script/test_kline_data.py
 """
 
 import os
