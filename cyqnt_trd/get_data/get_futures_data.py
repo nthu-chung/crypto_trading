@@ -410,7 +410,7 @@ if __name__ == "__main__":
     #     symbol=symbol,
     #     interval="3m",
     #     limit=365*3,
-    #     output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_futures"
+    #     output_dir=f"/Users/user/Desktop/repo/cyqnt_trd/tmp/data/{symbol}_futures"
     # )
     
     # 示例2: 使用字符串格式指定时间范围（自动分页，获取所有数据）
@@ -425,7 +425,7 @@ if __name__ == "__main__":
             start_time="2024-01-01 00:00:00",
             end_time="2025-11-30 23:59:59",
             limit=1000,  # 每次请求的 limit，实际会分页获取所有数据
-            output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_futures"
+            output_dir=f"/Users/user/Desktop/repo/cyqnt_trd/tmp/data/{symbol}_futures"
         )
     
     # 示例3: 使用 datetime 对象指定时间范围（自动分页）

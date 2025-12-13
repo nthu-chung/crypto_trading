@@ -16,6 +16,8 @@ from binance_sdk_derivatives_trading_usds_futures.rest_api.models import (
     NewOrderTimeInForceEnum as FuturesNewOrderTimeInForceEnum,
 )
 
+from cyqnt_trd.utils.set_user import set_user
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -24,8 +26,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 默认API密钥（如果环境变量未设置则使用）
-DEFAULT_API_KEY = os.getenv("API_KEY", "yNCZdF58V32y7oL2EATCIUKlmn8wkQ8ywoQukGIR7w4nkXBLldUFgld68I2xN0fj")
-DEFAULT_API_SECRET = os.getenv("API_SECRET", "xktvKv6fcTxcgGeLrAmC3MMpX5qcDntzvBByVTPTyHEsNThg7rHoRW48qQhUpP0k")
+DEFAULT_API_KEY = os.getenv("API_KEY", "KB6hxLqPAvkV8DBJq6xY1tnyXR7bLxPbCQMX6zjUMwQbrujdfKlShgJ9uGQqPsrn")
+DEFAULT_API_SECRET = os.getenv("API_SECRET", "Gv7l5ht1nyfl3Npw4q4zaT4FWPGCAOiSw8EldeSTXdQUQrsxLlE22Yi5ttoj9eaD")
 
 
 def get_spot_balance(asset: Optional[str] = None) -> Dict[str, Any]:
@@ -103,12 +105,10 @@ def get_futures_balance(asset: Optional[str] = None) -> Dict[str, Any]:
         余额信息字典
     """
     try:
-        futures_config = FuturesConfigurationRestAPI(
+        # 使用 set_user() 函数获取配置，确保使用正确的 API 密钥
+        futures_config = set_user(
             api_key=DEFAULT_API_KEY,
             api_secret=DEFAULT_API_SECRET,
-            base_path=os.getenv(
-                "BASE_PATH", DERIVATIVES_TRADING_USDS_FUTURES_REST_API_PROD_URL
-            ),
         )
         
         futures_client = DerivativesTradingUsdsFutures(config_rest_api=futures_config)
@@ -277,12 +277,10 @@ def get_futures_position_mode() -> Dict[str, Any]:
         持仓模式信息字典，包含 dualSidePosition (True表示对冲模式，False表示单向模式)
     """
     try:
-        futures_config = FuturesConfigurationRestAPI(
+        # 使用 set_user() 函数获取配置，确保使用正确的 API 密钥
+        futures_config = set_user(
             api_key=DEFAULT_API_KEY,
             api_secret=DEFAULT_API_SECRET,
-            base_path=os.getenv(
-                "BASE_PATH", DERIVATIVES_TRADING_USDS_FUTURES_REST_API_PROD_URL
-            ),
         )
         
         futures_client = DerivativesTradingUsdsFutures(config_rest_api=futures_config)
@@ -502,12 +500,10 @@ def test_futures_order(
     """
     try:
         # 创建合约客户端配置
-        futures_config = FuturesConfigurationRestAPI(
+        # 使用 set_user() 函数获取配置，确保使用正确的 API 密钥
+        futures_config = set_user(
             api_key=DEFAULT_API_KEY,
             api_secret=DEFAULT_API_SECRET,
-            base_path=os.getenv(
-                "BASE_PATH", DERIVATIVES_TRADING_USDS_FUTURES_REST_API_PROD_URL
-            ),
         )
         
         # 初始化合约客户端
@@ -754,12 +750,10 @@ def get_futures_open_orders(symbol: Optional[str] = None) -> Dict[str, Any]:
         挂单列表
     """
     try:
-        futures_config = FuturesConfigurationRestAPI(
+        # 使用 set_user() 函数获取配置，确保使用正确的 API 密钥
+        futures_config = set_user(
             api_key=DEFAULT_API_KEY,
             api_secret=DEFAULT_API_SECRET,
-            base_path=os.getenv(
-                "BASE_PATH", DERIVATIVES_TRADING_USDS_FUTURES_REST_API_PROD_URL
-            ),
         )
         
         futures_client = DerivativesTradingUsdsFutures(config_rest_api=futures_config)
@@ -896,12 +890,10 @@ def cancel_futures_order(
         if order_id is None and orig_client_order_id is None:
             raise ValueError("必须提供 order_id 或 orig_client_order_id 之一")
         
-        futures_config = FuturesConfigurationRestAPI(
+        # 使用 set_user() 函数获取配置，确保使用正确的 API 密钥
+        futures_config = set_user(
             api_key=DEFAULT_API_KEY,
             api_secret=DEFAULT_API_SECRET,
-            base_path=os.getenv(
-                "BASE_PATH", DERIVATIVES_TRADING_USDS_FUTURES_REST_API_PROD_URL
-            ),
         )
         
         futures_client = DerivativesTradingUsdsFutures(config_rest_api=futures_config)

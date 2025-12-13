@@ -747,18 +747,19 @@ if __name__ == "__main__":
     #     symbol=symbol,
     #     interval="1s",
     #     limit=10,
-    #     output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}"
+    #     output_dir=f"/Users/user/Desktop/repo/cyqnt_trd/tmp/data/{symbol}"
     # )
     
     # 示例用法 - 使用直接HTTP请求方法（避免数据量限制）
-    symbol = "BTCUSDT"
-    get_and_save_klines_direct(
-        symbol=symbol,
-        interval="3m",
-        start_time='2025-10-02',
-        end_time='2025-12-08',
-        output_dir=f"/Users/user/Desktop/repo/crypto_trading/tmp/data/{symbol}_current"
-    )
+    symbol_list = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT", "DOTUSDT", "BNBUSDT", "LINKUSDT", "LTCUSDT"]
+    for symbol in symbol_list:
+        get_and_save_klines_direct(
+            symbol=symbol,
+            interval="3m",
+            start_time='2025-10-02',
+            end_time='2025-12-08',
+            output_dir=f"/Users/user/Desktop/repo/cyqnt_trd/tmp/data/{symbol}_current"
+        )
     
     # 查询 ETHUSDT 最近100天的日线数据
     # get_and_save_klines_direct(

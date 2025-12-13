@@ -3,16 +3,14 @@ Alpha因子测试脚本
 
 测试 selected_alpha 模块中的 Alpha 因子
 
-这个文件是 test_script/test_alpha.py 的快捷方式，可以直接在 selected_alpha 目录下运行测试。
-
 使用方法：
     # 方式1: 作为模块运行（推荐）
-    cd /Users/user/Desktop/repo/crypto_trading
-    python -m crypto_trading.trading_signal.selected_alpha.test_alpha
+    cd /Users/user/Desktop/repo/cyqnt_trd
+    python -m cyqnt_trd.test_script.test_alpha
     
     # 方式2: 直接运行脚本
-    cd /Users/user/Desktop/repo/crypto_trading
-    python crypto_trading/trading_signal/selected_alpha/test_alpha.py
+    cd /Users/user/Desktop/repo/cyqnt_trd
+    python cyqnt_trd/test_script/test_alpha.py
 """
 
 import sys
@@ -20,18 +18,18 @@ import os
 
 # 添加项目根目录到路径，以便导入模块
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# 获取项目根目录（crypto_trading 的父目录）
-# test_alpha.py 位于: crypto_trading/crypto_trading/trading_signal/selected_alpha/test_alpha.py
-# 需要向上4级到达: crypto_trading/
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_dir))))
+# 获取项目根目录（cyqnt_trd 的父目录）
+# test_alpha.py 位于: cyqnt_trd/cyqnt_trd/test_script/test_alpha.py
+# 需要向上2级到达: cyqnt_trd/
+project_root = os.path.dirname(os.path.dirname(current_dir))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 # 导入回测框架和Alpha因子模块
 try:
-    from crypto_trading.backtesting import BacktestFramework
-    from crypto_trading.trading_signal.selected_alpha import alpha1_factor
-    from crypto_trading.trading_signal.signal import factor_based_signal
+    from cyqnt_trd.backtesting import BacktestFramework
+    from cyqnt_trd.trading_signal.selected_alpha import alpha1_factor
+    from cyqnt_trd.trading_signal.signal import factor_based_signal
 except ImportError as e:
     print(f"导入错误: {e}")
     print(f"\n当前工作目录: {os.getcwd()}")
@@ -39,11 +37,11 @@ except ImportError as e:
     print(f"项目根目录: {project_root}")
     print(f"Python路径: {sys.path[:3]}")
     print("\n提示：请使用以下方式运行：")
-    print("  cd /Users/user/Desktop/repo/crypto_trading")
-    print("  python -m crypto_trading.trading_signal.selected_alpha.test_alpha")
+    print("  cd /Users/user/Desktop/repo/cyqnt_trd")
+    print("  python -m cyqnt_trd.test_script.test_alpha")
     print("\n或者直接运行脚本：")
-    print("  cd /Users/user/Desktop/repo/crypto_trading")
-    print("  python crypto_trading/trading_signal/selected_alpha/test_alpha.py")
+    print("  cd /Users/user/Desktop/repo/cyqnt_trd")
+    print("  python cyqnt_trd/test_script/test_alpha.py")
     sys.exit(1)
 
 
@@ -66,12 +64,12 @@ def test_alpha1_factor():
     
     # 加载数据
     # 可以使用不同的数据文件进行测试
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
+    data_path = '/Users/user/Desktop/repo/cyqnt_trd/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
     
     # 如果数据文件不存在，尝试其他路径
     if not os.path.exists(data_path):
         # 尝试查找其他可用的数据文件
-        data_dir = '/Users/user/Desktop/repo/crypto_trading/tmp/data'
+        data_dir = '/Users/user/Desktop/repo/cyqnt_trd/tmp/data'
         if os.path.exists(data_dir):
             # 查找第一个可用的JSON文件
             for root, dirs, files in os.walk(data_dir):
@@ -105,22 +103,23 @@ def test_alpha1_factor():
         )
     
     # 测试因子
+    forward_periods = 3
     print("开始测试 Alpha#1 因子...")
     print(f"  回看天数: 5")
     print(f"  标准差周期: 20")
     print(f"  幂次: 2.0")
-    print(f"  向前看周期: 7")
+    print(f"  向前看周期: {forward_periods}")
     print()
     
     factor_results = framework.test_factor(
         factor_func=alpha1_wrapper,
-        forward_periods=7,  # 未来7个周期
+        forward_periods=forward_periods,  # 未来forward_periods个周期
         min_periods=30,  # 至少需要30个周期（5+20+一些缓冲）
         factor_name="Alpha#1因子"
     )
     
     # 打印结果并保存
-    save_dir = '/Users/user/Desktop/repo/crypto_trading/result'
+    save_dir = '/Users/user/Desktop/repo/cyqnt_trd/result'
     framework.print_factor_results(
         factor_results,
         save_dir=save_dir
@@ -136,7 +135,7 @@ def test_alpha1_with_different_params():
     print("=" * 60)
     
     # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_1d_1095_20251127_113603.json'
+    data_path = '/Users/user/Desktop/repo/cyqnt_trd/tmp/data/BTCUSDT_futures/BTCUSDT_3m_158879_20250101_000000_20251127_235959_20251128_145101.json'
     
     if not os.path.exists(data_path):
         print(f"错误：找不到数据文件: {data_path}")
@@ -167,7 +166,7 @@ def test_alpha1_with_different_params():
         
         factor_results = framework.test_factor(
             factor_func=alpha1_wrapper,
-            forward_periods=7,
+            forward_periods=3,
             min_periods=min_periods,
             factor_name=params['name']
         )
@@ -190,7 +189,7 @@ def test_alpha1_in_signal():
     print("=" * 60)
     
     # 加载数据
-    data_path = '/Users/user/Desktop/repo/crypto_trading/tmp/data/BTCUSDT_futures/BTCUSDT_1d_1095_20251127_113603.json'
+    data_path = '/Users/user/Desktop/repo/cyqnt_trd/tmp/data/BTCUSDT_futures/BTCUSDT_1d_1095_20251127_113603.json'
     
     if not os.path.exists(data_path):
         print(f"错误：找不到数据文件: {data_path}")
@@ -229,7 +228,7 @@ def test_alpha1_in_signal():
     framework.print_backtest_results(backtest_results)
     
     # 绘制结果并保存
-    save_dir = '/Users/user/Desktop/repo/crypto_trading/result'
+    save_dir = '/Users/user/Desktop/repo/cyqnt_trd/result'
     framework.plot_backtest_results(
         backtest_results,
         save_dir=save_dir
@@ -254,8 +253,9 @@ def main():
     print("=" * 60)
     print("\n提示：")
     print("  - 取消注释 main() 函数中的其他测试函数来运行更多测试")
-    print("  - 推荐使用模块方式运行: python3 -m crypto_trading.trading_signal.selected_alpha.test_alpha")
+    print("  - 推荐使用模块方式运行: python -m cyqnt_trd.test_script.test_alpha")
 
 
 if __name__ == "__main__":
     main()
+

@@ -33,7 +33,7 @@ factor_func(data: pd.DataFrame, index: int) -> float
 
 1. **ma_factor**: 简单移动平均线因子
    ```python
-   from crypto_trading.trading_signal.factor import ma_factor
+   from cyqnt_trd.trading_signal.factor import ma_factor
    
    # 使用MA5因子
    factor_value = ma_factor(data, index, period=5)
@@ -41,7 +41,7 @@ factor_func(data: pd.DataFrame, index: int) -> float
 
 2. **ma_cross_factor**: 移动平均线交叉因子
    ```python
-   from crypto_trading.trading_signal.factor import ma_cross_factor
+   from cyqnt_trd.trading_signal.factor import ma_cross_factor
    
    # 使用短期5日、长期20日均线交叉因子
    factor_value = ma_cross_factor(data, index, short_period=5, long_period=20)
@@ -49,7 +49,7 @@ factor_func(data: pd.DataFrame, index: int) -> float
 
 3. **rsi_factor**: RSI因子
    ```python
-   from crypto_trading.trading_signal.factor import rsi_factor
+   from cyqnt_trd.trading_signal.factor import rsi_factor
    
    # 使用RSI因子
    factor_value = rsi_factor(data, index, period=14, oversold=30.0, overbought=70.0)
@@ -82,7 +82,7 @@ signal_func(
 
 1. **ma_signal**: 基于移动平均线的交易信号
    ```python
-   from crypto_trading.trading_signal.signal import ma_signal
+   from cyqnt_trd.trading_signal.signal import ma_signal
    
    # 需要包装成符合框架要求的函数
    def ma_signal_wrapper(data, index, position, entry_price, entry_index, 
@@ -93,13 +93,13 @@ signal_func(
 
 2. **ma_cross_signal**: 基于移动平均线交叉的交易信号
    ```python
-   from crypto_trading.trading_signal.signal import ma_cross_signal
+   from cyqnt_trd.trading_signal.signal import ma_cross_signal
    ```
 
 3. **factor_based_signal**: 基于因子的交易信号（可在signal中使用factor）
    ```python
-   from crypto_trading.trading_signal.signal import factor_based_signal
-   from crypto_trading.trading_signal.factor import ma_factor
+   from cyqnt_trd.trading_signal.signal import factor_based_signal
+   from cyqnt_trd.trading_signal.factor import ma_factor
    
    # 使用factor中的ma_factor
    def factor_signal_wrapper(data, index, position, entry_price, entry_index,
@@ -114,8 +114,8 @@ signal_func(
 
 4. **multi_factor_signal**: 多因子组合策略
    ```python
-   from crypto_trading.trading_signal.signal import multi_factor_signal
-   from crypto_trading.trading_signal.factor import ma_factor, rsi_factor
+   from cyqnt_trd.trading_signal.signal import multi_factor_signal
+   from cyqnt_trd.trading_signal.factor import ma_factor, rsi_factor
    
    # 组合多个因子
    def multi_factor_wrapper(data, index, position, entry_price, entry_index,
@@ -138,8 +138,8 @@ signal_func(
 ### 示例1: 使用因子进行因子测试
 
 ```python
-from crypto_trading.backtesting import BacktestFramework
-from crypto_trading.trading_signal.factor import ma_factor
+from cyqnt_trd.backtesting import BacktestFramework
+from cyqnt_trd.trading_signal.factor import ma_factor
 
 # 加载数据
 framework = BacktestFramework(data_path='path/to/data.json')
@@ -162,8 +162,8 @@ framework.print_factor_results(factor_results, save_dir='result')
 ### 示例2: 使用信号策略进行回测
 
 ```python
-from crypto_trading.backtesting import BacktestFramework
-from crypto_trading.trading_signal.signal import ma_signal
+from cyqnt_trd.backtesting import BacktestFramework
+from cyqnt_trd.trading_signal.signal import ma_signal
 
 # 加载数据
 framework = BacktestFramework(data_path='path/to/data.json')
@@ -194,9 +194,9 @@ framework.plot_backtest_results(backtest_results, save_dir='result')
 ### 示例3: 在信号策略中使用因子
 
 ```python
-from crypto_trading.backtesting import BacktestFramework
-from crypto_trading.trading_signal.signal import factor_based_signal
-from crypto_trading.trading_signal.factor import ma_factor
+from cyqnt_trd.backtesting import BacktestFramework
+from cyqnt_trd.trading_signal.signal import factor_based_signal
+from cyqnt_trd.trading_signal.factor import ma_factor
 
 # 加载数据
 framework = BacktestFramework(data_path='path/to/data.json')
@@ -240,7 +240,7 @@ framework.plot_backtest_results(backtest_results, save_dir='result')
 
 1. 在 `signal/` 目录下创建新的信号文件（如 `macd_signal.py`）
 2. 实现信号函数，符合签名：`signal_func(data, index, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str`
-3. 如果需要使用factor中的因子，可以从 `crypto_trading.trading_signal.factor` 导入
+3. 如果需要使用factor中的因子，可以从 `cyqnt_trd.trading_signal.factor` 导入
 4. 在 `signal/__init__.py` 中导入并导出新信号
 
 ### 在信号中使用因子

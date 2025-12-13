@@ -205,7 +205,7 @@ if __name__ == "__main__":
     import json
     from datetime import datetime
     
-    output_dir = "/Users/user/Desktop/repo/crypto_trading/tmp"
+    output_dir = "/Users/user/Desktop/repo/cyqnt_trd/tmp"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
