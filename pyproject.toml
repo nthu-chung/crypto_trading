@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cyqnt-trd"
-version = "0.1.0"
+version = "0.1.1"
 description = "A cryptocurrency trading toolkit with data fetching, signal generation, and backtesting capabilities"
 readme = "README.md"
 license = "MIT"
