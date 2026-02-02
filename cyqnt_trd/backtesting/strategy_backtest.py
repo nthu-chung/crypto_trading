@@ -62,7 +62,7 @@ class StrategyBacktester:
         
         self.initial_capital = initial_capital
         self.commission_rate = commission_rate
-    
+
     def backtest(
         self,
         signal_func: Callable,
@@ -74,7 +74,7 @@ class StrategyBacktester:
     ) -> Dict:
         """
         执行回测
-        
+
         Args:
             signal_func: 信号生成函数，必须接受以下参数：
                         (data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods) -> str
@@ -93,7 +93,7 @@ class StrategyBacktester:
             stop_loss: 止损比例（传递给策略函数，由策略决定是否使用）
             check_periods: 检查未来多少个周期（只能为1，默认1，即只检查当前周期）
                           注意：回测时只能为1，因为实际交易中无法看到今天之后的数据
-        
+
         Returns:
             包含回测结果的字典：
             - initial_capital: 初始资金
@@ -108,104 +108,149 @@ class StrategyBacktester:
             - equity_curve: 资金曲线（DataFrame）
             - trades: 交易记录列表
         """
+        import concurrent.futures
+
         # 初始化
         capital = self.initial_capital
         position = 0  # 持仓数量
         entry_price = 0  # 入场价格
         entry_index = -1  # 入场索引
-        
+
         equity_curve = []
         trades = []
-        
-        # 遍历每个时间点
-        for i in range(min_periods, len(self.data)):
+
+        # 预先准备多线程需要的参数
+        max_period = 50
+        idx_range = range(min_periods, len(self.data))
+
+        # 1. 并行调用信号函数
+        def signal_func_runner(args):
+            i, position, entry_price, entry_index = args
             try:
-                # 获取当前价格
-                current_price = self.data.iloc[i]['close_price']
-                current_time = self.data.iloc[i]['datetime']
-                
-                # 生成信号：调用策略函数，传入数据切片而不是整个data和index
-                # 需要确定信号函数需要多少历史数据
-                # 为了兼容性，传递足够的数据切片（假设最多需要50个周期）
-                max_period = 50
                 start_idx = max(0, i - max_period)
                 data_slice = self.data.iloc[start_idx:i+1].copy()
-                
                 signal = signal_func(
                     data_slice, position, entry_price, entry_index,
                     take_profit, stop_loss, check_periods
                 )
-                
-                # 处理信号
-                if signal == 'buy' and position == 0:
-                    # 买入
-                    trade_amount = capital * position_size
-                    position = trade_amount / current_price
-                    commission = trade_amount * self.commission_rate
-                    capital = capital - trade_amount - commission
-                    entry_price = current_price
-                    entry_index = i
-                    
-                    trades.append({
-                        'type': 'buy',
-                        'datetime': current_time,
-                        'index': i,
-                        'price': float(current_price),
-                        'position': float(position),
-                        'capital': float(capital)
-                    })
-                
-                elif signal == 'sell' and position > 0:
-                    # 卖出（由策略函数决定，可能是策略信号、止盈或止损）
-                    # 策略函数已经检查了止盈止损条件，回测器只执行卖出
-                    trade_amount = position * current_price
-                    commission = trade_amount * self.commission_rate
-                    capital = capital + trade_amount - commission
-                    
-                    # 计算盈亏
-                    pnl = (current_price - entry_price) / entry_price if entry_price > 0 else 0
-                    pnl_amount = trade_amount - (position * entry_price) - commission if entry_price > 0 else 0
-                    
-                    # 根据价格变化判断卖出原因（用于记录，策略函数已经决定了是否卖出）
-                    reason = 'signal'
-                    if entry_price > 0:
-                        price_change = (current_price - entry_price) / entry_price
-                        if take_profit is not None and price_change >= take_profit:
-                            reason = 'take_profit'
-                        elif stop_loss is not None and price_change <= -stop_loss:
-                            reason = 'stop_loss'
-                    
-                    trades.append({
-                        'type': 'sell',
-                        'reason': reason,
-                        'datetime': current_time,
-                        'index': i,
-                        'price': float(current_price),
-                        'entry_price': float(entry_price),
-                        'pnl': float(pnl),
-                        'pnl_amount': float(pnl_amount),
-                        'capital': float(capital)
-                    })
-                    
-                    position = 0
-                    entry_price = 0
-                    entry_index = -1
-                
-                # 计算当前总资产（现金 + 持仓市值）
-                current_equity = capital + (position * current_price if position > 0 else 0)
-                equity_curve.append({
-                    'datetime': current_time,
-                    'index': i,
-                    'equity': float(current_equity),
-                    'capital': float(capital),
-                    'position': float(position),
-                    'price': float(current_price)
-                })
-                
+                current_price = self.data.iloc[i]['close_price']
+                current_time = self.data.iloc[i]['datetime']
+                return (i, signal, current_price, current_time)
             except Exception as e:
-                # 如果信号生成出错，继续
-                continue
-        
+                return (i, None, None, None)
+
+        # 为所有时间点提前构建并行参数列表（注意，position/entry_price/entry_index变化只能串行，这里仅signal并行！）
+        # 所以只能并行 signal_func 的输入，每步的仓位信息和买卖流水必须主进程顺序推进。
+        # 做法：先并行计算所有点的信号，然后主进程串行执行持仓等逻辑。
+
+        # 获取每个时间点需要的切片和并行参数（仓位参数全部为当前最新，后续再用）
+        # 方案：只并行计算信号，不动持仓逻辑。
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # 注意：这里只能给signal_func实际需要的参数，其余（如position, entry_price等）在回测流程串行推演
+            # 由于并行只加速技术信号（只依赖slice数据，不依赖仓位），所以先串行取决于之前的position。
+            # 所有信号都需要position等，回测需要逐步推进状态，不能直接全部并发。
+            #
+            # 解决办法：只并行信号生成(即信号与持仓变化无关的情形，例如策略只考虑slice，不用position等参数)。如果策略要用这些参数仍必须主线程推演，信号函数并行意义有限。
+            #
+            # 这里我们假设信号函数主要耗时来自数据slice运算（如大量因子），用过去slice计算信号，不严重依赖实时持仓等。
+            # 所以我们在持仓、entry_price、entry_index等参数为"推演至当前时刻"的主线程状态下，同步推进主循环，并行仅用于信号slice耗时运算。
+
+            # 改进方案：主循环推演仓位，但每次 slice 调 signal_func 并行
+            signals_future = [None] * len(idx_range)
+
+            def signal_worker(i, position, entry_price, entry_index):
+                try:
+                    start_idx = max(0, i - max_period)
+                    data_slice = self.data.iloc[start_idx:i+1].copy()
+                    signal = signal_func(
+                        data_slice, position, entry_price, entry_index,
+                        take_profit, stop_loss, check_periods
+                    )
+                    current_price = self.data.iloc[i]['close_price']
+                    current_time = self.data.iloc[i]['datetime']
+                    return (i, signal, current_price, current_time)
+                except Exception as e:
+                    return (i, None, None, None)
+            
+            # 逐步推进账户状态，但每步并发信号计算
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                # 先占位，后面主循环会推进position等参数
+                results_for_period = [None] * len(idx_range)
+                # 记录期望并发任务
+                futures = {}
+                for local_idx, i in enumerate(idx_range):
+                    # 提交并占位future
+                    futures[local_idx] = None # 先预占
+                # 下面主流程顺序推进持仓等状态，同时在每步将signal_func并发出去
+                for local_idx, i in enumerate(idx_range):
+                    # 提交signal_func任务（给实时position等参数）
+                    futures[local_idx] = pool.submit(signal_worker, i, position, entry_price, entry_index)
+
+                    # 取出回调结果（非阻塞等待，可以微调batch方式用于进一步加速）
+                    # 由于策略必须顺序推演（因为signal_func依赖当前仓位等），无法完全乱序
+                    i, signal, current_price, current_time = futures[local_idx].result()
+
+                    # 处理信号
+                    if signal == 'buy' and position == 0:
+                        # 买入
+                        trade_amount = capital * position_size
+                        position = trade_amount / current_price
+                        commission = trade_amount * self.commission_rate
+                        capital = capital - trade_amount - commission
+                        entry_price = current_price
+                        entry_index = i
+
+                        trades.append({
+                            'type': 'buy',
+                            'datetime': current_time,
+                            'index': i,
+                            'price': float(current_price),
+                            'position': float(position),
+                            'capital': float(capital)
+                        })
+                    elif signal == 'sell' and position > 0:
+                        trade_amount = position * current_price
+                        commission = trade_amount * self.commission_rate
+                        capital = capital + trade_amount - commission
+
+                        pnl = (current_price - entry_price) / entry_price if entry_price > 0 else 0
+                        pnl_amount = trade_amount - (position * entry_price) - commission if entry_price > 0 else 0
+
+                        reason = 'signal'
+                        if entry_price > 0:
+                            price_change = (current_price - entry_price) / entry_price
+                            if take_profit is not None and price_change >= take_profit:
+                                reason = 'take_profit'
+                            elif stop_loss is not None and price_change <= -stop_loss:
+                                reason = 'stop_loss'
+
+                        trades.append({
+                            'type': 'sell',
+                            'reason': reason,
+                            'datetime': current_time,
+                            'index': i,
+                            'price': float(current_price),
+                            'entry_price': float(entry_price),
+                            'pnl': float(pnl),
+                            'pnl_amount': float(pnl_amount),
+                            'capital': float(capital)
+                        })
+
+                        position = 0
+                        entry_price = 0
+                        entry_index = -1
+
+                    # 计算当前总资产（现金 + 持仓市值）
+                    current_equity = capital + (position * current_price if position > 0 else 0)
+                    equity_curve.append({
+                        'datetime': current_time,
+                        'index': i,
+                        'equity': float(current_equity),
+                        'capital': float(capital),
+                        'position': float(position),
+                        'price': float(current_price)
+                    })
+
         # 如果最后还有持仓，按最后价格平仓
         if position > 0:
             last_price = self.data.iloc[-1]['close_price']
@@ -213,10 +258,10 @@ class StrategyBacktester:
             trade_amount = position * last_price
             commission = trade_amount * self.commission_rate
             capital = capital + trade_amount - commission
-            
+
             pnl = (last_price - entry_price) / entry_price
             pnl_amount = trade_amount - (position * entry_price) - commission
-            
+
             trades.append({
                 'type': 'sell',
                 'reason': 'close_position',
@@ -228,40 +273,40 @@ class StrategyBacktester:
                 'pnl_amount': float(pnl_amount),
                 'capital': float(capital)
             })
-            
+
             # 更新最后一条资金曲线
             if equity_curve:
                 equity_curve[-1]['equity'] = float(capital)
                 equity_curve[-1]['capital'] = float(capital)
                 equity_curve[-1]['position'] = 0.0
-        
+
         # 构建资金曲线DataFrame
         equity_df = pd.DataFrame(equity_curve)
-        
+
         # 计算统计指标
         final_capital = capital
         total_return = (final_capital - self.initial_capital) / self.initial_capital
-        
+
         # 计算交易统计
         sell_trades = [t for t in trades if t['type'] == 'sell']
         total_trades = len(sell_trades)
         win_trades = len([t for t in sell_trades if t.get('pnl', 0) > 0])
         loss_trades = len([t for t in sell_trades if t.get('pnl', 0) < 0])
         win_rate = win_trades / total_trades if total_trades > 0 else 0.0
-        
+
         # 计算最大回撤
         equity_values = equity_df['equity'].values
         peak = np.maximum.accumulate(equity_values)
         drawdown = (equity_values - peak) / peak
         max_drawdown = abs(np.min(drawdown)) if len(drawdown) > 0 else 0.0
-        
+
         # 计算夏普比率（简化版，假设无风险利率为0）
         returns = equity_df['equity'].pct_change().dropna()
         if len(returns) > 0 and returns.std() > 0:
             sharpe_ratio = (returns.mean() / returns.std()) * np.sqrt(252)  # 年化
         else:
             sharpe_ratio = 0.0
-        
+
         results = {
             'initial_capital': self.initial_capital,
             'final_capital': final_capital,
@@ -275,7 +320,7 @@ class StrategyBacktester:
             'equity_curve': equity_df,
             'trades': trades
         }
-        
+
         return results
     
     def plot_results(

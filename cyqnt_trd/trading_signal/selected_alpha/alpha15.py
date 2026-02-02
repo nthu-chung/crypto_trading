@@ -54,11 +54,13 @@ def alpha15_factor(
         quote_volume = data_slice.get('quote_volume', volume * close_price)  # 如果没有quote_volume，使用volume*close_price估算
         
         # 计算收益率
-        returns = close_price.pct_change().fillna(0)
+        returns = close_price.pct_change()
+        returns = returns.fillna(0).infer_objects(copy=False)
         
         # 计算VWAP (Volume Weighted Average Price)
         # vwap = quote_volume / volume，如果volume为0则使用close_price
-        vwap = (quote_volume / (volume + 1e-10)).fillna(close_price)
+        vwap = (quote_volume / (volume + 1e-10))
+        vwap = vwap.fillna(close_price).infer_objects(copy=False)
         
         # 计算adv20 (20日平均成交量)
         adv20 = sma(volume, 20)

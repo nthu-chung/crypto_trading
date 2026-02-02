@@ -18,10 +18,15 @@ import os
 import sys
 import asyncio
 import logging
+import warnings
 from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Callable
+from concurrent.futures import ThreadPoolExecutor
 from cyqnt_trd.utils import set_user
+
+# 抑制 pandas FutureWarning 关于 fillna 的警告
+warnings.filterwarnings('ignore', category=FutureWarning, message='.*Downcasting object dtype arrays on .fillna.*')
 
 # 添加项目根目录到路径
 project_root = Path(__file__).parent.parent
@@ -42,10 +47,17 @@ try:
         cancel_futures_order
     )
     from cyqnt_trd.trading_signal.signal.ma_signal import ma_signal, ma_cross_signal
-    from cyqnt_trd.trading_signal.signal.factor_based_signal import factor_based_signal
+    from cyqnt_trd.trading_signal.signal.factor_based_signal import factor_based_signal, normalized_factor_signal
     from cyqnt_trd.trading_signal.factor.ma_factor import ma_factor
     from cyqnt_trd.trading_signal.factor.rsi_factor import rsi_factor
-    from cyqnt_trd.trading_signal.selected_alpha.alpha1 import alpha1_factor
+    from cyqnt_trd.trading_signal.selected_alpha import (
+        alpha1_factor, alpha3_factor, alpha7_factor, alpha9_factor,
+        alpha11_factor, alpha15_factor, alpha17_factor, alpha21_factor,
+        alpha23_factor, alpha25_factor, alpha29_factor, alpha33_factor,
+        alpha34_factor
+    )
+    from cyqnt_trd.backtesting.factor_test import FactorTester
+    import numpy as np
 except ImportError as e:
     print(f"导入错误: {e}")
     print("\n提示：请确保已安装 cyqnt_trd package: pip install -e /path/to/crypto_trading")
@@ -146,6 +158,360 @@ class RealTimeTradingBot:
             logger.warning("="*80)
             logger.warning("⚠️  实盘模式：将执行真实订单！")
             logger.warning("="*80)
+    
+    def _calculate_normalized_alpha_factor(
+        self, 
+        data_slice,
+        factor_func: Callable,
+        factor_name: str,
+        min_required: int = 30,
+        lookback_periods: int = 30,
+        **factor_kwargs
+    ) -> Optional[Dict[str, Any]]:
+        """
+        计算归一化Alpha因子的通用函数
+        
+        Args:
+            data_slice: 数据切片
+            factor_func: 因子计算函数
+            factor_name: 因子名称（用于日志）
+            min_required: 因子计算所需的最小周期数
+            lookback_periods: 归一化回看周期数
+            **factor_kwargs: 传递给因子函数的额外参数
+            
+        Returns:
+            包含因子值和看多/看空结果的字典，如果计算失败则返回None
+        """
+        try:
+            if len(data_slice) < min_required + 2:
+                return None
+            
+            available_periods = len(data_slice) - min_required - 1
+            if available_periods < 2:
+                return None
+            
+            actual_lookback = min(lookback_periods, max(2, available_periods))
+            
+            # 计算因子值：当前周期和之前actual_lookback个周期（使用多线程并行计算）
+            def compute_factor_value(i):
+                """计算单个时间点的因子值"""
+                end_idx = len(data_slice) - i
+                start_idx = max(0, end_idx - min_required - 1)
+                if end_idx <= start_idx:
+                    return 0.0
+                
+                period_slice = data_slice.iloc[start_idx:end_idx]
+                try:
+                    # 调用因子函数，传入额外参数
+                    factor_value = factor_func(period_slice, **factor_kwargs)
+                    if factor_value is not None:
+                        return factor_value
+                    else:
+                        return 0.0
+                except Exception:
+                    return 0.0
+            
+            # 使用多线程并行计算因子值
+            indices = list(range(actual_lookback + 1))
+            factor_values = []
+            with ThreadPoolExecutor() as executor:
+                # 返回顺序保证和原for循环一致
+                factor_values = list(executor.map(compute_factor_value, indices))
+            
+            if len(factor_values) < 2:
+                return None
+            
+            # 归一化
+            factor_array = np.array(factor_values)
+            factor_min = factor_array.min()
+            factor_max = factor_array.max()
+            
+            if factor_max == factor_min:
+                normalized_factors = np.zeros_like(factor_array)
+            else:
+                # Min-Max归一化到[-1, 1]区间
+                normalized_factors = 2 * (factor_array - factor_min) / (factor_max - factor_min) - 1
+            
+            current_normalized = float(normalized_factors[0])
+            prev_normalized = float(normalized_factors[1]) if len(normalized_factors) > 1 else 0.0
+            
+            # 判断信号：从负转正看多，从正转负看空
+            if prev_normalized <= 0 and current_normalized > 0:
+                signal = '看多'
+            elif prev_normalized >= 0 and current_normalized < 0:
+                signal = '看空'
+            else:
+                signal = '中性'
+            
+            return {
+                'value': current_normalized,
+                'signal': signal,
+                'raw_value': float(factor_values[0]) if len(factor_values) > 0 else 0.0,
+                'prev_normalized': prev_normalized
+            }
+        except Exception as e:
+            logger.debug(f"计算归一化{factor_name}因子时出错: {e}")
+            return None
+    
+    def _calculate_factor_win_rate(
+        self,
+        data_df,
+        factor_func: Callable,
+        forward_periods: int = 24,
+        min_periods: int = 30,
+        factor_name: str = "factor"
+    ) -> Optional[Dict[str, float]]:
+        """
+        计算因子基于历史数据的胜率（使用FactorTester.test_factor）
+        
+        Args:
+            data_df: 历史数据DataFrame
+            factor_func: 因子计算函数，接受数据切片作为参数，返回因子值
+            forward_periods: 向前看的周期数（默认24，即未来24个周期）
+            min_periods: 最小需要的周期数
+            factor_name: 因子名称
+            
+        Returns:
+            包含胜率信息的字典，如果计算失败则返回None
+        """
+        try:
+            if len(data_df) < min_periods + forward_periods + 1:
+                return None
+            
+            # 创建FactorTester实例
+            factor_tester = FactorTester(data_df)
+            
+            # 调用test_factor计算胜率
+            test_results = factor_tester.test_factor(
+                factor_func=factor_func,
+                forward_periods=forward_periods,
+                min_periods=min_periods,
+                factor_name=factor_name
+            )
+            
+            # 提取需要的胜率信息
+            result = {
+                'long_win_rate': test_results.get('long_win_rate', 0.0),
+                'short_win_rate': test_results.get('short_win_rate', 0.0),
+                'overall_win_rate': test_results.get('overall_win_rate', 0.0),
+                'long_avg_return': test_results.get('long_avg_return', 0.0),
+                'short_avg_return': test_results.get('short_avg_return', 0.0),
+                'long_signals': test_results.get('long_signals', 0),
+                'short_signals': test_results.get('short_signals', 0),
+                'total_samples': test_results.get('total_samples', 0)
+            }
+            
+            return result
+            
+        except Exception as e:
+            logger.debug(f"计算因子胜率时出错: {e}")
+            return None
+    
+    def _calculate_factor_values(self, data_df) -> Dict[str, Any]:
+        """
+        计算各种因子的因子值和看多/看空结果（使用多线程并行计算）
+        
+        Args:
+            data_df: 历史数据DataFrame
+            
+        Returns:
+            包含因子值和看多/看空结果的字典
+        """
+        result = {}
+        
+        if len(data_df) < 10:
+            return result
+        
+        # 使用足够的数据切片（对于alpha因子，需要更多数据）
+        # 至少需要65个周期（30+30+5缓冲）用于归一化alpha因子计算
+        min_slice_size = 65
+        if len(data_df) >= min_slice_size:
+            data_slice = data_df.iloc[-min_slice_size:].copy()
+        elif len(data_df) >= 30:
+            data_slice = data_df.iloc[-30:].copy()
+        else:
+            data_slice = data_df.copy()
+        
+        try:
+            # 定义所有需要计算的因子任务
+            def calculate_ma_factor():
+                """计算MA因子"""
+                if len(data_slice) < 6:
+                    return None
+                try:
+                    ma_factor_value = ma_factor(data_slice, period=5)
+                    ma_win_rate = self._calculate_factor_win_rate(
+                        data_df=data_df,
+                        factor_func=lambda d: ma_factor(d, period=5),
+                        forward_periods=2,
+                        min_periods=6,
+                        factor_name="MA5因子"
+                    )
+                    return ('ma_factor_5', {
+                        'value': ma_factor_value,
+                        'signal': '看多' if ma_factor_value > 0 else '看空' if ma_factor_value < 0 else '中性',
+                        'raw_value': ma_factor_value,
+                        'win_rate': ma_win_rate
+                    })
+                except Exception as e:
+                    logger.debug(f"计算MA因子时出错: {e}")
+                    return None
+            
+            def calculate_normalized_alpha1():
+                """计算归一化Alpha#1因子"""
+                normalized_result = self._calculate_normalized_alpha_factor(
+                    data_slice=data_slice,
+                    factor_func=alpha1_factor,
+                    factor_name="Alpha#1",
+                    min_required=30,
+                    lookback_periods=30,
+                    lookback_days=5,
+                    stddev_period=20,
+                    power=2.0
+                )
+                if normalized_result:
+                    def normalized_alpha1_wrapper(d):
+                        norm_res = self._calculate_normalized_alpha_factor(
+                            data_slice=d,
+                            factor_func=alpha1_factor,
+                            factor_name="Alpha#1",
+                            min_required=30,
+                            lookback_periods=30,
+                            lookback_days=5,
+                            stddev_period=20,
+                            power=2.0
+                        )
+                        if norm_res:
+                            return norm_res['value']
+                        return 0.0
+                    
+                    alpha1_win_rate = self._calculate_factor_win_rate(
+                        data_df=data_df,
+                        factor_func=normalized_alpha1_wrapper,
+                        forward_periods=2,
+                        min_periods=65,
+                        factor_name="归一化Alpha#1因子"
+                    )
+                    normalized_result['win_rate'] = alpha1_win_rate
+                    return ('normalized_alpha1', normalized_result)
+                return None
+            
+            def calculate_normalized_alpha15():
+                """计算归一化Alpha#15因子"""
+                normalized_result = self._calculate_normalized_alpha_factor(
+                    data_slice=data_slice,
+                    factor_func=alpha15_factor,
+                    factor_name="Alpha#15",
+                    min_required=30,
+                    lookback_periods=30
+                )
+                if normalized_result:
+                    def normalized_alpha15_wrapper(d):
+                        norm_res = self._calculate_normalized_alpha_factor(
+                            data_slice=d,
+                            factor_func=alpha15_factor,
+                            factor_name="Alpha#15",
+                            min_required=30,
+                            lookback_periods=30
+                        )
+                        if norm_res:
+                            return norm_res['value']
+                        return 0.0
+                    
+                    alpha15_win_rate = self._calculate_factor_win_rate(
+                        data_df=data_df,
+                        factor_func=normalized_alpha15_wrapper,
+                        forward_periods=2,
+                        min_periods=65,
+                        factor_name="归一化Alpha#15因子"
+                    )
+                    normalized_result['win_rate'] = alpha15_win_rate
+                    return ('normalized_alpha15', normalized_result)
+                return None
+            
+            def calculate_normalized_alpha(factor_key, factor_func, min_req, alpha_num):
+                """计算归一化Alpha因子的通用函数"""
+                try:
+                    normalized_result = self._calculate_normalized_alpha_factor(
+                        data_slice=data_slice,
+                        factor_func=factor_func,
+                        factor_name=f"Alpha#{alpha_num}",
+                        min_required=min_req,
+                        lookback_periods=30
+                    )
+                    if normalized_result:
+                        def normalized_wrapper(d, func=factor_func, req=min_req, num=alpha_num):
+                            norm_res = self._calculate_normalized_alpha_factor(
+                                data_slice=d,
+                                factor_func=func,
+                                factor_name=f"Alpha#{num}",
+                                min_required=req,
+                                lookback_periods=30
+                            )
+                            if norm_res:
+                                return norm_res['value']
+                            return 0.0
+                        
+                        win_rate = self._calculate_factor_win_rate(
+                            data_df=data_df,
+                            factor_func=normalized_wrapper,
+                            forward_periods=2,
+                            min_periods=65,
+                            factor_name=f"归一化Alpha#{alpha_num}因子"
+                        )
+                        normalized_result['win_rate'] = win_rate
+                        return (f'normalized_{factor_key}', normalized_result)
+                except Exception as e:
+                    logger.debug(f"计算{factor_key}因子时出错: {e}")
+                return None
+            
+            # 准备所有因子计算任务
+            tasks = []
+            
+            # MA因子
+            if len(data_slice) >= 6:
+                tasks.append(calculate_ma_factor)
+            
+            # 归一化Alpha#1和Alpha#15
+            tasks.append(calculate_normalized_alpha1)
+            tasks.append(calculate_normalized_alpha15)
+            
+            # 其他归一化Alpha因子
+            alpha_factors_to_add = [
+                ('alpha3', alpha3_factor, 30, '3'),
+                ('alpha7', alpha7_factor, 30, '7'),
+                ('alpha9', alpha9_factor, 30, '9'),
+                ('alpha11', alpha11_factor, 30, '11'),
+                ('alpha17', alpha17_factor, 30, '17'),
+                ('alpha21', alpha21_factor, 30, '21'),
+                ('alpha23', alpha23_factor, 30, '23'),
+                ('alpha25', alpha25_factor, 30, '25'),
+                ('alpha29', alpha29_factor, 30, '29'),
+                ('alpha33', alpha33_factor, 30, '33'),
+                ('alpha34', alpha34_factor, 30, '34'),
+            ]
+            
+            for factor_key, factor_func, min_req, alpha_num in alpha_factors_to_add:
+                # 使用默认参数捕获循环变量，避免闭包问题
+                tasks.append(lambda k=factor_key, f=factor_func, r=min_req, n=alpha_num: 
+                           calculate_normalized_alpha(k, f, r, n))
+            
+            # 使用多线程并行计算所有因子
+            with ThreadPoolExecutor() as executor:
+                futures = [executor.submit(task) for task in tasks]
+                for future in futures:
+                    try:
+                        task_result = future.result()
+                        if task_result is not None:
+                            key, value = task_result
+                            result[key] = value
+                    except Exception as e:
+                        logger.debug(f"计算因子任务时出错: {e}")
+                    
+        except Exception as e:
+            logger.debug(f"计算因子值时出错: {e}")
+        
+        return result
     
     def _calculate_signal(self, data_df) -> Optional[str]:
         """
@@ -518,8 +884,8 @@ class RealTimeTradingBot:
         # 计算交易信号
         signal = self._calculate_signal(data_df)
         
-        # 显示状态
-        self._display_status(current_time, current_price, signal)
+        # 显示状态（包含因子值）
+        self._display_status(current_time, current_price, signal, data_df)
         
         # 检查止盈止损（如果有持仓）
         if self.position > 0:
@@ -551,7 +917,7 @@ class RealTimeTradingBot:
             self.last_signal = 'sell'
             self.last_signal_time = datetime.now()
     
-    def _display_status(self, time_str: str, price: float, signal: Optional[str]):
+    def _display_status(self, time_str: str, price: float, signal: Optional[str], data_df=None):
         """
         显示当前状态
         
@@ -559,6 +925,7 @@ class RealTimeTradingBot:
             time_str: 时间字符串
             price: 当前价格
             signal: 交易信号
+            data_df: 历史数据DataFrame（用于计算因子值）
         """
         # 计算统计信息
         runtime = datetime.now() - self.start_time
@@ -586,6 +953,96 @@ class RealTimeTradingBot:
             print(f"持仓: {self.position:.6f} | 入场价: {self.entry_price:.2f} | 浮动盈亏: {profit_pct:+.2f}%")
         else:
             print(f"持仓: 无")
+        
+        # 计算并显示因子值
+        if data_df is not None:
+            try:
+                factor_results = self._calculate_factor_values(data_df)
+                if factor_results:
+                    print(f"{'='*80}")
+                    print(f"📈 因子分析:")
+                    
+                    # MA因子
+                    if 'ma_factor_5' in factor_results:
+                        ma_info = factor_results['ma_factor_5']
+                        signal_emoji = "🟢" if ma_info.get('signal') == '看多' else "🔴" if ma_info.get('signal') == '看空' else "⚪"
+                        signal_text = ma_info.get('signal', '中性')
+                        win_rate_info = ""
+                        if ma_info.get('win_rate'):
+                            wr = ma_info['win_rate']
+                            if wr and isinstance(wr, dict):
+                                if signal_text == '看多' and wr.get('long_win_rate') is not None:
+                                    win_rate_info = f" | 看多胜率={wr['long_win_rate']:.2%} (样本={wr.get('long_signals', 0)})"
+                                elif signal_text == '看空' and wr.get('short_win_rate') is not None:
+                                    win_rate_info = f" | 看空胜率={wr['short_win_rate']:.2%} (样本={wr.get('short_signals', 0)})"
+                                if wr.get('overall_win_rate') is not None:
+                                    win_rate_info += f" | 总体胜率={wr['overall_win_rate']:.2%}"
+                        print(f"  MA5因子: 因子值={ma_info.get('raw_value', 0):+.4f} | {signal_emoji} {signal_text}{win_rate_info}")
+                    
+                    # # 归一化Alpha#1因子
+                    # if 'normalized_alpha1' in factor_results:
+                    #     alpha1_info = factor_results['normalized_alpha1']
+                    #     signal_emoji = "🟢" if alpha1_info.get('signal') == '看多' else "🔴" if alpha1_info.get('signal') == '看空' else "⚪"
+                    #     signal_text = alpha1_info.get('signal', '中性')
+                    #     win_rate_info = ""
+                    #     if alpha1_info.get('win_rate'):
+                    #         wr = alpha1_info['win_rate']
+                    #         if wr and isinstance(wr, dict):
+                    #             if signal_text == '看多' and wr.get('long_win_rate') is not None:
+                    #                 win_rate_info = f" | 看多胜率={wr['long_win_rate']:.2%} (样本={wr.get('long_signals', 0)})"
+                    #             elif signal_text == '看空' and wr.get('short_win_rate') is not None:
+                    #                 win_rate_info = f" | 看空胜率={wr['short_win_rate']:.2%} (样本={wr.get('short_signals', 0)})"
+                    #             if wr.get('overall_win_rate') is not None:
+                    #                 win_rate_info += f" | 总体胜率={wr['overall_win_rate']:.2%}"
+                    #     print(f"  归一化Alpha#1: 原始值={alpha1_info.get('raw_value', 0):+.6f} | 归一化值={alpha1_info.get('value', 0):+.4f} | {signal_emoji} {signal_text}{win_rate_info}")
+                    
+                    # # 归一化Alpha#15因子
+                    # if 'normalized_alpha15' in factor_results:
+                    #     alpha15_info = factor_results['normalized_alpha15']
+                    #     signal_emoji = "🟢" if alpha15_info.get('signal') == '看多' else "🔴" if alpha15_info.get('signal') == '看空' else "⚪"
+                    #     signal_text = alpha15_info.get('signal', '中性')
+                    #     win_rate_info = ""
+                    #     if alpha15_info.get('win_rate'):
+                    #         wr = alpha15_info['win_rate']
+                    #         if wr and isinstance(wr, dict):
+                    #             if signal_text == '看多' and wr.get('long_win_rate') is not None:
+                    #                 win_rate_info = f" | 看多胜率={wr['long_win_rate']:.2%} (样本={wr.get('long_signals', 0)})"
+                    #             elif signal_text == '看空' and wr.get('short_win_rate') is not None:
+                    #                 win_rate_info = f" | 看空胜率={wr['short_win_rate']:.2%} (样本={wr.get('short_signals', 0)})"
+                    #             if wr.get('overall_win_rate') is not None:
+                    #                 win_rate_info += f" | 总体胜率={wr['overall_win_rate']:.2%}"
+                    #     print(f"  归一化Alpha#15: 原始值={alpha15_info.get('raw_value', 0):+.6f} | 归一化值={alpha15_info.get('value', 0):+.4f} | {signal_emoji} {signal_text}{win_rate_info}")
+                    
+                    # 显示其他归一化Alpha因子
+                    other_alpha_factors = [
+                        'normalized_alpha1', 'normalized_alpha15', 'normalized_alpha3', 'normalized_alpha7', 'normalized_alpha9',
+                        'normalized_alpha11', 'normalized_alpha17', 'normalized_alpha21',
+                        'normalized_alpha23', 'normalized_alpha25', 'normalized_alpha29',
+                        'normalized_alpha33', 'normalized_alpha34'
+                    ]
+                    
+                    for factor_key in other_alpha_factors:
+                        if factor_key in factor_results:
+                            alpha_info = factor_results[factor_key]
+                            alpha_num = factor_key.replace('normalized_alpha', '')
+                            signal_emoji = "🟢" if alpha_info.get('signal') == '看多' else "🔴" if alpha_info.get('signal') == '看空' else "⚪"
+                            signal_text = alpha_info.get('signal', '中性')
+                            win_rate_info = ""
+                            if alpha_info.get('win_rate'):
+                                wr = alpha_info['win_rate']
+                                if wr and isinstance(wr, dict):
+                                    if signal_text == '看多' and wr.get('long_win_rate') is not None:
+                                        win_rate_info = f" | 看多胜率={wr['long_win_rate']:.2%} (样本={wr.get('long_signals', 0)})"
+                                    elif signal_text == '看空' and wr.get('short_win_rate') is not None:
+                                        win_rate_info = f" | 看空胜率={wr['short_win_rate']:.2%} (样本={wr.get('short_signals', 0)})"
+                                    if wr.get('overall_win_rate') is not None:
+                                        win_rate_info += f" | 总体胜率={wr['overall_win_rate']:.2%}"
+                            print(f"  归一化Alpha#{alpha_num}: 原始值={alpha_info.get('raw_value', 0):+.6f} | 归一化值={alpha_info.get('value', 0):+.4f} | {signal_emoji} {signal_text}{win_rate_info}")
+            except Exception as e:
+                logger.debug(f"显示因子分析时出错: {e}")
+                import traceback
+                logger.debug(traceback.format_exc())
+        
         print(f"{'='*80}")
         print(f"💰 账户信息:")
         print(f"  可用余额: {available_balance:.2f}")
@@ -684,9 +1141,9 @@ async def test_real_time_trading():
     # 创建实盘交易机器人
     # ⚠️ 警告：设置 dry_run=False 将执行真实交易！
     bot = RealTimeTradingBot(
-        symbol="BNBUSDT",
-        interval="3m",
-        lookback_periods=1000,
+        symbol="ETHUSDT",
+        interval="5m",
+        lookback_periods=800,
         market_type="futures",  # 或 "spot"
         position_size_pct=0.01,
         take_profit=0.1,
@@ -694,7 +1151,7 @@ async def test_real_time_trading():
         strategy="ma5",  # 可选: ma5, ma_cross, ma_factor, rsi_factor, alpha1
         min_order_quantity=0.00001,
         ssl_verify=False,
-        dry_run=False  # ⚠️ 设置为 False 将执行真实交易！
+        dry_run=True  # ⚠️ 设置为 False 将执行真实交易！
     )
     
     try:

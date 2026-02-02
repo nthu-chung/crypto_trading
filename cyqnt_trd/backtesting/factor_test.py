@@ -103,8 +103,9 @@ class FactorTester:
             try:
                 # 计算因子值：传递数据切片而不是整个data和index
                 # 需要确定因子函数需要多少历史数据
-                # 为了兼容性，传递足够的数据切片（假设最多需要50个周期）
-                max_period = 50
+                # 为了兼容性，传递足够的数据切片
+                # 使用min_periods + 一些缓冲，或者至少50个周期
+                max_period = max(min_periods + 10, 50)
                 start_idx = max(0, i - max_period)
                 data_slice = self.data.iloc[start_idx:i+1].copy()
                 factor_value = factor_func(data_slice)
