@@ -13,6 +13,7 @@
 
 import sys
 import os
+import numpy as np
 
 # 尝试直接导入（当作为 package 安装时）
 try:
@@ -22,9 +23,10 @@ try:
         ma_signal, 
         ma_cross_signal, 
         factor_based_signal,
-        multi_factor_signal
+        multi_factor_signal,
+        normalized_factor_signal
     )
-    from cyqnt_trd.trading_signal.selected_alpha import alpha1_factor
+    from cyqnt_trd.trading_signal.selected_alpha import alpha1_factor, alpha15_factor
 except ImportError:
     # 如果直接导入失败，尝试添加项目根目录到路径（用于开发模式）
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,9 +45,10 @@ except ImportError:
             ma_signal, 
             ma_cross_signal, 
             factor_based_signal,
-            multi_factor_signal
+            multi_factor_signal,
+            normalized_factor_signal
         )
-        from cyqnt_trd.trading_signal.selected_alpha import alpha1_factor
+        from cyqnt_trd.trading_signal.selected_alpha import alpha1_factor, alpha15_factor
     except ImportError as e:
         print(f"导入错误: {e}")
         print("\n提示：请使用以下方式之一：")
@@ -254,9 +257,124 @@ def example_5_alpha1_factor(data_path):
     
     factor_results = framework.test_factor(
         factor_func=alpha1_wrapper,
-        forward_periods=7,  # 未来7个周期
+        forward_periods=24,  # 未来7个周期
         min_periods=30,  # 至少需要30个周期（5+20+一些缓冲）
         factor_name="Alpha#1因子"
+    )
+    
+    # 打印结果并保存
+    save_dir = '/Users/user/Desktop/repo/cyqnt_trd/result'
+    framework.print_factor_results(
+        factor_results,
+        save_dir=save_dir
+    )
+
+
+def example_5_normalized_alpha1_factor(data_path):
+    """
+    示例5（归一化版本）: 使用归一化Alpha#1因子进行因子测试
+    """
+    print("\n" + "=" * 60)
+    print("示例5（归一化版本）: 使用归一化Alpha#1因子进行因子测试")
+    print("=" * 60)
+    print("\n因子说明：")
+    print("  - 公式: rank(Ts_ArgMax(SignedPower(((returns<0)?stddev(returns,20):close),2.),5))-0.5)")
+    print("  - 策略逻辑：对过去5天按照收盘价最高或下行波动率最高进行排名")
+    print("  - 下行波动率最高的一天离计算时间越近，越可以投资")
+    print("  - 收盘价最高离计算时间越近，越可以投资")
+    print("  - 标签：mean-reversion+momentum")
+    print("\n归一化说明：")
+    print("  - 计算当前周期和之前30个周期的因子值，进行归一化")
+    print("  - 使用Min-Max归一化将因子值映射到[-1, 1]区间")
+    print("  - 返回归一化后的当前因子值用于测试")
+    print()
+    
+    framework = BacktestFramework(data_path=data_path)
+    
+    # 归一化参数
+    lookback_periods = 30
+    min_required = 30  # alpha1_factor需要的最小周期数（保守估计）
+    
+    # 使用归一化Alpha#1因子进行测试
+    def normalized_alpha1_wrapper(data_slice):
+        """
+        归一化Alpha#1 因子包装函数
+        
+        计算当前周期和之前lookback_periods个周期的因子值，进行归一化后返回当前归一化因子值
+        """
+        # 需要至少min_required+lookback_periods+1行数据
+        # min_required用于计算因子，lookback_periods用于回看，+1用于当前周期
+        available_periods = len(data_slice) - min_required - 1
+        if available_periods < 2:
+            return 0.0  # 至少需要2个周期才能计算归一化
+        
+        # 自适应调整回看周期，但不能小于2
+        actual_lookback = min(lookback_periods, max(2, available_periods))
+        
+        try:
+            # 计算因子值：当前周期和之前actual_lookback个周期
+            factor_values = []
+            for i in range(actual_lookback + 1):
+                end_idx = len(data_slice) - i
+                start_idx = max(0, end_idx - min_required - 1)
+                if end_idx <= start_idx:
+                    factor_values.append(0.0)
+                    continue
+                
+                period_slice = data_slice.iloc[start_idx:end_idx]
+                try:
+                    factor_value = alpha1_factor(
+                        period_slice,
+                        lookback_days=5,
+                        stddev_period=20,
+                        power=2.0
+                    )
+                    if factor_value is not None:
+                        factor_values.append(factor_value)
+                    else:
+                        factor_values.append(0.0)
+                except Exception:
+                    factor_values.append(0.0)
+            
+            # 如果收集到的因子值不足，返回0
+            if len(factor_values) < 2:
+                return 0.0
+            
+            # 将因子值转换为numpy数组进行归一化
+            factor_array = np.array(factor_values)
+            
+            # Min-Max归一化：将值映射到[-1, 1]区间
+            # 如果所有值都相同，则归一化后都为0
+            factor_min = factor_array.min()
+            factor_max = factor_array.max()
+            
+            if factor_max == factor_min:
+                # 所有值相同，归一化后都为0
+                normalized_factors = np.zeros_like(factor_array)
+            else:
+                # Min-Max归一化到[-1, 1]区间
+                normalized_factors = 2 * (factor_array - factor_min) / (factor_max - factor_min) - 1
+            
+            # 返回当前归一化因子值（第一个，即当前周期）
+            return float(normalized_factors[0])
+            
+        except Exception:
+            return 0.0
+    
+    # 测试因子
+    print("开始测试归一化 Alpha#1 因子...")
+    print(f"  回看天数: 5")
+    print(f"  标准差周期: 20")
+    print(f"  幂次: 2.0")
+    print(f"  归一化回看周期数: {lookback_periods}")
+    print(f"  向前看周期: 24")
+    print()
+    
+    factor_results = framework.test_factor(
+        factor_func=normalized_alpha1_wrapper,
+        forward_periods=24,  # 未来24个周期
+        min_periods=65,  # 至少需要65个周期（30+30+5缓冲，确保有足够数据计算因子和归一化）
+        factor_name="归一化Alpha#1因子"
     )
     
     # 打印结果并保存
@@ -315,18 +433,108 @@ def example_6_alpha1_signal(data_path):
     )
 
 
+def example_7_normalized_alpha15_signal(data_path):
+    """
+    示例7: 使用基于归一化Alpha#15因子的信号策略进行回测
+    """
+    print("\n" + "=" * 60)
+    print("示例7: 使用基于归一化Alpha#15因子的信号策略进行回测")
+    print("=" * 60)
+    print("\n策略说明：")
+    print("  - 使用 normalized_factor_signal 策略")
+    print("  - 因子：Alpha#15")
+    print("  - 公式: (-1 * sum(rank(correlation(rank(high), rank(volume), 3)), 3))")
+    print("  - 计算当前周期和之前30个周期的因子值，进行归一化后生成交易信号")
+    print("  - 当归一化后的因子值从负转正时买入，从正转负时卖出")
+    print()
+
+    framework = BacktestFramework(data_path=data_path)
+    
+    # 创建使用归一化 Alpha#15 因子的信号策略
+    # 添加调试计数器
+    debug_count = {'total': 0, 'buy': 0, 'sell': 0, 'hold': 0, 'factor_zero': 0}
+    
+    def normalized_alpha15_signal_wrapper(data_slice, position, entry_price, entry_index, take_profit, stop_loss, check_periods):
+        """
+        使用归一化 Alpha#15 因子的信号策略
+        """
+        debug_count['total'] += 1
+        
+        # 使用 Alpha#15 因子
+        factor_func = lambda d: alpha15_factor(d)
+        
+        # 调试：检查前几个因子值
+        if debug_count['total'] <= 5:
+            try:
+                test_factor = factor_func(data_slice.iloc[-30:] if len(data_slice) >= 30 else data_slice)
+                print(f"  调试 [{debug_count['total']}]: 数据长度={len(data_slice)}, 测试因子值={test_factor:.6f}")
+            except Exception as e:
+                print(f"  调试 [{debug_count['total']}]: 计算因子时出错: {e}")
+        
+        signal = normalized_factor_signal(
+            data_slice, position, entry_price, entry_index,
+            take_profit, stop_loss, check_periods,
+            factor_func=factor_func,
+            lookback_periods=30  # 回看30个周期进行归一化
+        )
+        
+        debug_count[signal] += 1
+        if debug_count['total'] % 5000 == 0:
+            print(f"  进度: 总调用={debug_count['total']}, buy={debug_count['buy']}, sell={debug_count['sell']}, hold={debug_count['hold']}")
+        
+        return signal
+    
+    # 回测策略
+    print("开始回测基于归一化 Alpha#15 因子的策略...")
+    print(f"  回看周期数: 30")
+    print(f"  止盈比例: 10%")
+    print(f"  止损比例: 50%")
+    print()
+    
+    backtest_results = framework.backtest_strategy(
+        signal_func=normalized_alpha15_signal_wrapper,
+        min_periods=65,  # 至少需要65个周期（30+30+5缓冲，确保有足够数据计算因子和归一化）
+        position_size=0.8,  # 每次使用20%的资金
+        initial_capital=10000.0,
+        commission_rate=0.00001,  # 0.001%手续费
+        take_profit=0.5,  # 止盈10%
+        stop_loss=0.2,  # 止损50%
+        check_periods=1,  # 只能为1，因为实际使用时无法看到未来数据
+        strategy_name="基于归一化Alpha#15因子的策略"
+    )
+    
+    # 打印调试信息
+    print(f"\n调试统计:")
+    print(f"  总调用次数: {debug_count['total']}")
+    print(f"  buy信号: {debug_count['buy']}")
+    print(f"  sell信号: {debug_count['sell']}")
+    print(f"  hold信号: {debug_count['hold']}")
+    print()
+    
+    # 打印结果
+    framework.print_backtest_results(backtest_results)
+    
+    # 绘制结果并保存
+    save_dir = '/Users/user/Desktop/repo/cyqnt_trd/result'
+    framework.plot_backtest_results(
+        backtest_results,
+        save_dir=save_dir
+    )
+
+
 def main():
     """
     主函数：运行所有示例
     """
     # 取消注释想要运行的示例
-    data_path = "/Users/user/Desktop/repo/cyqnt_trd/tmp/data/BTCUSDT_current/BTCUSDT_3m_32160_20251002_000000_20251208_000000_20251211_111242.json"
-    # example_1_use_factor()
-    example_2_use_signal(data_path)
-    # example_4_multi_factor()
-    example_3_factor_in_signal(data_path)
-    # example_5_alpha1_factor()  # Alpha#1因子测试
-    example_6_alpha1_signal(data_path)  # 基于Alpha#1因子的策略回测
+    data_path = "/Users/user/Desktop/repo/cyqnt_trd/tmp/data/ETHUSDT_futures/ETHUSDT_30m_1775_20251130_000000_20260105_235959_20260108_230726.json"
+    # example_1_use_factor(data_path)
+    # example_2_use_signal(data_path)
+    # example_4_multi_factor(data_path)
+    # example_3_factor_in_signal(data_path)
+    example_5_normalized_alpha1_factor(data_path)  # Alpha#1因子测试
+    # example_6_alpha1_signal(data_path)  # 基于Alpha#1因子的策略回测
+    # example_7_normalized_alpha15_signal(data_path)  # 基于归一化Alpha#15因子的策略回测
     
     
     # print("\n提示：")

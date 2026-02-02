@@ -96,6 +96,9 @@ class RealtimePriceTracker:
         self.stream = None
         self.is_running = False
         
+        # 对于 10m 间隔，需要缓存 1m 数据用于合并（需要10个1m周期）
+        self._pending_1m_klines: list = []
+        
         # 回调函数
         self.on_new_kline_callbacks: list = []
         self.on_data_updated_callbacks: list = []
@@ -136,6 +139,7 @@ class RealtimePriceTracker:
             "1m": KlineCandlestickDataIntervalEnum.INTERVAL_1m,
             "3m": KlineCandlestickDataIntervalEnum.INTERVAL_3m,
             "5m": KlineCandlestickDataIntervalEnum.INTERVAL_5m,
+            "10m": "10m",  # Binance API 可能不支持，但尝试使用字符串格式
             "15m": KlineCandlestickDataIntervalEnum.INTERVAL_15m,
             "30m": KlineCandlestickDataIntervalEnum.INTERVAL_30m,
             "1h": KlineCandlestickDataIntervalEnum.INTERVAL_1h,
@@ -223,11 +227,19 @@ class RealtimePriceTracker:
             
             interval_enum = self.interval_map[self.interval]
             
+            # 对于 10m 间隔，使用 1m 获取数据然后合并
+            if self.interval == "10m":
+                # 获取 10 倍的数据量（因为要合并成 10m）
+                base_limit = self.lookback_periods * 10
+                interval_enum = KlineCandlestickDataIntervalEnum.INTERVAL_1m
+            else:
+                base_limit = self.lookback_periods
+            
             # 查询历史 K 线数据
             response = self.rest_client.rest_api.kline_candlestick_data(
                 symbol=self.symbol,
                 interval=interval_enum,
-                limit=self.lookback_periods
+                limit=base_limit
             )
             
             klines_data = response.data()
@@ -235,6 +247,10 @@ class RealtimePriceTracker:
             if not klines_data:
                 logging.warning("未获取到历史数据")
                 return False
+            
+            # 对于 10m 间隔，合并 1m 数据
+            if self.interval == "10m":
+                klines_data = self._merge_1m_to_10m(klines_data)
             
             # 转换为 DataFrame
             data_list = []
@@ -255,6 +271,73 @@ class RealtimePriceTracker:
             import traceback
             logging.error(traceback.format_exc())
             return False
+    
+    def _merge_1m_to_10m(self, klines_data: list) -> list:
+        """
+        将 1m K线数据合并为 10m K线数据
+        
+        Args:
+            klines_data: 1m K线数据列表
+        
+        Returns:
+            合并后的 10m K线数据列表
+        """
+        if not klines_data or len(klines_data) < 10:
+            return klines_data
+        
+        merged = []
+        # 从后往前处理，每10个1m周期合并成1个10m周期
+        i = len(klines_data) - 1
+        while i >= 9:
+            # 获取10个1m周期
+            klines_10m = klines_data[i - 9:i + 1]  # 包含i-9到i，共10个
+            
+            # 提取第一个（最旧的）和最后一个（最新的）的数据
+            kline_first = klines_10m[0]
+            kline_last = klines_10m[-1]
+            
+            # 提取所有数据用于计算
+            open_time_first = int(kline_first[0]) if isinstance(kline_first[0], str) else kline_first[0]
+            open_price_first = float(kline_first[1]) if isinstance(kline_first[1], str) else kline_first[1]
+            close_time_last = int(kline_last[6]) if isinstance(kline_last[6], str) else kline_last[6]
+            close_price_last = float(kline_last[4]) if isinstance(kline_last[4], str) else kline_last[4]
+            
+            # 计算最高价和最低价
+            high_prices = [float(k[2]) if isinstance(k[2], str) else k[2] for k in klines_10m]
+            low_prices = [float(k[3]) if isinstance(k[3], str) else k[3] for k in klines_10m]
+            max_high = max(high_prices)
+            min_low = min(low_prices)
+            
+            # 合并成交量、成交额等
+            total_volume = sum(float(k[5]) if isinstance(k[5], str) else k[5] for k in klines_10m)
+            total_quote_volume = sum(float(k[7]) if isinstance(k[7], str) else k[7] for k in klines_10m)
+            total_trades = sum(int(k[8]) if isinstance(k[8], str) else k[8] for k in klines_10m)
+            total_taker_buy_base_volume = sum(float(k[9]) if isinstance(k[9], str) else k[9] for k in klines_10m)
+            total_taker_buy_quote_volume = sum(float(k[10]) if isinstance(k[10], str) else k[10] for k in klines_10m)
+            
+            # 合并：开盘价用第一个，收盘价用最后一个，最高价和最低价取10个周期的最大最小值
+            merged_kline = [
+                open_time_first,  # open_time: 使用第一个的开始时间
+                str(open_price_first),  # open_price: 使用第一个的开盘价
+                str(max_high),  # high_price: 取10个周期的最高价
+                str(min_low),  # low_price: 取10个周期的最低价
+                str(close_price_last),  # close_price: 使用最后一个的收盘价
+                str(total_volume),  # volume: 合并10个周期的成交量
+                close_time_last,  # close_time: 使用最后一个的结束时间
+                str(total_quote_volume),  # quote_volume: 合并10个周期的成交额
+                total_trades,  # trades: 合并10个周期的成交笔数
+                str(total_taker_buy_base_volume),  # taker_buy_base_volume
+                str(total_taker_buy_quote_volume),  # taker_buy_quote_volume
+                "0"  # ignore
+            ]
+            
+            merged.insert(0, merged_kline)
+            i -= 10
+        
+        # 如果还有剩余的1m周期（少于10个），可以保留或丢弃
+        # 这里选择丢弃，因为不完整的10m周期可能不准确
+        
+        return merged
     
     def _handle_kline_message(self, data: Any):
         """
@@ -305,6 +388,61 @@ class RealtimePriceTracker:
                         str(kline_info.get('Q', '0')),  # taker_buy_quote_volume
                         "0"  # ignore
                     ]
+                    
+                    # 对于 10m 间隔，需要合并 1m 数据
+                    if self.interval == "10m":
+                        # 将新的1m周期添加到缓存
+                        self._pending_1m_klines.append(kline_data)
+                        
+                        # 如果缓存了10个1m周期，合并成1个10m周期
+                        if len(self._pending_1m_klines) >= 10:
+                            klines_10m = self._pending_1m_klines[-10:]  # 取最后10个
+                            
+                            # 提取第一个（最旧的）和最后一个（最新的）的数据
+                            kline_first = klines_10m[0]
+                            kline_last = klines_10m[-1]
+                            
+                            # 提取所有数据用于计算
+                            open_time_first = int(kline_first[0]) if isinstance(kline_first[0], str) else kline_first[0]
+                            open_price_first = float(kline_first[1]) if isinstance(kline_first[1], str) else kline_first[1]
+                            close_time_last = int(kline_last[6]) if isinstance(kline_last[6], str) else kline_last[6]
+                            close_price_last = float(kline_last[4]) if isinstance(kline_last[4], str) else kline_last[4]
+                            
+                            # 计算最高价和最低价
+                            high_prices = [float(k[2]) if isinstance(k[2], str) else k[2] for k in klines_10m]
+                            low_prices = [float(k[3]) if isinstance(k[3], str) else k[3] for k in klines_10m]
+                            max_high = max(high_prices)
+                            min_low = min(low_prices)
+                            
+                            # 合并成交量、成交额等
+                            total_volume = sum(float(k[5]) if isinstance(k[5], str) else k[5] for k in klines_10m)
+                            total_quote_volume = sum(float(k[7]) if isinstance(k[7], str) else k[7] for k in klines_10m)
+                            total_trades = sum(int(k[8]) if isinstance(k[8], str) else k[8] for k in klines_10m)
+                            total_taker_buy_base_volume = sum(float(k[9]) if isinstance(k[9], str) else k[9] for k in klines_10m)
+                            total_taker_buy_quote_volume = sum(float(k[10]) if isinstance(k[10], str) else k[10] for k in klines_10m)
+                            
+                            # 合并：开盘价用第一个，收盘价用最后一个，最高价和最低价取10个周期的最大最小值
+                            merged_kline = [
+                                open_time_first,  # open_time: 使用第一个的开始时间
+                                str(open_price_first),  # open_price: 使用第一个的开盘价
+                                str(max_high),  # high_price: 取10个周期的最高价
+                                str(min_low),  # low_price: 取10个周期的最低价
+                                str(close_price_last),  # close_price: 使用最后一个的收盘价
+                                str(total_volume),  # volume: 合并10个周期的成交量
+                                close_time_last,  # close_time: 使用最后一个的结束时间
+                                str(total_quote_volume),  # quote_volume: 合并10个周期的成交额
+                                total_trades,  # trades: 合并10个周期的成交笔数
+                                str(total_taker_buy_base_volume),  # taker_buy_base_volume
+                                str(total_taker_buy_quote_volume),  # taker_buy_quote_volume
+                                "0"  # ignore
+                            ]
+                            
+                            kline_data = merged_kline
+                            # 清空缓存（保留最后9个，因为下一个10m周期会用到）
+                            self._pending_1m_klines = self._pending_1m_klines[-9:]
+                        else:
+                            # 还没有10个1m周期，等待更多数据
+                            return
                     
                     kline_dict = self._kline_to_dict(kline_data)
                     self.latest_kline = kline_dict
@@ -442,9 +580,11 @@ class RealtimePriceTracker:
                 return
             
             # 订阅 K 线流
+            # 对于 10m 间隔，使用 1m 流然后合并
+            ws_interval = "1m" if self.interval == "10m" else self.interval
             self.stream = await self.connection.kline_candlestick_streams(
                 symbol=self.symbol.lower(),
-                interval=self.interval,
+                interval=ws_interval,
             )
             
             # 检查流是否成功创建

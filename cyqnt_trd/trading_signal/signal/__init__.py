@@ -8,12 +8,13 @@
 
 # 导入所有信号策略
 from .ma_signal import ma_signal, ma_cross_signal
-from .factor_based_signal import factor_based_signal, multi_factor_signal
+from .factor_based_signal import factor_based_signal, multi_factor_signal, normalized_factor_signal
 
 __all__ = [
     'ma_signal',
     'ma_cross_signal',
     'factor_based_signal',
     'multi_factor_signal',
+    'normalized_factor_signal',
 ]
 

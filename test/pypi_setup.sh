@@ -1,4 +1,4 @@
-export TWINE_USERNAME='binance_agent'
+export TWINE_USERNAME='__token__'
 export TWINE_PASSWORD='pypi-your-token-here'
 
 

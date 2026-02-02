@@ -421,7 +421,7 @@ def get_and_save_klines_direct(
     start_time: Optional[Union[datetime, str, int]] = None,
     end_time: Optional[Union[datetime, str, int]] = None,
     output_dir: str = "data",
-    save_csv: bool = True,
+    save_csv: bool = False,
     save_json: bool = True,
     base_url: str = "https://www.binance.com/api/v3/uiKlines"
 ) -> Optional[list]:
@@ -751,14 +751,14 @@ if __name__ == "__main__":
     # )
     
     # 示例用法 - 使用直接HTTP请求方法（避免数据量限制）
-    symbol_list = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT", "DOTUSDT", "BNBUSDT", "LINKUSDT", "LTCUSDT"]
+    symbol_list = ['BTCUSDT', 'BNBUSDT', 'DOGEUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'ZECUSDT']
     for symbol in symbol_list:
         get_and_save_klines_direct(
             symbol=symbol,
             interval="3m",
-            start_time='2025-10-02',
-            end_time='2025-12-08',
-            output_dir=f"/Users/user/Desktop/repo/cyqnt_trd/tmp/data/{symbol}_current"
+            start_time='2025-12-15',
+            end_time='2025-12-21',
+            output_dir=f"/Users/user/Desktop/repo/data_all/tmp/data/{symbol}_current"
         )
     
     # 查询 ETHUSDT 最近100天的日线数据
