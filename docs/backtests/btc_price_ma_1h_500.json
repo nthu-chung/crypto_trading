@@ -1,0 +1,4399 @@
+{
+  "request_id": "cc659431-bf79-475f-9f49-f870bb3b0834",
+  "total_return": -0.09966872459176465,
+  "metrics": {
+    "snapshot_count": 500.0,
+    "trade_count": 126.0,
+    "final_equity": 9003.312754082353,
+    "total_return": -0.09966872459176465
+  },
+  "equity_curve": [
+    {
+      "timestamp": 1773932399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773935999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773939599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773943199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773946799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773950399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773953999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773957599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773961199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773964799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773968399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773971999999,
+      "equity": 9990.0,
+      "cash": -10.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773975599999,
+      "equity": 9990.412102161546,
+      "cash": -10.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773979199999,
+      "equity": 10036.212283770707,
+      "cash": -10.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773982799999,
+      "equity": 10042.93381212973,
+      "cash": -10.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773986399999,
+      "equity": 10018.321365791826,
+      "cash": -10.0,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773989999999,
+      "equity": 9992.932746348277,
+      "cash": 9992.932746348277,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773993599999,
+      "equity": 9982.939813601928,
+      "cash": -9.992932746348277,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1773997199999,
+      "equity": 10009.54082025034,
+      "cash": -9.992932746348277,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774000799999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774004399999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774007999999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774011599999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774015199999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774018799999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774022399999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774025999999,
+      "equity": 9935.305680291385,
+      "cash": 9935.305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774029599999,
+      "equity": 9925.370374611093,
+      "cash": -9.935305680291385,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774033199999,
+      "equity": 9881.745651860108,
+      "cash": 9881.745651860108,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774036799999,
+      "equity": 9871.863906208247,
+      "cash": -9.88174565186011,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774040399999,
+      "equity": 9854.648100553464,
+      "cash": -9.88174565186011,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774043999999,
+      "equity": 9922.07432466459,
+      "cash": -9.88174565186011,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774047599999,
+      "equity": 9956.012848250823,
+      "cash": -9.88174565186011,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774051199999,
+      "equity": 9918.467740173899,
+      "cash": -9.88174565186011,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774054799999,
+      "equity": 9942.586773955398,
+      "cash": -9.88174565186011,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774058399999,
+      "equity": 9902.571958530929,
+      "cash": 9902.571958530929,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774061999999,
+      "equity": 9892.669386572397,
+      "cash": -9.90257195853093,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774065599999,
+      "equity": 9883.467619512463,
+      "cash": -9.90257195853093,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774069199999,
+      "equity": 9878.523595506136,
+      "cash": -9.90257195853093,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774072799999,
+      "equity": 9888.495677921162,
+      "cash": -9.90257195853093,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774076399999,
+      "equity": 9897.641422046181,
+      "cash": -9.90257195853093,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774079999999,
+      "equity": 9890.372446240846,
+      "cash": -9.90257195853093,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774083599999,
+      "equity": 9863.122428508546,
+      "cash": 9863.122428508546,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774087199999,
+      "equity": 9863.122428508546,
+      "cash": 9863.122428508546,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774090799999,
+      "equity": 9863.122428508546,
+      "cash": 9863.122428508546,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774094399999,
+      "equity": 9863.122428508546,
+      "cash": 9863.122428508546,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774097999999,
+      "equity": 9853.259306080037,
+      "cash": -9.863122428508547,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774101599999,
+      "equity": 9856.092093082001,
+      "cash": -9.863122428508547,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774105199999,
+      "equity": 9831.546621667703,
+      "cash": 9831.546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774108799999,
+      "equity": 9831.546621667703,
+      "cash": 9831.546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774112399999,
+      "equity": 9831.546621667703,
+      "cash": 9831.546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774115999999,
+      "equity": 9831.546621667703,
+      "cash": 9831.546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774119599999,
+      "equity": 9831.546621667703,
+      "cash": 9831.546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774123199999,
+      "equity": 9831.546621667703,
+      "cash": 9831.546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774126799999,
+      "equity": 9821.715075046035,
+      "cash": -9.831546621667703,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774130399999,
+      "equity": 9796.432599160065,
+      "cash": 9796.432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774133999999,
+      "equity": 9796.432599160065,
+      "cash": 9796.432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774137599999,
+      "equity": 9796.432599160065,
+      "cash": 9796.432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774141199999,
+      "equity": 9796.432599160065,
+      "cash": 9796.432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774144799999,
+      "equity": 9796.432599160065,
+      "cash": 9796.432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774148399999,
+      "equity": 9796.432599160065,
+      "cash": 9796.432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774151999999,
+      "equity": 9786.636166560906,
+      "cash": -9.796432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774155599999,
+      "equity": 9787.54079623229,
+      "cash": -9.796432599160065,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774159199999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774162799999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774166399999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774169999999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774173599999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774177199999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774180799999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774184399999,
+      "equity": 9749.925672563237,
+      "cash": 9749.925672563237,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774187999999,
+      "equity": 9740.175746890673,
+      "cash": -9.749925672563236,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774191599999,
+      "equity": 9742.334182991635,
+      "cash": -9.749925672563236,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774195199999,
+      "equity": 9762.129314075468,
+      "cash": -9.749925672563236,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774198799999,
+      "equity": 9754.603188197108,
+      "cash": -9.749925672563236,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774202399999,
+      "equity": 9726.836753789095,
+      "cash": 9726.836753789095,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774205999999,
+      "equity": 9726.836753789095,
+      "cash": 9726.836753789095,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774209599999,
+      "equity": 9726.836753789095,
+      "cash": 9726.836753789095,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774213199999,
+      "equity": 9726.836753789095,
+      "cash": 9726.836753789095,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774216799999,
+      "equity": 9726.836753789095,
+      "cash": 9726.836753789095,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774220399999,
+      "equity": 9717.109917035306,
+      "cash": -9.726836753789096,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774223999999,
+      "equity": 9640.389133443865,
+      "cash": 9640.389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774227599999,
+      "equity": 9640.389133443865,
+      "cash": 9640.389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774231199999,
+      "equity": 9640.389133443865,
+      "cash": 9640.389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774234799999,
+      "equity": 9630.748744310422,
+      "cash": -9.640389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774238399999,
+      "equity": 9597.245757576415,
+      "cash": -9.640389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774241999999,
+      "equity": 9662.105732736984,
+      "cash": -9.640389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774245599999,
+      "equity": 9712.889653209899,
+      "cash": -9.640389133443865,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774249199999,
+      "equity": 9559.458496997739,
+      "cash": 9559.458496997739,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774252799999,
+      "equity": 9559.458496997739,
+      "cash": 9559.458496997739,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774256399999,
+      "equity": 9549.89903850074,
+      "cash": -9.559458496997738,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774259999999,
+      "equity": 9527.061888910288,
+      "cash": 9527.061888910288,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774263599999,
+      "equity": 9517.534827021378,
+      "cash": -9.52706188891029,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774267199999,
+      "equity": 9737.953172952639,
+      "cash": -9.52706188891029,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774270799999,
+      "equity": 9823.15304712593,
+      "cash": -9.52706188891029,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774274399999,
+      "equity": 9926.05480473689,
+      "cash": -9.52706188891029,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774277999999,
+      "equity": 9920.46473628289,
+      "cash": -9.52706188891029,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774281599999,
+      "equity": 9730.27556157214,
+      "cash": 9730.27556157214,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774285199999,
+      "equity": 9730.27556157214,
+      "cash": 9730.27556157214,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774288799999,
+      "equity": 9720.545286010567,
+      "cash": -9.73027556157214,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774292399999,
+      "equity": 9718.874563267433,
+      "cash": -9.73027556157214,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774295999999,
+      "equity": 9655.325871148085,
+      "cash": 9655.325871148085,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774299599999,
+      "equity": 9645.670545276937,
+      "cash": -9.655325871148085,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774303199999,
+      "equity": 9627.455092688395,
+      "cash": 9627.455092688395,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774306799999,
+      "equity": 9627.455092688395,
+      "cash": 9627.455092688395,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774310399999,
+      "equity": 9617.827637595707,
+      "cash": -9.627455092688395,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774313999999,
+      "equity": 9578.89851573583,
+      "cash": 9578.89851573583,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774317599999,
+      "equity": 9578.89851573583,
+      "cash": 9578.89851573583,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774321199999,
+      "equity": 9578.89851573583,
+      "cash": 9578.89851573583,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774324799999,
+      "equity": 9578.89851573583,
+      "cash": 9578.89851573583,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774328399999,
+      "equity": 9578.89851573583,
+      "cash": 9578.89851573583,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774331999999,
+      "equity": 9578.89851573583,
+      "cash": 9578.89851573583,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774335599999,
+      "equity": 9569.319617220093,
+      "cash": -9.578898515735828,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774339199999,
+      "equity": 9670.858294510563,
+      "cash": -9.578898515735828,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774342799999,
+      "equity": 9627.194217870001,
+      "cash": -9.578898515735828,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774346399999,
+      "equity": 9675.382294983901,
+      "cash": -9.578898515735828,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774349999999,
+      "equity": 9668.440060023313,
+      "cash": -9.578898515735828,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774353599999,
+      "equity": 9652.001499744818,
+      "cash": -9.578898515735828,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774357199999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774360799999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774364399999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774367999999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774371599999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774375199999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774378799999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774382399999,
+      "equity": 9616.281676620132,
+      "cash": 9616.281676620132,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774385999999,
+      "equity": 9606.665394943511,
+      "cash": -9.616281676620131,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774389599999,
+      "equity": 9638.176817974625,
+      "cash": -9.616281676620131,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774393199999,
+      "equity": 9635.665236783556,
+      "cash": -9.616281676620131,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774396799999,
+      "equity": 9669.427475745466,
+      "cash": -9.616281676620131,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774400399999,
+      "equity": 9707.910938367091,
+      "cash": -9.616281676620131,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774403999999,
+      "equity": 9685.787064705872,
+      "cash": -9.616281676620131,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774407599999,
+      "equity": 9656.471559656018,
+      "cash": 9656.471559656018,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774411199999,
+      "equity": 9646.815088096362,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774414799999,
+      "equity": 9680.802270372074,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774418399999,
+      "equity": 9700.200099484417,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774421999999,
+      "equity": 9684.176399802178,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774425599999,
+      "equity": 9675.59764157503,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774429199999,
+      "equity": 9717.822071001969,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774432799999,
+      "equity": 9730.444320368028,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774436399999,
+      "equity": 9752.464954543448,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774439999999,
+      "equity": 9778.0919456806,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774443599999,
+      "equity": 9782.886761186537,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774447199999,
+      "equity": 9763.926066251375,
+      "cash": -9.656471559656019,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774450799999,
+      "equity": 9707.344019416747,
+      "cash": 9707.344019416747,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774454399999,
+      "equity": 9707.344019416747,
+      "cash": 9707.344019416747,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774457999999,
+      "equity": 9707.344019416747,
+      "cash": 9707.344019416747,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774461599999,
+      "equity": 9707.344019416747,
+      "cash": 9707.344019416747,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774465199999,
+      "equity": 9707.344019416747,
+      "cash": 9707.344019416747,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774468799999,
+      "equity": 9707.344019416747,
+      "cash": 9707.344019416747,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774472399999,
+      "equity": 9697.63667539733,
+      "cash": -9.707344019416748,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774475999999,
+      "equity": 9701.740103896449,
+      "cash": -9.707344019416748,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774479599999,
+      "equity": 9746.891495481761,
+      "cash": -9.707344019416748,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774483199999,
+      "equity": 9742.432436512716,
+      "cash": -9.707344019416748,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774486799999,
+      "equity": 9738.096480398648,
+      "cash": -9.707344019416748,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774490399999,
+      "equity": 9730.8607681452,
+      "cash": -9.707344019416748,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774493999999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774497599999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774501199999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774504799999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774508399999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774511999999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774515599999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774519199999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774522799999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774526399999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774529999999,
+      "equity": 9672.215251940535,
+      "cash": 9672.215251940535,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774533599999,
+      "equity": 9662.543036688596,
+      "cash": -9.672215251940536,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774537199999,
+      "equity": 9629.650427540333,
+      "cash": 9629.650427540333,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774540799999,
+      "equity": 9629.650427540333,
+      "cash": 9629.650427540333,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774544399999,
+      "equity": 9629.650427540333,
+      "cash": 9629.650427540333,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774547999999,
+      "equity": 9629.650427540333,
+      "cash": 9629.650427540333,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774551599999,
+      "equity": 9629.650427540333,
+      "cash": 9629.650427540333,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774555199999,
+      "equity": 9629.650427540333,
+      "cash": 9629.650427540333,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774558799999,
+      "equity": 9620.020777112793,
+      "cash": -9.629650427540334,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774562399999,
+      "equity": 9607.734818710856,
+      "cash": -9.629650427540334,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774565999999,
+      "equity": 9604.481831997615,
+      "cash": -9.629650427540334,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774569599999,
+      "equity": 9594.080651305067,
+      "cash": -9.629650427540334,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774573199999,
+      "equity": 9578.674841302753,
+      "cash": 9578.674841302753,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774576799999,
+      "equity": 9569.09616646145,
+      "cash": -9.578674841302753,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774580399999,
+      "equity": 9548.888577295778,
+      "cash": -9.578674841302753,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774583999999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774587599999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774591199999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774594799999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774598399999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774601999999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774605599999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774609199999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774612799999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774616399999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774619999999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774623599999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774627199999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774630799999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774634399999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774637999999,
+      "equity": 9519.641867022598,
+      "cash": 9519.641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774641599999,
+      "equity": 9510.122225155576,
+      "cash": -9.519641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774645199999,
+      "equity": 9506.89158072616,
+      "cash": -9.519641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774648799999,
+      "equity": 9515.155684556763,
+      "cash": -9.519641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774652399999,
+      "equity": 9506.617552850452,
+      "cash": -9.519641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774655999999,
+      "equity": 9561.870226105311,
+      "cash": -9.519641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774659599999,
+      "equity": 9565.576813687274,
+      "cash": -9.519641867022598,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774663199999,
+      "equity": 9519.578047372597,
+      "cash": 9519.578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774666799999,
+      "equity": 9519.578047372597,
+      "cash": 9519.578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774670399999,
+      "equity": 9510.058469325224,
+      "cash": -9.519578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774673999999,
+      "equity": 9517.493864420223,
+      "cash": -9.519578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774677599999,
+      "equity": 9527.057767201992,
+      "cash": -9.519578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774681199999,
+      "equity": 9533.989798992687,
+      "cash": -9.519578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774684799999,
+      "equity": 9557.374619929764,
+      "cash": -9.519578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774688399999,
+      "equity": 9536.39156104465,
+      "cash": -9.519578047372597,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774691999999,
+      "equity": 9511.903525944435,
+      "cash": 9511.903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774695599999,
+      "equity": 9511.903525944435,
+      "cash": 9511.903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774699199999,
+      "equity": 9511.903525944435,
+      "cash": 9511.903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774702799999,
+      "equity": 9502.39162241849,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774706399999,
+      "equity": 9559.190905405896,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774709999999,
+      "equity": 9545.284676515132,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774713599999,
+      "equity": 9583.394331590645,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774717199999,
+      "equity": 9570.79136410983,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774720799999,
+      "equity": 9558.51779236999,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774724399999,
+      "equity": 9567.46876359216,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774727999999,
+      "equity": 9567.740873117313,
+      "cash": -9.511903525944435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774731599999,
+      "equity": 9559.952024390861,
+      "cash": 9559.952024390861,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774735199999,
+      "equity": 9559.952024390861,
+      "cash": 9559.952024390861,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774738799999,
+      "equity": 9559.952024390861,
+      "cash": 9559.952024390861,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774742399999,
+      "equity": 9559.952024390861,
+      "cash": 9559.952024390861,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774745999999,
+      "equity": 9559.952024390861,
+      "cash": 9559.952024390861,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774749599999,
+      "equity": 9559.952024390861,
+      "cash": 9559.952024390861,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774753199999,
+      "equity": 9550.39207236647,
+      "cash": -9.559952024390862,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774756799999,
+      "equity": 9564.995353396096,
+      "cash": -9.559952024390862,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774760399999,
+      "equity": 9540.11250787699,
+      "cash": -9.559952024390862,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774763999999,
+      "equity": 9545.753383098237,
+      "cash": -9.559952024390862,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774767599999,
+      "equity": 9530.92040104818,
+      "cash": 9530.92040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774771199999,
+      "equity": 9530.92040104818,
+      "cash": 9530.92040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774774799999,
+      "equity": 9530.92040104818,
+      "cash": 9530.92040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774778399999,
+      "equity": 9530.92040104818,
+      "cash": 9530.92040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774781999999,
+      "equity": 9530.92040104818,
+      "cash": 9530.92040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774785599999,
+      "equity": 9521.389480647133,
+      "cash": -9.53092040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774789199999,
+      "equity": 9526.784276623815,
+      "cash": -9.53092040104818,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774792799999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774796399999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774799999999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774803599999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774807199999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774810799999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774814399999,
+      "equity": 9478.381539155353,
+      "cash": 9478.381539155353,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774817999999,
+      "equity": 9468.903157616198,
+      "cash": -9.478381539155352,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774821599999,
+      "equity": 9483.168008938144,
+      "cash": -9.478381539155352,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774825199999,
+      "equity": 9351.57827187869,
+      "cash": 9351.57827187869,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774828799999,
+      "equity": 9351.57827187869,
+      "cash": 9351.57827187869,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774832399999,
+      "equity": 9351.57827187869,
+      "cash": 9351.57827187869,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774835999999,
+      "equity": 9342.226693606812,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774839599999,
+      "equity": 9407.200863344979,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774843199999,
+      "equity": 9414.612045376034,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774846799999,
+      "equity": 9476.273641327594,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774850399999,
+      "equity": 9459.416009472865,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774853999999,
+      "equity": 9433.364581727337,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774857599999,
+      "equity": 9478.63174470111,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774861199999,
+      "equity": 9483.979586280338,
+      "cash": -9.351578271878692,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774864799999,
+      "equity": 9450.956847000894,
+      "cash": 9450.956847000894,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774868399999,
+      "equity": 9450.956847000894,
+      "cash": 9450.956847000894,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774871999999,
+      "equity": 9441.505890153894,
+      "cash": -9.450956847000894,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774875599999,
+      "equity": 9470.535680074396,
+      "cash": -9.450956847000894,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774879199999,
+      "equity": 9409.641448817136,
+      "cash": 9409.641448817136,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774882799999,
+      "equity": 9400.231807368318,
+      "cash": -9.409641448817135,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774886399999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774889999999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774893599999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774897199999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774900799999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774904399999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774907999999,
+      "equity": 9366.892482085017,
+      "cash": 9366.892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774911599999,
+      "equity": 9357.525589602932,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774915199999,
+      "equity": 9360.037592111368,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774918799999,
+      "equity": 9417.308442596996,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774922399999,
+      "equity": 9518.869125019068,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774925999999,
+      "equity": 9521.058356255471,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774929599999,
+      "equity": 9487.237540359769,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774933199999,
+      "equity": 9464.685651918113,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774936799999,
+      "equity": 9484.164196508664,
+      "cash": -9.366892482085017,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774940399999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774943999999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774947599999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774951199999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774954799999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774958399999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774961999999,
+      "equity": 9448.944882858908,
+      "cash": 9448.944882858908,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774965599999,
+      "equity": 9439.49593797605,
+      "cash": -9.448944882858909,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774969199999,
+      "equity": 9331.84230370224,
+      "cash": 9331.84230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774972799999,
+      "equity": 9322.510461398539,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774976399999,
+      "equity": 9452.988364433511,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774979999999,
+      "equity": 9433.583169118316,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774983599999,
+      "equity": 9478.451562323675,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774987199999,
+      "equity": 9476.828633227376,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774990799999,
+      "equity": 9536.177471386754,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774994399999,
+      "equity": 9537.212788224047,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1774997999999,
+      "equity": 9524.201373917536,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775001599999,
+      "equity": 9538.178151220982,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775005199999,
+      "equity": 9544.683858374237,
+      "cash": -9.33184230370224,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775008799999,
+      "equity": 9459.431616798094,
+      "cash": 9459.431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775012399999,
+      "equity": 9459.431616798094,
+      "cash": 9459.431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775015999999,
+      "equity": 9449.972185181296,
+      "cash": -9.459431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775019599999,
+      "equity": 9469.173162558276,
+      "cash": -9.459431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775023199999,
+      "equity": 9489.429291258937,
+      "cash": -9.459431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775026799999,
+      "equity": 9579.797448704176,
+      "cash": -9.459431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775030399999,
+      "equity": 9521.87519446212,
+      "cash": -9.459431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775033999999,
+      "equity": 9518.945761181902,
+      "cash": -9.459431616798094,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775037599999,
+      "equity": 9506.310546217945,
+      "cash": 9506.310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775041199999,
+      "equity": 9506.310546217945,
+      "cash": 9506.310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775044799999,
+      "equity": 9506.310546217945,
+      "cash": 9506.310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775048399999,
+      "equity": 9506.310546217945,
+      "cash": 9506.310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775051999999,
+      "equity": 9506.310546217945,
+      "cash": 9506.310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775055599999,
+      "equity": 9496.804235671727,
+      "cash": -9.506310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775059199999,
+      "equity": 9540.883812600869,
+      "cash": -9.506310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775062799999,
+      "equity": 9527.586450450806,
+      "cash": -9.506310546217945,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775066399999,
+      "equity": 9443.054647823537,
+      "cash": 9443.054647823537,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775069999999,
+      "equity": 9443.054647823537,
+      "cash": 9443.054647823537,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775073599999,
+      "equity": 9443.054647823537,
+      "cash": 9443.054647823537,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775077199999,
+      "equity": 9443.054647823537,
+      "cash": 9443.054647823537,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775080799999,
+      "equity": 9433.611593175714,
+      "cash": -9.443054647823537,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775084399999,
+      "equity": 9391.542527444528,
+      "cash": 9391.542527444528,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775087999999,
+      "equity": 9391.542527444528,
+      "cash": 9391.542527444528,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775091599999,
+      "equity": 9382.150984917083,
+      "cash": -9.391542527444528,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775095199999,
+      "equity": 9201.892748767576,
+      "cash": 9201.892748767576,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775098799999,
+      "equity": 9201.892748767576,
+      "cash": 9201.892748767576,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775102399999,
+      "equity": 9201.892748767576,
+      "cash": 9201.892748767576,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775105999999,
+      "equity": 9201.892748767576,
+      "cash": 9201.892748767576,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775109599999,
+      "equity": 9201.892748767576,
+      "cash": 9201.892748767576,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775113199999,
+      "equity": 9201.892748767576,
+      "cash": 9201.892748767576,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775116799999,
+      "equity": 9192.690856018808,
+      "cash": -9.201892748767575,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775120399999,
+      "equity": 9118.936078591765,
+      "cash": 9118.936078591765,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775123999999,
+      "equity": 9118.936078591765,
+      "cash": 9118.936078591765,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775127599999,
+      "equity": 9118.936078591765,
+      "cash": 9118.936078591765,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775131199999,
+      "equity": 9118.936078591765,
+      "cash": 9118.936078591765,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775134799999,
+      "equity": 9118.936078591765,
+      "cash": 9118.936078591765,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775138399999,
+      "equity": 9118.936078591765,
+      "cash": 9118.936078591765,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775141999999,
+      "equity": 9109.817142513173,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775145599999,
+      "equity": 9108.206852464817,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775149199999,
+      "equity": 9140.890281836148,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775152799999,
+      "equity": 9085.116930754466,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775156399999,
+      "equity": 9126.083801306755,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775159999999,
+      "equity": 9126.30214572009,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775163599999,
+      "equity": 9121.266577687515,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775167199999,
+      "equity": 9121.86702482419,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775170799999,
+      "equity": 9127.775970510114,
+      "cash": -9.118936078591766,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775174399999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775177999999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775181599999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775185199999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775188799999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775192399999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775195999999,
+      "equity": 9106.982963795435,
+      "cash": 9106.982963795435,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775199599999,
+      "equity": 9097.875980831639,
+      "cash": -9.106982963795437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775203199999,
+      "equity": 9131.541889514196,
+      "cash": -9.106982963795437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775206799999,
+      "equity": 9121.474855232296,
+      "cash": -9.106982963795437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775210399999,
+      "equity": 9107.001788331083,
+      "cash": -9.106982963795437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775213999999,
+      "equity": 9109.238907060395,
+      "cash": -9.106982963795437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775217599999,
+      "equity": 9128.077083677334,
+      "cash": -9.106982963795437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775221199999,
+      "equity": 9079.011831811891,
+      "cash": 9079.011831811891,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775224799999,
+      "equity": 9079.011831811891,
+      "cash": 9079.011831811891,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775228399999,
+      "equity": 9069.932819980078,
+      "cash": -9.079011831811892,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775231999999,
+      "equity": 9048.123364324707,
+      "cash": 9048.123364324707,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775235599999,
+      "equity": 9039.075240960383,
+      "cash": -9.048123364324708,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775239199999,
+      "equity": 9017.256256700599,
+      "cash": -9.048123364324708,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775242799999,
+      "equity": 9004.545354103679,
+      "cash": 9004.545354103679,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775246399999,
+      "equity": 8995.540808749574,
+      "cash": -9.004545354103678,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775249999999,
+      "equity": 8978.880426728887,
+      "cash": 8978.880426728887,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775253599999,
+      "equity": 8969.901546302159,
+      "cash": -8.978880426728887,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775257199999,
+      "equity": 8960.577822239411,
+      "cash": -8.978880426728887,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775260799999,
+      "equity": 8969.96862345369,
+      "cash": -8.978880426728887,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775264399999,
+      "equity": 8952.063934042522,
+      "cash": 8952.063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775267999999,
+      "equity": 8952.063934042522,
+      "cash": 8952.063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775271599999,
+      "equity": 8952.063934042522,
+      "cash": 8952.063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775275199999,
+      "equity": 8952.063934042522,
+      "cash": 8952.063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775278799999,
+      "equity": 8952.063934042522,
+      "cash": 8952.063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775282399999,
+      "equity": 8943.11187010848,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775285999999,
+      "equity": 8957.904576434266,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775289599999,
+      "equity": 8957.971511757009,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775293199999,
+      "equity": 8948.038309862226,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775296799999,
+      "equity": 8953.968779457091,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775300399999,
+      "equity": 8979.002590162268,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775303999999,
+      "equity": 8977.637109578347,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775307599999,
+      "equity": 8968.681163395588,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775311199999,
+      "equity": 8983.139193107669,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775314799999,
+      "equity": 8984.156610013333,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775318399999,
+      "equity": 9008.213165006491,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775321999999,
+      "equity": 9005.254623741333,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775325599999,
+      "equity": 9000.850279504968,
+      "cash": -8.952063934042522,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775329199999,
+      "equity": 8986.945711202503,
+      "cash": 8986.945711202503,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775332799999,
+      "equity": 8986.945711202503,
+      "cash": 8986.945711202503,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775336399999,
+      "equity": 8986.945711202503,
+      "cash": 8986.945711202503,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775339999999,
+      "equity": 8977.958765491301,
+      "cash": -8.986945711200681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775343599999,
+      "equity": 8983.818801387652,
+      "cash": -8.986945711200681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775347199999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775350799999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775354399999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775357999999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775361599999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775365199999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775368799999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775372399999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775375999999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775379599999,
+      "equity": 8961.770783414166,
+      "cash": 8961.770783414166,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775383199999,
+      "equity": 8952.80901263075,
+      "cash": -8.961770783414165,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775386799999,
+      "equity": 8954.989394500857,
+      "cash": -8.961770783414165,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775390399999,
+      "equity": 8949.692270448328,
+      "cash": -8.961770783414165,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775393999999,
+      "equity": 8911.160856324477,
+      "cash": 8911.160856324477,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775397599999,
+      "equity": 8911.160856324477,
+      "cash": 8911.160856324477,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775401199999,
+      "equity": 8911.160856324477,
+      "cash": 8911.160856324477,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775404799999,
+      "equity": 8902.249695468152,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775408399999,
+      "equity": 8889.877535437996,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775411999999,
+      "equity": 8911.522192278762,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775415599999,
+      "equity": 8916.67505122066,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775419199999,
+      "equity": 8909.786910732779,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775422799999,
+      "equity": 8950.5329110034,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775426399999,
+      "equity": 8935.008102057636,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775429999999,
+      "equity": 9040.118476617909,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775433599999,
+      "equity": 9130.843234697717,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775437199999,
+      "equity": 9137.996303665903,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775440799999,
+      "equity": 9102.36342306513,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775444399999,
+      "equity": 9155.441844093866,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775447999999,
+      "equity": 9143.361105392041,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775451599999,
+      "equity": 9145.374561842345,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775455199999,
+      "equity": 9153.256184131365,
+      "cash": -8.911160856324479,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775458799999,
+      "equity": 9116.516074686437,
+      "cash": 9116.516074686437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775462399999,
+      "equity": 9116.516074686437,
+      "cash": 9116.516074686437,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775465999999,
+      "equity": 9107.39955861175,
+      "cash": -9.116516074688258,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775469599999,
+      "equity": 9174.292772842911,
+      "cash": -9.116516074688258,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775473199999,
+      "equity": 9179.536715971532,
+      "cash": -9.116516074688258,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775476799999,
+      "equity": 9159.0352699712,
+      "cash": -9.116516074688258,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775480399999,
+      "equity": 9117.44773101464,
+      "cash": 9117.44773101464,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775483999999,
+      "equity": 9117.44773101464,
+      "cash": 9117.44773101464,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775487599999,
+      "equity": 9108.330283283625,
+      "cash": -9.11744773101464,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775491199999,
+      "equity": 9147.945737731083,
+      "cash": -9.11744773101464,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775494799999,
+      "equity": 9126.559940338455,
+      "cash": -9.11744773101464,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775498399999,
+      "equity": 9088.824995499572,
+      "cash": 9088.824995499572,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775501999999,
+      "equity": 9079.736170504073,
+      "cash": -9.088824995499571,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775505599999,
+      "equity": 9051.396764260671,
+      "cash": 9051.396764260671,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775509199999,
+      "equity": 9042.345367496411,
+      "cash": -9.05139676425885,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775512799999,
+      "equity": 8994.042753154834,
+      "cash": 8994.042753154834,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775516399999,
+      "equity": 8994.042753154834,
+      "cash": 8994.042753154834,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775519999999,
+      "equity": 8994.042753154834,
+      "cash": 8994.042753154834,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775523599999,
+      "equity": 8994.042753154834,
+      "cash": 8994.042753154834,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775527199999,
+      "equity": 8994.042753154834,
+      "cash": 8994.042753154834,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775530799999,
+      "equity": 8994.042753154834,
+      "cash": 8994.042753154834,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775534399999,
+      "equity": 8985.04871040168,
+      "cash": -8.994042753154833,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775537999999,
+      "equity": 8994.599262518379,
+      "cash": -8.994042753154833,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775541599999,
+      "equity": 8960.52766784205,
+      "cash": 8960.52766784205,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775545199999,
+      "equity": 8960.52766784205,
+      "cash": 8960.52766784205,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775548799999,
+      "equity": 8960.52766784205,
+      "cash": 8960.52766784205,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775552399999,
+      "equity": 8951.56714017421,
+      "cash": -8.960527667842051,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775555999999,
+      "equity": 8977.925802173793,
+      "cash": -8.960527667842051,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775559599999,
+      "equity": 8850.229203017681,
+      "cash": 8850.229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775563199999,
+      "equity": 8850.229203017681,
+      "cash": 8850.229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775566799999,
+      "equity": 8850.229203017681,
+      "cash": 8850.229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775570399999,
+      "equity": 8850.229203017681,
+      "cash": 8850.229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775573999999,
+      "equity": 8850.229203017681,
+      "cash": 8850.229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775577599999,
+      "equity": 8850.229203017681,
+      "cash": 8850.229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775581199999,
+      "equity": 8841.378973814664,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775584799999,
+      "equity": 8901.429614731704,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775588399999,
+      "equity": 8868.173393324967,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775591999999,
+      "equity": 8941.121687023237,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775595599999,
+      "equity": 8981.254926512518,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775599199999,
+      "equity": 9059.302593996525,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775602799999,
+      "equity": 9266.028352659067,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775606399999,
+      "equity": 9319.266853022638,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775609999999,
+      "equity": 9292.238874407645,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775613599999,
+      "equity": 9261.694533716482,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775617199999,
+      "equity": 9246.578069440693,
+      "cash": -8.850229203017681,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775620799999,
+      "equity": 9228.197019803592,
+      "cash": 9228.197019803592,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775624399999,
+      "equity": 9218.968822783789,
+      "cash": -9.228197019803593,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775627999999,
+      "equity": 9241.288259826119,
+      "cash": -9.228197019803593,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775631599999,
+      "equity": 9240.759302069624,
+      "cash": -9.228197019803593,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775635199999,
+      "equity": 9229.728597635409,
+      "cash": -9.228197019803593,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775638799999,
+      "equity": 9250.88690789519,
+      "cash": -9.228197019803593,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775642399999,
+      "equity": 9226.083253003004,
+      "cash": 9226.083253003004,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775645999999,
+      "equity": 9226.083253003004,
+      "cash": 9226.083253003004,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775649599999,
+      "equity": 9216.857169750001,
+      "cash": -9.226083253003004,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775653199999,
+      "equity": 9264.938256567224,
+      "cash": -9.226083253003004,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775656799999,
+      "equity": 9196.439679162917,
+      "cash": 9196.439679162917,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775660399999,
+      "equity": 9196.439679162917,
+      "cash": 9196.439679162917,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775663999999,
+      "equity": 9196.439679162917,
+      "cash": 9196.439679162917,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775667599999,
+      "equity": 9187.243239483754,
+      "cash": -9.196439679162918,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775671199999,
+      "equity": 9224.074799903594,
+      "cash": -9.196439679162918,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775674799999,
+      "equity": 9114.368553069518,
+      "cash": 9114.368553069518,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775678399999,
+      "equity": 9114.368553069518,
+      "cash": 9114.368553069518,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775681999999,
+      "equity": 9114.368553069518,
+      "cash": 9114.368553069518,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775685599999,
+      "equity": 9105.254184516449,
+      "cash": -9.11436855306952,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775689199999,
+      "equity": 9034.359642275584,
+      "cash": 9034.359642275584,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775692799999,
+      "equity": 9034.359642275584,
+      "cash": 9034.359642275584,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775696399999,
+      "equity": 9034.359642275584,
+      "cash": 9034.359642275584,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775699999999,
+      "equity": 9034.359642275584,
+      "cash": 9034.359642275584,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775703599999,
+      "equity": 9034.359642275584,
+      "cash": 9034.359642275584,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775707199999,
+      "equity": 9025.325282633308,
+      "cash": -9.034359642275582,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775710799999,
+      "equity": 8990.713665076319,
+      "cash": 8990.713665076319,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775714399999,
+      "equity": 8981.722951411242,
+      "cash": -8.990713665076319,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775717999999,
+      "equity": 8986.676987354243,
+      "cash": -8.990713665076319,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775721599999,
+      "equity": 8979.860436619374,
+      "cash": -8.990713665076319,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775725199999,
+      "equity": 9013.132299499981,
+      "cash": -8.990713665076319,
+      "drawdown": null
+    },
+    {
+      "timestamp": 1775728799999,
+      "equity": 9003.312754082353,
+      "cash": 9003.312754082353,
+      "drawdown": null
+    }
+  ],
+  "trades": [
+    {
+      "timestamp": 1773971999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70370.9,
+      "quantity": 0.14210419363685842,
+      "fee": 10.0,
+      "signal_id": "555bfc8e-6076-5c80-8c5e-de648c8ada51",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1773989999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70462.0,
+      "quantity": 0.14210419363685842,
+      "fee": 10.012945692040317,
+      "signal_id": "8d04a284-7fa0-5466-8033-d9a3d21d7c71",
+      "action": "exit",
+      "entry_price": 70370.9,
+      "pnl": 2.9327463482783127
+    },
+    {
+      "timestamp": 1773993599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70811.9,
+      "quantity": 0.141119398665313,
+      "fee": 9.992932746348277,
+      "signal_id": "4de0733a-f0ce-57dc-bb36-6e67dc07dc42",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774000799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70544.9,
+      "quantity": 0.141119398665313,
+      "fee": 9.95525386690464,
+      "signal_id": "e4545125-d8b9-500f-aaa3-3162f972179d",
+      "action": "exit",
+      "entry_price": 70811.9,
+      "pnl": -47.63413331054321
+    },
+    {
+      "timestamp": 1774029599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69970.8,
+      "quantity": 0.14199216930907443,
+      "fee": 9.935305680291385,
+      "signal_id": "56230e0d-91cc-5045-923a-5b4db5c047d4",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774033199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69733.3,
+      "quantity": 0.14199216930907443,
+      "fee": 9.901582540080481,
+      "signal_id": "9c209c3d-3986-540f-9414-79531aa7e3f5",
+      "action": "exit",
+      "entry_price": 69970.8,
+      "pnl": -43.62472275098566
+    },
+    {
+      "timestamp": 1774036799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70141.9,
+      "quantity": 0.14088220666762818,
+      "fee": 9.88174565186011,
+      "signal_id": "992cec42-9084-5794-a6f3-7c78027f5fd4",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774058399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70430.3,
+      "quantity": 0.14088220666762818,
+      "fee": 9.922376080263055,
+      "signal_id": "34685755-353f-54ac-ad2f-4181b89378f7",
+      "action": "exit",
+      "entry_price": 70141.9,
+      "pnl": 30.708052322682143
+    },
+    {
+      "timestamp": 1774061999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70703.7,
+      "quantity": 0.1400573372897165,
+      "fee": 9.90257195853093,
+      "signal_id": "056b94e1-90c4-5d18-a2f5-d3fb35fbc647",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774083599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70563.3,
+      "quantity": 0.1400573372897165,
+      "fee": 9.882907908375454,
+      "signal_id": "3638ebe2-cb64-53ea-aa0c-e6de0ac3a19b",
+      "action": "exit",
+      "entry_price": 70703.7,
+      "pnl": -29.546958063850838
+    },
+    {
+      "timestamp": 1774097999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70680.0,
+      "quantity": 0.13954615773215262,
+      "fee": 9.863122428508547,
+      "signal_id": "7ae56264-d809-5e3d-b3ce-16c45f40c574",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774105199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70595.0,
+      "quantity": 0.13954615773215262,
+      "fee": 9.851261005101316,
+      "signal_id": "e7077e38-5a34-53b9-85b9-aaa4dbd68c4f",
+      "action": "exit",
+      "entry_price": 70680.0,
+      "pnl": -21.71268441233429
+    },
+    {
+      "timestamp": 1774126799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70432.4,
+      "quantity": 0.13958840848342105,
+      "fee": 9.831546621667703,
+      "signal_id": "e5b80800-6d2b-547e-872a-5710284f7947",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774130399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70321.6,
+      "quantity": 0.13958840848342105,
+      "fee": 9.816080226007742,
+      "signal_id": "bbb66df9-3928-5cf3-8b75-7ce59a5658b2",
+      "action": "exit",
+      "entry_price": 70432.4,
+      "pnl": -25.28247588596917
+    },
+    {
+      "timestamp": 1774151999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69307.0,
+      "quantity": 0.1413483861537805,
+      "fee": 9.796432599160065,
+      "signal_id": "85df8a28-d1d5-5767-a23c-3837196166f1",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774159199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69116.4,
+      "quantity": 0.1413483861537805,
+      "fee": 9.769491596759154,
+      "signal_id": "5959bb9d-c48b-5a12-9d42-07c19a1c8317",
+      "action": "exit",
+      "entry_price": 69307.0,
+      "pnl": -36.71049399767054
+    },
+    {
+      "timestamp": 1774187999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68660.3,
+      "quantity": 0.1420023750633661,
+      "fee": 9.749925672563236,
+      "signal_id": "3bca9c2e-8ff7-5cd8-8357-e963aeca72eb",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774202399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68635.0,
+      "quantity": 0.1420023750633661,
+      "fee": 9.746333012474134,
+      "signal_id": "cc66e0d6-acf4-5dbd-a127-02e1ef02682c",
+      "action": "exit",
+      "entry_price": 68660.3,
+      "pnl": -13.33899310157771
+    },
+    {
+      "timestamp": 1774220399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68301.5,
+      "quantity": 0.14241029485134435,
+      "fee": 9.726836753789096,
+      "signal_id": "57004a49-fe59-50b7-b8ed-418ac15820b0",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774223999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67830.6,
+      "quantity": 0.14241029485134435,
+      "fee": 9.659775745943598,
+      "signal_id": "2e63594a-76a0-54cb-8006-017081a12e97",
+      "action": "exit",
+      "entry_price": 68301.5,
+      "pnl": -76.72078359144083
+    },
+    {
+      "timestamp": 1774234799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68282.4,
+      "quantity": 0.1411840991740751,
+      "fee": 9.640389133443865,
+      "signal_id": "1aac4b9b-2319-507a-bf9c-e1faf294432d",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774249199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67845.3,
+      "quantity": 0.1411840991740751,
+      "fee": 9.578677563694876,
+      "signal_id": "203454e8-79ed-518c-987d-9e6acb330c25",
+      "action": "exit",
+      "entry_price": 68282.4,
+      "pnl": -71.29024731268187
+    },
+    {
+      "timestamp": 1774256399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68400.1,
+      "quantity": 0.1397579608362815,
+      "fee": 9.559458496997738,
+      "signal_id": "ec041566-cb52-502b-80a3-87a937f58318",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774259999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68305.0,
+      "quantity": 0.1397579608362815,
+      "fee": 9.546167514922208,
+      "signal_id": "3599d600-d8eb-559b-b9d7-becb639a1e7c",
+      "action": "exit",
+      "entry_price": 68400.1,
+      "pnl": -22.837149590453393
+    },
+    {
+      "timestamp": 1774263599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68512.2,
+      "quantity": 0.139056429204,
+      "fee": 9.52706188891029,
+      "signal_id": "657c90d2-b969-5d0c-80c4-ab3839b8538c",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774281599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70112.2,
+      "quantity": 0.139056429204,
+      "fee": 9.749552175636687,
+      "signal_id": "53603678-d19e-585d-8672-2316692d0a17",
+      "action": "exit",
+      "entry_price": 68512.2,
+      "pnl": 212.7407345507633
+    },
+    {
+      "timestamp": 1774288799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 71052.7,
+      "quantity": 0.1369444871422499,
+      "fee": 9.73027556157214,
+      "signal_id": "d06b518b-f81a-534b-a0e8-12004f48c0fe",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774295999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70647.1,
+      "quantity": 0.1369444871422499,
+      "fee": 9.674730877587244,
+      "signal_id": "95084d9f-dbd5-545e-ab0e-d6711d9310c6",
+      "action": "exit",
+      "entry_price": 71052.7,
+      "pnl": -65.21941486248261
+    },
+    {
+      "timestamp": 1774299599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70876.6,
+      "quantity": 0.1362272720636724,
+      "fee": 9.655325871148085,
+      "signal_id": "dc37f2db-2445-5118-a05f-4a4154c480f1",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774303199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70813.7,
+      "quantity": 0.1362272720636724,
+      "fee": 9.646757175735278,
+      "signal_id": "a5d80558-0709-51f3-ab46-1fa1462d176a",
+      "action": "exit",
+      "entry_price": 70876.6,
+      "pnl": -18.21545258854146
+    },
+    {
+      "timestamp": 1774310399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70865.9,
+      "quantity": 0.1358545519451301,
+      "fee": 9.627455092688395,
+      "signal_id": "3f2b7d9c-0c5a-5030-ad90-fc03937a3627",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774313999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70650.0,
+      "quantity": 0.1358545519451301,
+      "fee": 9.598124094923442,
+      "signal_id": "00044b32-b1d1-5d2d-bdf4-fca07fa5850b",
+      "action": "exit",
+      "entry_price": 70865.9,
+      "pnl": -38.92912185987624
+    },
+    {
+      "timestamp": 1774335599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70507.8,
+      "quantity": 0.13585587007020258,
+      "fee": 9.578898515735828,
+      "signal_id": "1a8101d0-953c-5baf-8ebd-8413440b7114",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774357199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70924.4,
+      "quantity": 0.13585587007020258,
+      "fee": 9.635496071207076,
+      "signal_id": "4e33f57a-4e93-592b-a1f5-ac2a3cc89275",
+      "action": "exit",
+      "entry_price": 70507.8,
+      "pnl": 46.96205940003813
+    },
+    {
+      "timestamp": 1774385999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70066.6,
+      "quantity": 0.1372448738289018,
+      "fee": 9.616281676620131,
+      "signal_id": "d904ad0f-254a-53ea-af36-d4f563e65587",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774407599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70500.0,
+      "quantity": 0.1372448738289018,
+      "fee": 9.675763604937575,
+      "signal_id": "61ee3361-4f0a-5bf9-a2d3-61eba4225c3f",
+      "action": "exit",
+      "entry_price": 70066.6,
+      "pnl": 49.806164712507666
+    },
+    {
+      "timestamp": 1774411199999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70689.3,
+      "quantity": 0.13660443036861333,
+      "fee": 9.656471559656019,
+      "signal_id": "28da6772-4d0e-5b92-97e5-3582afe6552f",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774450799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71203.6,
+      "quantity": 0.13660443036861333,
+      "fee": 9.726727218194597,
+      "signal_id": "0ec6efc3-5d8d-51fc-9107-359e94111db5",
+      "action": "exit",
+      "entry_price": 70689.3,
+      "pnl": 60.528931320383634
+    },
+    {
+      "timestamp": 1774472399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70970.0,
+      "quantity": 0.136780949970646,
+      "fee": 9.707344019416748,
+      "signal_id": "c3400aed-1f73-5e39-a8d9-e15d696bf093",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774493999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70855.0,
+      "quantity": 0.136780949970646,
+      "fee": 9.691614210170123,
+      "signal_id": "e55570f3-b2be-58b5-9adf-a3b1b02b9918",
+      "action": "exit",
+      "entry_price": 70970.0,
+      "pnl": -25.42142345679441
+    },
+    {
+      "timestamp": 1774533599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69617.4,
+      "quantity": 0.13893387647255623,
+      "fee": 9.672215251940536,
+      "signal_id": "af410632-6625-5211-b441-cb117361f3ae",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774537199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69450.1,
+      "quantity": 0.13893387647255623,
+      "fee": 9.648971614406678,
+      "signal_id": "d6984c8e-ed78-5c47-9f49-98307c7870c0",
+      "action": "exit",
+      "entry_price": 69617.4,
+      "pnl": -32.892609148263716
+    },
+    {
+      "timestamp": 1774558799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68973.8,
+      "quantity": 0.13961316365837945,
+      "fee": 9.629650427540334,
+      "signal_id": "3e474509-b880-52b6-9975-bffaf08ca604",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774573199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68746.4,
+      "quantity": 0.13961316365837945,
+      "fee": 9.597902394124416,
+      "signal_id": "56ee7b04-f27e-5566-972e-79f74e3be300",
+      "action": "exit",
+      "entry_price": 68973.8,
+      "pnl": -41.34593581004112
+    },
+    {
+      "timestamp": 1774576799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69016.4,
+      "quantity": 0.13878838712686772,
+      "fee": 9.578674841302753,
+      "signal_id": "7ffd15bc-e054-5fc9-b139-2331787d5fb9",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774583999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68728.8,
+      "quantity": 0.13878838712686772,
+      "fee": 9.538759301165067,
+      "signal_id": "aeed4e0d-0279-58e2-a058-764a803dde51",
+      "action": "exit",
+      "entry_price": 69016.4,
+      "pnl": -49.45429943885101
+    },
+    {
+      "timestamp": 1774641599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66005.4,
+      "quantity": 0.14422519774173928,
+      "fee": 9.519641867022598,
+      "signal_id": "7bde9830-2994-590e-8f05-cafeff4c6629",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774663199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66137.1,
+      "quantity": 0.14422519774173928,
+      "fee": 9.538636325565184,
+      "signal_id": "6df35619-3fe5-599a-ba60-cfcfcd44c585",
+      "action": "exit",
+      "entry_price": 66005.4,
+      "pnl": 9.455822217023558
+    },
+    {
+      "timestamp": 1774670399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66191.8,
+      "quantity": 0.14381808694389028,
+      "fee": 9.519578047372597,
+      "signal_id": "93291645-cb05-53ea-bfd9-f96babbd8d79",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774691999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66270.9,
+      "quantity": 0.14381808694389028,
+      "fee": 9.530954058049858,
+      "signal_id": "86df12c2-558a-5c62-83ec-ae878e1f52c0",
+      "action": "exit",
+      "entry_price": 66191.8,
+      "pnl": 1.8450566192106077
+    },
+    {
+      "timestamp": 1774702799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66416.7,
+      "quantity": 0.143215539554727,
+      "fee": 9.511903525944435,
+      "signal_id": "7c7ad223-6540-527e-9f01-e9a08a6d2e40",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774731599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66885.5,
+      "quantity": 0.143215539554727,
+      "fee": 9.579042970887693,
+      "signal_id": "19ca44c1-07e4-56ef-b786-4c099dc0358f",
+      "action": "exit",
+      "entry_price": 66416.7,
+      "pnl": 57.560401972368744
+    },
+    {
+      "timestamp": 1774753199999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66773.7,
+      "quantity": 0.1431694218590682,
+      "fee": 9.559952024390862,
+      "signal_id": "a6967653-b9e0-58ef-a55f-64ba6d39be5c",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774767599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66704.4,
+      "quantity": 0.1431694218590682,
+      "fee": 9.550030383456027,
+      "signal_id": "fa2c2e2e-c813-527d-a4a6-cfe393af488d",
+      "action": "exit",
+      "entry_price": 66773.7,
+      "pnl": -19.47167131828987
+    },
+    {
+      "timestamp": 1774785599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66780.8,
+      "quantity": 0.1427194702825989,
+      "fee": 9.53092040104818,
+      "signal_id": "e7c189df-fdc9-563a-83dc-c7742a4493ec",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774792799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66546.0,
+      "quantity": 0.1427194702825989,
+      "fee": 9.497409869425827,
+      "signal_id": "27262a92-777a-5872-be18-fac4b7505e35",
+      "action": "exit",
+      "entry_price": 66780.8,
+      "pnl": -43.00794149178047
+    },
+    {
+      "timestamp": 1774817999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66578.6,
+      "quantity": 0.1423637856481715,
+      "fee": 9.478381539155352,
+      "signal_id": "b0e6ceac-7f01-5dcc-9628-3980a3eb663a",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774825199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 65820.3,
+      "quantity": 0.1423637856481715,
+      "fee": 9.370427080498345,
+      "signal_id": "993a95fc-fa38-5358-b9e6-a4f4f3d773c1",
+      "action": "exit",
+      "entry_price": 66578.6,
+      "pnl": -117.32488573750722
+    },
+    {
+      "timestamp": 1774835999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66624.1,
+      "quantity": 0.14036329604270362,
+      "fee": 9.351578271878692,
+      "signal_id": "6735fb6f-c0e8-5af3-9c95-9494a4c523b4",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774864799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67466.2,
+      "quantity": 0.14036329604270362,
+      "fee": 9.469778203476249,
+      "signal_id": "1b9878c6-a209-529a-9f3a-7c90d7f6be41",
+      "action": "exit",
+      "entry_price": 66624.1,
+      "pnl": 108.73015339408323
+    },
+    {
+      "timestamp": 1774871999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 67651.5,
+      "quantity": 0.13970062521896623,
+      "fee": 9.450956847000894,
+      "signal_id": "6eb8642a-e8d0-5395-99d4-c881724d4ef0",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774879199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67490.9,
+      "quantity": 0.13970062521896623,
+      "fee": 9.428520926590727,
+      "signal_id": "99d9ec2c-31e4-5de9-91fe-3be4eedd6ea2",
+      "action": "exit",
+      "entry_price": 67651.5,
+      "pnl": -31.864441336757515
+    },
+    {
+      "timestamp": 1774882799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 67762.7,
+      "quantity": 0.13886166650409645,
+      "fee": 9.409641448817135,
+      "signal_id": "02174a45-5046-5445-89b3-550736607293",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774886399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67590.2,
+      "quantity": 0.13886166650409645,
+      "fee": 9.38568781134518,
+      "signal_id": "d5f7f9f0-d27e-56f7-ac25-abf02f080cd2",
+      "action": "exit",
+      "entry_price": 67762.7,
+      "pnl": -33.33932528330182
+    },
+    {
+      "timestamp": 1774911599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66746.5,
+      "quantity": 0.14033533566681425,
+      "fee": 9.366892482085017,
+      "signal_id": "497b8bde-5114-5d54-a1ad-b87cbd562074",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774940399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67465.4,
+      "quantity": 0.14033533566681425,
+      "fee": 9.46777955489589,
+      "signal_id": "58b4ba7a-5a5f-5ffa-99bc-b5985f801ea8",
+      "action": "exit",
+      "entry_price": 66746.5,
+      "pnl": 91.41929325597606
+    },
+    {
+      "timestamp": 1774965599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 67255.6,
+      "quantity": 0.14049305757229,
+      "fee": 9.448944882858909,
+      "signal_id": "d92248af-60d1-5bba-89de-b4b3aed88e7d",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1774969199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66555.9,
+      "quantity": 0.14049305757229,
+      "fee": 9.350641890475575,
+      "signal_id": "2b3120a4-ee08-5d3b-8804-45c04cccbbde",
+      "action": "exit",
+      "entry_price": 67255.6,
+      "pnl": -107.65363427380852
+    },
+    {
+      "timestamp": 1774972799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66700.0,
+      "quantity": 0.139907680715176,
+      "fee": 9.33184230370224,
+      "signal_id": "12ddca0d-6a8c-51f3-8401-36004fcceaad",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775008799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67746.4,
+      "quantity": 0.139907680715176,
+      "fee": 9.478241700802599,
+      "signal_id": "fa661b7e-9aee-5fc8-a93d-06c1effa39df",
+      "action": "exit",
+      "entry_price": 66700.0,
+      "pnl": 136.92115539955677
+    },
+    {
+      "timestamp": 1775015999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68134.0,
+      "quantity": 0.1388357004843117,
+      "fee": 9.459431616798094,
+      "signal_id": "526896f6-26c7-5e16-94d9-b37d38502c10",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775037599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68608.4,
+      "quantity": 0.1388357004843117,
+      "fee": 9.525295273107853,
+      "signal_id": "d91b1134-1e92-5b5d-8225-a5e73da5a1ad",
+      "action": "exit",
+      "entry_price": 68134.0,
+      "pnl": 56.33836103664881
+    },
+    {
+      "timestamp": 1775055599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68559.1,
+      "quantity": 0.13865862513098837,
+      "fee": 9.506310546217945,
+      "signal_id": "cfe64d21-1568-5082-848f-945ccb41fc6e",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775066399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68239.7,
+      "quantity": 0.13865862513098837,
+      "fee": 9.462022981351108,
+      "signal_id": "7df7f3ad-26b4-5599-af32-5eacddf2b017",
+      "action": "exit",
+      "entry_price": 68559.1,
+      "pnl": -53.749587848190004
+    },
+    {
+      "timestamp": 1775080799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68324.7,
+      "quantity": 0.13820850509147553,
+      "fee": 9.443054647823537,
+      "signal_id": "3492164d-f690-530d-b26e-28af07110627",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775084399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68088.4,
+      "quantity": 0.13820850509147553,
+      "fee": 9.41039597807042,
+      "signal_id": "976a92bc-1da3-5a3a-9066-32cb7ad1610e",
+      "action": "exit",
+      "entry_price": 68324.7,
+      "pnl": -42.06906573118649
+    },
+    {
+      "timestamp": 1775091599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68565.1,
+      "quantity": 0.13697263662482118,
+      "fee": 9.391542527444528,
+      "signal_id": "d874a07d-3c94-57a6-a679-0118c0b78500",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775095199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67316.4,
+      "quantity": 0.13697263662482118,
+      "fee": 9.220504796091111,
+      "signal_id": "f72e4d3c-61ee-5db9-befd-6d3edada6cb0",
+      "action": "exit",
+      "entry_price": 68565.1,
+      "pnl": -180.25823614950693
+    },
+    {
+      "timestamp": 1775116799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66887.9,
+      "quantity": 0.13757185901736452,
+      "fee": 9.201892748767575,
+      "signal_id": "b129bcfd-6fe5-5ad2-9e72-59c780f8cd55",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775120399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66418.2,
+      "quantity": 0.13757185901736452,
+      "fee": 9.13727524658712,
+      "signal_id": "9ba0ed61-4bd0-52a3-898a-69862fa316a7",
+      "action": "exit",
+      "entry_price": 66887.9,
+      "pnl": -73.75477742704284
+    },
+    {
+      "timestamp": 1775141999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66822.4,
+      "quantity": 0.136465258335405,
+      "fee": 9.118936078591766,
+      "signal_id": "531537d7-6de9-561c-bafc-5c388a3c874d",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775174399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66868.5,
+      "quantity": 0.136465258335405,
+      "fee": 9.125227127001027,
+      "signal_id": "429c03b5-49e9-586a-8ba1-88a0a3d099a9",
+      "action": "exit",
+      "entry_price": 66822.4,
+      "pnl": -2.8341787177380633
+    },
+    {
+      "timestamp": 1775199599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66762.0,
+      "quantity": 0.13640967861650993,
+      "fee": 9.106982963795437,
+      "signal_id": "c4ddcbfc-8fb7-582a-a0e9-02948e297b30",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775221199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66690.4,
+      "quantity": 0.13640967861650993,
+      "fee": 9.097216030806493,
+      "signal_id": "fa516f55-1ef7-5493-824c-08518a3503de",
+      "action": "exit",
+      "entry_price": 66762.0,
+      "pnl": -18.864149019749398
+    },
+    {
+      "timestamp": 1775228399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66900.0,
+      "quantity": 0.13571019180585786,
+      "fee": 9.079011831811892,
+      "signal_id": "d5930b4e-5333-53ec-aca7-4e80614b90d5",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775231999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66806.1,
+      "quantity": 0.13571019180585786,
+      "fee": 9.06626864480132,
+      "signal_id": "fe5a8017-ee56-5dbf-991b-bebbdc1f7df6",
+      "action": "exit",
+      "entry_price": 66900.0,
+      "pnl": -21.809455655370584
+    },
+    {
+      "timestamp": 1775235599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66972.5,
+      "quantity": 0.13510206972002997,
+      "fee": 9.048123364324708,
+      "signal_id": "bd0d9eb6-1687-5fc3-bec5-fb15e19107d4",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775242799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66783.7,
+      "quantity": 0.13510206972002997,
+      "fee": 9.022616093561565,
+      "signal_id": "75508988-a842-5923-a59c-cb9ad2b1869d",
+      "action": "exit",
+      "entry_price": 66972.5,
+      "pnl": -34.52988685670362
+    },
+    {
+      "timestamp": 1775246399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66857.0,
+      "quantity": 0.13468365846663294,
+      "fee": 9.004545354103678,
+      "signal_id": "e76b0d37-3943-52c6-a26b-49f955a6b316",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775249999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66800.1,
+      "quantity": 0.13468365846663294,
+      "fee": 8.996881853936927,
+      "signal_id": "134940c6-fb70-5f75-86fd-e184ee85c546",
+      "action": "exit",
+      "entry_price": 66857.0,
+      "pnl": -16.660382020687557
+    },
+    {
+      "timestamp": 1775253599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66929.5,
+      "quantity": 0.13415430306111487,
+      "fee": 8.978880426728887,
+      "signal_id": "dda63ae7-9f43-5501-b337-706ac407c13a",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775264399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66863.4,
+      "quantity": 0.13415430306111487,
+      "fee": 8.970012827296546,
+      "signal_id": "c14fe7ed-d835-5620-a483-202c21d9144f",
+      "action": "exit",
+      "entry_price": 66929.5,
+      "pnl": -17.83761225963702
+    },
+    {
+      "timestamp": 1775282399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66871.0,
+      "quantity": 0.1338706454822348,
+      "fee": 8.952063934042522,
+      "signal_id": "f252c23f-55ce-5ed2-ad9b-a9be0bf64361",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775329199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67265.7,
+      "quantity": 0.1338706454822348,
+      "fee": 9.00490267781436,
+      "signal_id": "590bea4d-60a3-588e-9465-fd166b3ca4f4",
+      "action": "exit",
+      "entry_price": 66871.0,
+      "pnl": 43.83384109402333
+    },
+    {
+      "timestamp": 1775339999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 67325.0,
+      "quantity": 0.13348601130638696,
+      "fee": 8.9869457112025,
+      "signal_id": "2821a5b9-1387-5b39-9418-94c3d6552879",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775347199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 67271.0,
+      "quantity": 0.13348601130638696,
+      "fee": 8.979737466591958,
+      "signal_id": "e0efe807-d2b2-5d6c-9d12-f933daa350fd",
+      "action": "exit",
+      "entry_price": 67325.0,
+      "pnl": -16.187982077136855
+    },
+    {
+      "timestamp": 1775383199999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 66996.0,
+      "quantity": 0.13376575890223544,
+      "fee": 8.961770783414165,
+      "signal_id": "68fd374f-d74a-5857-915e-e174a0120fa9",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775393999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 66751.4,
+      "quantity": 0.13376575890223544,
+      "fee": 8.929051678786678,
+      "signal_id": "c79b6071-833d-53e1-8abe-c3b79a0e465a",
+      "action": "exit",
+      "entry_price": 66996.0,
+      "pnl": -41.648156306274245
+    },
+    {
+      "timestamp": 1775404799999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 67272.2,
+      "quantity": 0.13246424015157046,
+      "fee": 8.911160856324479,
+      "signal_id": "a732952d-54f6-580b-a2e5-144ab00eabce",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775458799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68958.7,
+      "quantity": 0.13246424015157046,
+      "fee": 9.134561797340103,
+      "signal_id": "b05d6f3d-e4c6-5045-82ba-a2d06f647e1d",
+      "action": "exit",
+      "entry_price": 67272.2,
+      "pnl": 214.26637921828348
+    },
+    {
+      "timestamp": 1775465999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69191.7,
+      "quantity": 0.13175736504069763,
+      "fee": 9.116516074686439,
+      "signal_id": "d2f06706-c643-5fd5-a7cf-24f0d5fa715b",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775480399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69337.3,
+      "quantity": 0.13175736504069763,
+      "fee": 9.135699947036365,
+      "signal_id": "cf29777b-cad1-562a-914d-af3f50266b6a",
+      "action": "exit",
+      "entry_price": 69191.7,
+      "pnl": 10.048172402889978
+    },
+    {
+      "timestamp": 1775487599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69620.0,
+      "quantity": 0.13096017999159207,
+      "fee": 9.11744773101464,
+      "signal_id": "26b0c33d-19e3-5b56-af5d-65d1e3240ca1",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775498399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69540.6,
+      "quantity": 0.13096017999159207,
+      "fee": 9.10704949272331,
+      "signal_id": "1e498d7d-efbb-5f4b-9a4e-a512ea0e473e",
+      "action": "exit",
+      "entry_price": 69620.0,
+      "pnl": -19.505287784054957
+    },
+    {
+      "timestamp": 1775501999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69852.9,
+      "quantity": 0.1301137818973811,
+      "fee": 9.088824995499571,
+      "signal_id": "d44625f2-b736-553b-bb94-5c7c05340d6a",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775505599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69704.8,
+      "quantity": 0.1301137818973811,
+      "fee": 9.06955514440057,
+      "signal_id": "4e403479-72af-5af0-82df-c79aea6ec854",
+      "action": "exit",
+      "entry_price": 69852.9,
+      "pnl": -28.339406243401577
+    },
+    {
+      "timestamp": 1775509199999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69779.4,
+      "quantity": 0.129714453897005,
+      "fee": 9.05139676426067,
+      "signal_id": "21faeefe-1803-5923-ac53-181bd673e451",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775512799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 69476.5,
+      "quantity": 0.129714453897005,
+      "fee": 9.012106256175269,
+      "signal_id": "cd11c18f-3b94-5432-843b-0ff56660c2f2",
+      "action": "exit",
+      "entry_price": 69779.4,
+      "pnl": -48.302614341577325
+    },
+    {
+      "timestamp": 1775534399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68746.3,
+      "quantity": 0.13082948105068684,
+      "fee": 8.994042753154833,
+      "signal_id": "5fa9bcae-aac7-5bc4-85f8-0104b00e1ec2",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775541599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68627.5,
+      "quantity": 0.13082948105068684,
+      "fee": 8.978500210806011,
+      "signal_id": "6c11d9ee-98ac-5dc3-9433-4e84ba96de90",
+      "action": "exit",
+      "entry_price": 68746.3,
+      "pnl": -24.521042559627986
+    },
+    {
+      "timestamp": 1775552399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68907.1,
+      "quantity": 0.13003779970194726,
+      "fee": 8.960527667842051,
+      "signal_id": "b577c3d4-c790-5314-a78e-e7b357f8b235",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775559599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68196.0,
+      "quantity": 0.13003779970194726,
+      "fee": 8.868057788473996,
+      "signal_id": "13b49dbb-0828-5d5d-91eb-08442504a319",
+      "action": "exit",
+      "entry_price": 68907.1,
+      "pnl": -101.33793715652945
+    },
+    {
+      "timestamp": 1775581199999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 68207.2,
+      "quantity": 0.1297550581612745,
+      "fee": 8.850229203017681,
+      "signal_id": "211634e0-9221-562b-b84f-7d4393dcd032",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775620799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71259.6,
+      "quantity": 0.1297550581612745,
+      "fee": 9.246293542549159,
+      "signal_id": "7de621f2-a316-5450-8e31-4e3eabfca7a5",
+      "action": "exit",
+      "entry_price": 68207.2,
+      "pnl": 386.81804598892626
+    },
+    {
+      "timestamp": 1775624399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 71528.6,
+      "quantity": 0.12901408694988567,
+      "fee": 9.228197019803593,
+      "signal_id": "c7663f17-3d3a-52b3-af12-3920077e7b84",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775642399999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71655.4,
+      "quantity": 0.12901408694988567,
+      "fee": 9.244556006028837,
+      "signal_id": "aa6c47a4-3c95-5cdb-a379-eddd10c0845f",
+      "action": "exit",
+      "entry_price": 71528.6,
+      "pnl": 7.114430219215166
+    },
+    {
+      "timestamp": 1775649599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 71650.2,
+      "quantity": 0.1287656315404982,
+      "fee": 9.226083253003004,
+      "signal_id": "1cab99d7-240e-5a85-9f92-d4b670d5f0f6",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775656799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71563.2,
+      "quantity": 0.1287656315404982,
+      "fee": 9.21488064305898,
+      "signal_id": "deeee6db-86df-5b6a-860c-753e3d431946",
+      "action": "exit",
+      "entry_price": 71650.2,
+      "pnl": -20.41749058708232
+    },
+    {
+      "timestamp": 1775667599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 71560.9,
+      "quantity": 0.1285120740399145,
+      "fee": 9.196439679162918,
+      "signal_id": "c32ba116-1078-512b-bca3-74a17cfbe4a6",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775674799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71064.9,
+      "quantity": 0.1285120740399145,
+      "fee": 9.13269769043912,
+      "signal_id": "f8923e74-cf84-547b-b291-7f1c2ec082e7",
+      "action": "exit",
+      "entry_price": 71560.9,
+      "pnl": -72.8746864142367
+    },
+    {
+      "timestamp": 1775685599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 71509.5,
+      "quantity": 0.127456751243814,
+      "fee": 9.11436855306952,
+      "signal_id": "0f072f83-17d0-54b4-8438-75dba00225c0",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775689199999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71024.3,
+      "quantity": 0.127456751243814,
+      "fee": 9.052526537366019,
+      "signal_id": "1024bf11-fe36-5d6d-9a9b-31344f31c58f",
+      "action": "exit",
+      "entry_price": 71509.5,
+      "pnl": -70.8945422408642
+    },
+    {
+      "timestamp": 1775707199999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70961.2,
+      "quantity": 0.12731407645693116,
+      "fee": 9.034359642275582,
+      "signal_id": "25c0d397-204c-5b7e-9deb-b720559529e8",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775710799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 70760.1,
+      "quantity": 0.12731407645693116,
+      "fee": 9.008756781500095,
+      "signal_id": "5d085b75-6aad-52c2-996b-26af14512c40",
+      "action": "exit",
+      "entry_price": 70961.2,
+      "pnl": -34.61161755698784
+    },
+    {
+      "timestamp": 1775714399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 70959.7,
+      "quantity": 0.12670168652173444,
+      "fee": 8.990713665076319,
+      "signal_id": "97f16cd2-d0e3-5db8-935f-58245760a4bd",
+      "action": "entry"
+    },
+    {
+      "timestamp": 1775728799999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71201.3,
+      "quantity": 0.12670168652173444,
+      "fee": 9.02132479253997,
+      "action": "forced_exit",
+      "entry_price": 70959.7,
+      "pnl": 21.589802671111812
+    }
+  ]
+}

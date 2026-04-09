@@ -11,16 +11,28 @@ Cyqnt Trading Package
 
 __version__ = "0.1.0"
 
+_OPTIONAL_IMPORT_ERRORS = {}
+
+
+def _safe_import(module_name: str):
+    try:
+        module = __import__(f"{__name__}.{module_name}", fromlist=[module_name])
+        globals()[module_name] = module
+    except Exception as exc:  # pragma: no cover - import environment dependent
+        globals()[module_name] = None
+        _OPTIONAL_IMPORT_ERRORS[module_name] = exc
+
+
 # 导入主要模块
-from . import get_data
-from . import trading_signal
-from . import backtesting
+for _module_name in ("get_data", "trading_signal", "backtesting", "standard_bot"):
+    _safe_import(_module_name)
 
 __all__ = [
     'get_data',
     'trading_signal',
     'backtesting',
+    'standard_bot',
     'utils',
     '__version__',
+    '_OPTIONAL_IMPORT_ERRORS',
 ]
-

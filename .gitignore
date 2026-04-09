@@ -28,6 +28,7 @@ venv/
 env/
 ENV/
 .venv
+.venv-standard-bot/
 
 # IDE
 .vscode/
@@ -48,10 +49,10 @@ htmlcov/
 
 # Logs
 *.log
+docs/*.jsonl
 
 # Environment variables
 .env
 .env.local
-
 
 
