@@ -50,6 +50,7 @@ htmlcov/
 
 # Logs
 *.log
+.standard_bot_runs/
 docs/*.jsonl
 /data/historical/
 /data/
