@@ -10,9 +10,13 @@ from .interfaces import (
     SignalState,
     StepSignalResult,
 )
+from .encoders import EncodedCloseSeries, encode_close_series, series_for
+from .numba_kernels import NUMBA_AVAILABLE
 from .plugins import (
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
+    MultiTimeframeMaSpreadConfig,
+    MultiTimeframeMaSpreadPlugin,
     PriceMovingAverageConfig,
     PriceMovingAveragePlugin,
     RsiReversionConfig,
@@ -23,9 +27,13 @@ from .registry import PipelineStepResult, SignalPluginRegistry
 
 __all__ = [
     "BatchSignalPlugin",
+    "EncodedCloseSeries",
     "IncrementalSignalPlugin",
     "MovingAverageCrossConfig",
     "MovingAverageCrossPlugin",
+    "MultiTimeframeMaSpreadConfig",
+    "MultiTimeframeMaSpreadPlugin",
+    "NUMBA_AVAILABLE",
     "PipelineStepResult",
     "PriceMovingAverageConfig",
     "PriceMovingAveragePlugin",
@@ -36,5 +44,7 @@ __all__ = [
     "SignalPluginRegistry",
     "SignalState",
     "StepSignalResult",
+    "encode_close_series",
     "register_builtin_plugins",
+    "series_for",
 ]

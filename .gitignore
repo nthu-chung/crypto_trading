@@ -29,6 +29,7 @@ env/
 ENV/
 .venv
 .venv-standard-bot/
+.venv-standard-bot.old/
 
 # IDE
 .vscode/
@@ -50,9 +51,12 @@ htmlcov/
 # Logs
 *.log
 docs/*.jsonl
+/data/historical/
+/data/
+docs/backtests/e2e_*.json
+docs/backtests/tmp_*.json
+docs/backtests/*_smoke.json
 
 # Environment variables
 .env
 .env.local
-
-

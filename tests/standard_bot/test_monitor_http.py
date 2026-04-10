@@ -34,6 +34,7 @@ def _serve(runner):
         fee_bps=10.0,
         slippage_bps=0.0,
         max_position_pct=0.95,
+        secondary_interval="1h",
     )
     server_cls = __import__("http.server", fromlist=["ThreadingHTTPServer"]).ThreadingHTTPServer
     server = server_cls(("127.0.0.1", 0), handler_factory(args, runner_override=runner))
@@ -132,6 +133,40 @@ def test_monitor_run_endpoint_returns_500_on_runner_error() -> None:
             assert payload["detail"] == "boom"
         else:
             raise AssertionError("expected HTTPError")
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_monitor_run_endpoint_supports_multi_timeframe_strategy() -> None:
+    runner = DummyRunner(summary=RunSummary(run_id="run-mtf", status="dry_run", signal_count=1))
+    server, thread = _serve(runner)
+    try:
+        with _request(
+            "http://127.0.0.1:%s/run" % server.server_port,
+            method="POST",
+            payload={
+                "symbol": "BTCUSDT",
+                "interval": "5m",
+                "strategy": "multi_timeframe_ma_spread",
+                "secondary_interval": "1h",
+                "primary_ma_period": 3,
+                "reference_ma_period": 2,
+                "spread_threshold_bps": 0.0,
+                "signal_only": True,
+                "dry_run": True,
+                "limit": 60,
+            },
+        ) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        assert payload["run_id"] == "run-mtf"
+        context = runner.contexts[0]
+        assert context.data_query.market.timeframes == ["5m", "1h"]
+        plugin_spec = context.signal_pipeline.plugin_chain[0]
+        assert plugin_spec["plugin_id"] == "multi_timeframe_ma_spread"
+        assert plugin_spec["config"]["reference_timeframe"] == "1h"
+        assert plugin_spec["config"]["primary_ma_period"] == 3
     finally:
         server.shutdown()
         server.server_close()

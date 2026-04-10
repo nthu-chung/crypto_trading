@@ -1,0 +1,2808 @@
+{
+  "request_id": "3d19b7f0-4fcb-4e22-ad77-f56c8edc9076",
+  "total_return": 0.04277347513064979,
+  "metrics": {
+    "snapshot_count": 120.0,
+    "trade_count": 5.0,
+    "signal_count": 101.0,
+    "final_equity": 10427.734751306498,
+    "total_return": 0.04277347513064979,
+    "max_drawdown": 0.018107343192468605,
+    "ending_position_qty": 0.14632527043526358
+  },
+  "equity_curve": [
+    {
+      "timestamp": 1775307599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775311199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775314799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775318399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775321999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775325599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775329199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775332799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775336399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775339999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775343599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775347199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775350799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775354399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775357999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775361599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775365199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775368799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775372399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775375999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775379599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775383199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775386799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775390399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775393999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775397599999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775401199999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775404799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775408399999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775411999999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775415599999,
+      "equity": 9989.784953275463,
+      "cash": -0.999076507369408,
+      "drawdown": 0.0010215046724537386
+    },
+    {
+      "timestamp": 1775419199999,
+      "equity": 9981.076460549006,
+      "cash": -1.99738389181349,
+      "drawdown": 0.0018923539450994213
+    },
+    {
+      "timestamp": 1775422799999,
+      "equity": 10025.682304047292,
+      "cash": -3.0002521474329624,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775426399999,
+      "equity": 10007.303601970294,
+      "cash": -4.001382645894582,
+      "drawdown": 0.001833162224737408
+    },
+    {
+      "timestamp": 1775429999999,
+      "equity": 10123.945168888762,
+      "cash": -5.0142785906425225,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775433599999,
+      "equity": 10224.474155062293,
+      "cash": -6.037329739122664,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775437199999,
+      "equity": 10231.457034172812,
+      "cash": -7.061181560696015,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775440799999,
+      "equity": 10190.551789024012,
+      "cash": -8.081044844082825,
+      "drawdown": 0.003997988264249953
+    },
+    {
+      "timestamp": 1775444399999,
+      "equity": 10248.93889342174,
+      "cash": -9.106849418366837,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775447999999,
+      "equity": 10234.391962187816,
+      "cash": -10.131301744760094,
+      "drawdown": 0.0014193597391103133
+    },
+    {
+      "timestamp": 1775451599999,
+      "equity": 10235.621030971362,
+      "cash": -11.15597944580181,
+      "drawdown": 0.0012994381749047268
+    },
+    {
+      "timestamp": 1775455199999,
+      "equity": 10243.417702351993,
+      "cash": -12.181539369974008,
+      "drawdown": 0.0005387085557989726
+    },
+    {
+      "timestamp": 1775458799999,
+      "equity": 10211.495181946802,
+      "cash": -13.204009289097598,
+      "drawdown": 0.0036534232337916655
+    },
+    {
+      "timestamp": 1775462399999,
+      "equity": 10229.894505804135,
+      "cash": -14.228421581836196,
+      "drawdown": 0.0018581813996206597
+    },
+    {
+      "timestamp": 1775465999999,
+      "equity": 10243.992406222835,
+      "cash": -15.254346257084189,
+      "drawdown": 0.0004826340804978977
+    },
+    {
+      "timestamp": 1775469599999,
+      "equity": 10318.237051778937,
+      "cash": -16.287798742136296,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775473199999,
+      "equity": 10323.1042664107,
+      "cash": -17.321841352912656,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775476799999,
+      "equity": 10299.001284016595,
+      "cash": -18.353576838998215,
+      "drawdown": 0.0023348579818700914
+    },
+    {
+      "timestamp": 1775480399999,
+      "equity": 10261.453611071414,
+      "cash": -19.381660366141972,
+      "drawdown": 0.005972104296174287
+    },
+    {
+      "timestamp": 1775483999999,
+      "equity": 10269.691650529221,
+      "cash": -20.41067059825472,
+      "drawdown": 0.005174084703888307
+    },
+    {
+      "timestamp": 1775487599999,
+      "equity": 10301.309044797685,
+      "cash": -21.44294579731422,
+      "drawdown": 0.0021113049961079405
+    },
+    {
+      "timestamp": 1775491199999,
+      "equity": 10345.124804845786,
+      "cash": -22.47970624842364,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775494799999,
+      "equity": 10319.877518259596,
+      "cash": -23.514045404790078,
+      "drawdown": 0.0024405009183033734
+    },
+    {
+      "timestamp": 1775498399999,
+      "equity": 10286.433987351069,
+      "cash": -24.545143317856972,
+      "drawdown": 0.005673282691304517
+    },
+    {
+      "timestamp": 1775501999999,
+      "equity": 10331.703852769202,
+      "cash": -25.580871790312923,
+      "drawdown": 0.00129732142721922
+    },
+    {
+      "timestamp": 1775505599999,
+      "equity": 10308.71111927161,
+      "cash": -26.61440434267435,
+      "drawdown": 0.003519888475112417
+    },
+    {
+      "timestamp": 1775509199999,
+      "equity": 10318.737631114082,
+      "cash": -27.649043010086768,
+      "drawdown": 0.002550686843269783
+    },
+    {
+      "timestamp": 1775512799999,
+      "equity": 10272.795654012407,
+      "cash": -28.679190494537462,
+      "drawdown": 0.00699161703679967
+    },
+    {
+      "timestamp": 1775516399999,
+      "equity": 10168.073883877169,
+      "cash": -29.69896777970315,
+      "drawdown": 0.017114430643280797
+    },
+    {
+      "timestamp": 1775519999999,
+      "equity": 10173.103031676575,
+      "cash": -30.719350017872596,
+      "drawdown": 0.016628293656605564
+    },
+    {
+      "timestamp": 1775523599999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775527199999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775530799999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775534399999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775537999999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775541599999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775545199999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775548799999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775552399999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775555999999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775559599999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775563199999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775566799999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775570399999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775573999999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775577599999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775581199999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775584799999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775588399999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775591999999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775595599999,
+      "equity": 10157.802079635523,
+      "cash": 10157.802079635523,
+      "drawdown": 0.018107343192468605
+    },
+    {
+      "timestamp": 1775599199999,
+      "equity": 10229.598099066414,
+      "cash": -1.0230619366151616,
+      "drawdown": 0.011167260710596507
+    },
+    {
+      "timestamp": 1775602799999,
+      "equity": 10461.778145569646,
+      "cash": -2.0694466958417106,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775606399999,
+      "equity": 10520.789026355556,
+      "cash": -3.1218377822554917,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775609999999,
+      "equity": 10489.246924294119,
+      "cash": -4.171179592644168,
+      "drawdown": 0.0029980738119946815
+    },
+    {
+      "timestamp": 1775613599999,
+      "equity": 10453.741135227272,
+      "cash": -5.217075413708266,
+      "drawdown": 0.006372895698252591
+    },
+    {
+      "timestamp": 1775617199999,
+      "equity": 10435.642664617008,
+      "cash": -6.261265806750642,
+      "drawdown": 0.008093153614738335
+    },
+    {
+      "timestamp": 1775620799999,
+      "equity": 10424.293742334185,
+      "cash": -7.304425623546416,
+      "drawdown": 0.009171867602291252
+    },
+    {
+      "timestamp": 1775624399999,
+      "equity": 10462.625197266698,
+      "cash": -8.351523295602647,
+      "drawdown": 0.0055284664432632205
+    },
+    {
+      "timestamp": 1775627999999,
+      "equity": 10486.900807221522,
+      "cash": -9.401153491673966,
+      "drawdown": 0.0032210720174258127
+    },
+    {
+      "timestamp": 1775631599999,
+      "equity": 10485.251043492097,
+      "cash": -10.450723668390015,
+      "drawdown": 0.003377881903575254
+    },
+    {
+      "timestamp": 1775635199999,
+      "equity": 10471.686493534466,
+      "cash": -11.49904222196566,
+      "drawdown": 0.0046671910916647385
+    },
+    {
+      "timestamp": 1775638799999,
+      "equity": 10494.643516315042,
+      "cash": -12.549761549752139,
+      "drawdown": 0.002485128251789642
+    },
+    {
+      "timestamp": 1775642399999,
+      "equity": 10475.9400886647,
+      "cash": -13.598715430161626,
+      "drawdown": 0.004262887277608715
+    },
+    {
+      "timestamp": 1775645999999,
+      "equity": 10444.196500163733,
+      "cash": -14.644599540132013,
+      "drawdown": 0.0072801123565877325
+    },
+    {
+      "timestamp": 1775649599999,
+      "equity": 10473.08410570519,
+      "cash": -15.693477298432375,
+      "drawdown": 0.004534348187275858
+    },
+    {
+      "timestamp": 1775653199999,
+      "equity": 10526.691291691843,
+      "cash": -16.74782120972253,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1775656799999,
+      "equity": 10458.246343205898,
+      "cash": -17.79542538658178,
+      "drawdown": 0.006502038160838353
+    },
+    {
+      "timestamp": 1775660399999,
+      "equity": 10358.366992267944,
+      "cash": -18.83314540034861,
+      "drawdown": 0.015990238030134732
+    },
+    {
+      "timestamp": 1775663999999,
+      "equity": 10413.94674803497,
+      "cash": -19.8765277279249,
+      "drawdown": 0.010710349580200533
+    },
+    {
+      "timestamp": 1775667599999,
+      "equity": 10454.780976412885,
+      "cash": -20.924098235389724,
+      "drawdown": 0.006831236262785872
+    },
+    {
+      "timestamp": 1775671199999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775674799999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775678399999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775681999999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775685599999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775689199999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775692799999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775696399999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775699999999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775703599999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775707199999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775710799999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775714399999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775717999999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775721599999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775725199999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775728799999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775732399999,
+      "equity": 10439.086995441208,
+      "cash": 10439.086995441208,
+      "drawdown": 0.00832211127154226
+    },
+    {
+      "timestamp": 1775735999999,
+      "equity": 10427.734751306498,
+      "cash": -1.0428629392584536,
+      "drawdown": 0.009400535994006587
+    }
+  ],
+  "signal_batches": [
+    {
+      "batch_id": "acf4b143-7b04-5d1f-910a-4358e6aeafee",
+      "created_at": 1775375999999,
+      "signals": [
+        {
+          "signal_id": "4cb63cf6-aa28-53ea-b8f7-4915f1f9a4af",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.003416114016192572,
+          "payload": {
+            "bar_timestamp": 1775375999999,
+            "decision_price": 66787.4,
+            "execute_at_open_time": 1775376000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "2637667f-aff5-5961-9904-b3b6df1db1e3",
+      "created_at": 1775379599999,
+      "signals": [
+        {
+          "signal_id": "7a75c57a-8fcd-53da-aaa0-dcd1adff98d4",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.003948565373443933,
+          "payload": {
+            "bar_timestamp": 1775379599999,
+            "decision_price": 66892.5,
+            "execute_at_open_time": 1775379600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "eb31fb39-a94d-5843-981c-3bd7459c5249",
+      "created_at": 1775383199999,
+      "signals": [
+        {
+          "signal_id": "8622c9a5-dd28-53f5-a347-9195f9432775",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.004028611129666379,
+          "payload": {
+            "bar_timestamp": 1775383199999,
+            "decision_price": 66996.0,
+            "execute_at_open_time": 1775383200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7820856b-d95a-53f5-b466-e67b1037c400",
+      "created_at": 1775386799999,
+      "signals": [
+        {
+          "signal_id": "b05f71e8-0663-5153-973c-5a961e1c4236",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0035866255421721028,
+          "payload": {
+            "bar_timestamp": 1775386799999,
+            "decision_price": 67012.3,
+            "execute_at_open_time": 1775386800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "6dc71454-4340-5996-a2a7-baedbeca16da",
+      "created_at": 1775390399999,
+      "signals": [
+        {
+          "signal_id": "9377d4b8-f725-5c4e-8296-2cb8247462b7",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0027018405087140757,
+          "payload": {
+            "bar_timestamp": 1775390399999,
+            "decision_price": 66972.7,
+            "execute_at_open_time": 1775390400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "a082ec71-f3e0-54c6-8014-bf4f58771ae5",
+      "created_at": 1775393999999,
+      "signals": [
+        {
+          "signal_id": "a45b27d5-02f3-55ae-9522-6e3f3e5849a4",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0023752197234760968,
+          "payload": {
+            "bar_timestamp": 1775393999999,
+            "decision_price": 66751.4,
+            "execute_at_open_time": 1775394000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "d4d6e6de-1ca2-58f6-8ead-8702c66f2e0e",
+      "created_at": 1775397599999,
+      "signals": [
+        {
+          "signal_id": "57144f41-7879-58be-96a8-32b28595ef61",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0021355491808928923,
+          "payload": {
+            "bar_timestamp": 1775397599999,
+            "decision_price": 66863.4,
+            "execute_at_open_time": 1775397600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "071599d5-62e2-5053-b40b-e30a87323a3c",
+      "created_at": 1775401199999,
+      "signals": [
+        {
+          "signal_id": "4e842c75-583f-5ae7-9c4f-92c6b3aca919",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.002166571467586337,
+          "payload": {
+            "bar_timestamp": 1775401199999,
+            "decision_price": 66892.5,
+            "execute_at_open_time": 1775401200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7dd31668-4ee0-5689-81bb-4dcffde8157f",
+      "created_at": 1775404799999,
+      "signals": [
+        {
+          "signal_id": "7414e8ef-85e1-501c-a115-d632c3a6baf3",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.001398331458698672,
+          "payload": {
+            "bar_timestamp": 1775404799999,
+            "decision_price": 67272.2,
+            "execute_at_open_time": 1775404800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "6beeebf2-0912-56d6-b9fe-5b4e8ec259c0",
+      "created_at": 1775408399999,
+      "signals": [
+        {
+          "signal_id": "091b59b5-6b09-566b-a1dc-e29af9e342a9",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0007377561711378308,
+          "payload": {
+            "bar_timestamp": 1775408399999,
+            "decision_price": 67178.8,
+            "execute_at_open_time": 1775408400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "4e133272-1171-5432-97ec-e3329fd8c509",
+      "created_at": 1775411999999,
+      "signals": [
+        {
+          "signal_id": "b05b05b3-abd1-5af7-99b9-a4b5bef8063a",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.001011903288059595,
+          "payload": {
+            "bar_timestamp": 1775411999999,
+            "decision_price": 67342.2,
+            "execute_at_open_time": 1775412000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "b1c93230-ffcc-5b49-9a42-31c36cdb4a5a",
+      "created_at": 1775415599999,
+      "signals": [
+        {
+          "signal_id": "e3c0b3e8-8273-5a4e-a194-cdfff1c41abe",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.002547186795737137,
+          "payload": {
+            "bar_timestamp": 1775415599999,
+            "decision_price": 67381.1,
+            "execute_at_open_time": 1775415600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "038ddcbf-61e6-59da-a24e-60301dc7feb8",
+      "created_at": 1775419199999,
+      "signals": [
+        {
+          "signal_id": "b133fd1b-c756-5a18-8849-dc0245b3cf79",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0038061468559520313,
+          "payload": {
+            "bar_timestamp": 1775419199999,
+            "decision_price": 67329.1,
+            "execute_at_open_time": 1775419200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "6525cb26-d970-5321-b609-a824d8b8756f",
+      "created_at": 1775422799999,
+      "signals": [
+        {
+          "signal_id": "06a95f30-a66a-5d06-b524-01c35c8aa9c7",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.004549081774329629,
+          "payload": {
+            "bar_timestamp": 1775422799999,
+            "decision_price": 67636.7,
+            "execute_at_open_time": 1775422800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "f585449c-8b97-557d-8316-19e8cc5200fd",
+      "created_at": 1775426399999,
+      "signals": [
+        {
+          "signal_id": "b78285f2-f414-576b-b126-dd2282388455",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.005221159037835286,
+          "payload": {
+            "bar_timestamp": 1775426399999,
+            "decision_price": 67519.5,
+            "execute_at_open_time": 1775426400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "e2669920-de25-5030-a93c-77681ab1252e",
+      "created_at": 1775429999999,
+      "signals": [
+        {
+          "signal_id": "7c204182-720c-5f0c-a632-64ff8a802132",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.007237840853279576,
+          "payload": {
+            "bar_timestamp": 1775429999999,
+            "decision_price": 68313.0,
+            "execute_at_open_time": 1775430000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "0b5fede0-0b0e-55ac-9dc2-61d313d878cb",
+      "created_at": 1775433599999,
+      "signals": [
+        {
+          "signal_id": "f387b8ee-8e20-57f3-8c5b-280e54bbffdf",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.010635285663809108,
+          "payload": {
+            "bar_timestamp": 1775433599999,
+            "decision_price": 68997.9,
+            "execute_at_open_time": 1775433600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "82cc690a-ce08-5efd-8595-5822fefbce95",
+      "created_at": 1775437199999,
+      "signals": [
+        {
+          "signal_id": "537b94b5-362c-5dac-8260-825f57d76b92",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.014261761347981749,
+          "payload": {
+            "bar_timestamp": 1775437199999,
+            "decision_price": 69051.9,
+            "execute_at_open_time": 1775437200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "154a7ef0-0f4c-5965-b429-6ebfdcfbf243",
+      "created_at": 1775440799999,
+      "signals": [
+        {
+          "signal_id": "c54b069a-c03d-5a3b-9674-002887c6ce93",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.016248956159322432,
+          "payload": {
+            "bar_timestamp": 1775440799999,
+            "decision_price": 68782.9,
+            "execute_at_open_time": 1775440800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "d87348c0-f5ff-5d0e-b300-4c78992bc217",
+      "created_at": 1775444399999,
+      "signals": [
+        {
+          "signal_id": "72a8cae4-ecae-5736-a99c-da246cd6094a",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.019361257103264286,
+          "payload": {
+            "bar_timestamp": 1775444399999,
+            "decision_price": 69183.6,
+            "execute_at_open_time": 1775444400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "6693d7d4-8de8-55c8-a756-27efe51699c4",
+      "created_at": 1775447999999,
+      "signals": [
+        {
+          "signal_id": "126f30ac-4945-5cf1-aeaa-dcc54aea3362",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.01992867033365845,
+          "payload": {
+            "bar_timestamp": 1775447999999,
+            "decision_price": 69092.4,
+            "execute_at_open_time": 1775448000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "043bc9ae-8a66-59c2-9b45-a5d5dcf54cae",
+      "created_at": 1775451599999,
+      "signals": [
+        {
+          "signal_id": "432ccb5f-d028-51ef-8148-2109f53ec748",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.018585840346065217,
+          "payload": {
+            "bar_timestamp": 1775451599999,
+            "decision_price": 69107.6,
+            "execute_at_open_time": 1775451600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "4e7a8feb-dc93-5e52-bd27-023d5fdb812e",
+      "created_at": 1775455199999,
+      "signals": [
+        {
+          "signal_id": "947edc16-9fde-5c16-96b5-ad05b3404381",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.017296556618291194,
+          "payload": {
+            "bar_timestamp": 1775455199999,
+            "decision_price": 69167.1,
+            "execute_at_open_time": 1775455200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7c441d5c-9af0-5da2-b0bf-85c937b249f4",
+      "created_at": 1775458799999,
+      "signals": [
+        {
+          "signal_id": "bdaf7fd9-faea-5279-8831-71fc9909b80e",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.016357542796718475,
+          "payload": {
+            "bar_timestamp": 1775458799999,
+            "decision_price": 68958.7,
+            "execute_at_open_time": 1775458800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "db76115d-c406-5520-a92a-e940e2dfa717",
+      "created_at": 1775462399999,
+      "signals": [
+        {
+          "signal_id": "8ef41e69-3be0-5889-8684-460643287568",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.014501894652935703,
+          "payload": {
+            "bar_timestamp": 1775462399999,
+            "decision_price": 69089.7,
+            "execute_at_open_time": 1775462400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "dcb3df87-99cd-53c8-8854-1252b4dd3c66",
+      "created_at": 1775465999999,
+      "signals": [
+        {
+          "signal_id": "e3a23889-e224-505c-a742-d6c366c4121a",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.01297846889952218,
+          "payload": {
+            "bar_timestamp": 1775465999999,
+            "decision_price": 69191.7,
+            "execute_at_open_time": 1775466000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "58f58015-fda7-5d0b-9193-57f4d67100dd",
+      "created_at": 1775469599999,
+      "signals": [
+        {
+          "signal_id": "14a2c0c5-3393-555a-ba89-58dc48cd22a4",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.012608653674550127,
+          "payload": {
+            "bar_timestamp": 1775469599999,
+            "decision_price": 69699.4,
+            "execute_at_open_time": 1775469600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "35edcd66-6038-59b6-9013-7024049480e0",
+      "created_at": 1775473199999,
+      "signals": [
+        {
+          "signal_id": "8330b585-07dd-50b7-80cf-d906d486c317",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.012174947101705504,
+          "payload": {
+            "bar_timestamp": 1775473199999,
+            "decision_price": 69739.2,
+            "execute_at_open_time": 1775473200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "b4e2cc2a-43f2-5c13-87c5-57df81c57649",
+      "created_at": 1775476799999,
+      "signals": [
+        {
+          "signal_id": "bff4b7b6-8b3d-590c-9c01-826774dfc82d",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.01229157863311649,
+          "payload": {
+            "bar_timestamp": 1775476799999,
+            "decision_price": 69583.6,
+            "execute_at_open_time": 1775476800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7b123146-9ff5-5054-901a-a90ed8e3d27c",
+      "created_at": 1775480399999,
+      "signals": [
+        {
+          "signal_id": "9f4473fa-efce-527e-a665-b61f1cfdbde9",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.01142244267498303,
+          "payload": {
+            "bar_timestamp": 1775480399999,
+            "decision_price": 69337.3,
+            "execute_at_open_time": 1775480400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "b87d52f4-42ed-5b15-be6e-b252438acd97",
+      "created_at": 1775483999999,
+      "signals": [
+        {
+          "signal_id": "3352423b-76c1-5429-9d16-ada61c3c4540",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.010515325787676206,
+          "payload": {
+            "bar_timestamp": 1775483999999,
+            "decision_price": 69399.8,
+            "execute_at_open_time": 1775484000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "8e7062b0-264d-545e-b66a-9eed4cc37e5a",
+      "created_at": 1775487599999,
+      "signals": [
+        {
+          "signal_id": "39905c12-f306-569e-879d-9e455318c77d",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.008644103924779753,
+          "payload": {
+            "bar_timestamp": 1775487599999,
+            "decision_price": 69620.0,
+            "execute_at_open_time": 1775487600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "873cd40e-6bc6-5ed6-b37b-9fb74b147159",
+      "created_at": 1775491199999,
+      "signals": [
+        {
+          "signal_id": "324669db-6f41-5bfd-b4d0-9852de479ff1",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.007281265416939728,
+          "payload": {
+            "bar_timestamp": 1775491199999,
+            "decision_price": 69922.5,
+            "execute_at_open_time": 1775491200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "e42502cc-4625-5d22-94ee-3e09e4c25e86",
+      "created_at": 1775494799999,
+      "signals": [
+        {
+          "signal_id": "fccbbe83-c48c-5ac3-9db7-d58b5e842464",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.006243652951138977,
+          "payload": {
+            "bar_timestamp": 1775494799999,
+            "decision_price": 69759.2,
+            "execute_at_open_time": 1775494800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "e2fed972-a8b8-578c-807c-a7e7c4fcd9da",
+      "created_at": 1775498399999,
+      "signals": [
+        {
+          "signal_id": "db2ca4e5-7261-5301-b532-b8d50485848f",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.005362754008713705,
+          "payload": {
+            "bar_timestamp": 1775498399999,
+            "decision_price": 69540.6,
+            "execute_at_open_time": 1775498400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "bda4a048-1e24-58b2-94e0-a8785f078f67",
+      "created_at": 1775501999999,
+      "signals": [
+        {
+          "signal_id": "95479a12-a35d-5278-8c56-97c8c6c7f13b",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.005553256558031034,
+          "payload": {
+            "bar_timestamp": 1775501999999,
+            "decision_price": 69852.9,
+            "execute_at_open_time": 1775502000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "918f7e11-64c0-57fe-92fb-29941894bf15",
+      "created_at": 1775505599999,
+      "signals": [
+        {
+          "signal_id": "1df90bec-6630-5882-a8b6-84a8ecd11ff1",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.005285473274713305,
+          "payload": {
+            "bar_timestamp": 1775505599999,
+            "decision_price": 69704.8,
+            "execute_at_open_time": 1775505600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "2e577524-9dd3-5a3f-8675-ba57bbd02f99",
+      "created_at": 1775509199999,
+      "signals": [
+        {
+          "signal_id": "efbaea85-507e-590e-be86-40528a7b4237",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.004346522220471901,
+          "payload": {
+            "bar_timestamp": 1775509199999,
+            "decision_price": 69779.4,
+            "execute_at_open_time": 1775509200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "b2a33775-54d0-5284-8639-d3b1a49eec3d",
+      "created_at": 1775512799999,
+      "signals": [
+        {
+          "signal_id": "c3ddb3db-db3b-5163-baf9-72715bffb9b9",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0030310839429144804,
+          "payload": {
+            "bar_timestamp": 1775512799999,
+            "decision_price": 69476.5,
+            "execute_at_open_time": 1775512800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "adf3e912-420e-58e7-8bff-158cb9b84543",
+      "created_at": 1775516399999,
+      "signals": [
+        {
+          "signal_id": "a5842651-25b5-5f44-940b-7b33a2cec8b0",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.001125648446734568,
+          "payload": {
+            "bar_timestamp": 1775516399999,
+            "decision_price": 68777.1,
+            "execute_at_open_time": 1775516400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "92f29f0f-8d96-598b-8aae-3dd5c37885b5",
+      "created_at": 1775519999999,
+      "signals": [
+        {
+          "signal_id": "1ee667db-aa75-5bee-be9b-1a790fbd2761",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0016580184008203947,
+          "payload": {
+            "bar_timestamp": 1775519999999,
+            "decision_price": 68817.9,
+            "execute_at_open_time": 1775520000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "fd4e2b84-4245-5376-8538-4415ecedb8b8",
+      "created_at": 1775523599999,
+      "signals": [
+        {
+          "signal_id": "7cf2fde4-0ed7-53a5-98e3-cdb5c23c5314",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.00417654757991484,
+          "payload": {
+            "bar_timestamp": 1775523599999,
+            "decision_price": 68738.7,
+            "execute_at_open_time": 1775523600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7c7ff133-aafb-556f-a61c-c21e565de9d2",
+      "created_at": 1775527199999,
+      "signals": [
+        {
+          "signal_id": "ad9c6bb0-df18-5a92-955f-9d8085fa609d",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.007681174703277782,
+          "payload": {
+            "bar_timestamp": 1775527199999,
+            "decision_price": 68363.9,
+            "execute_at_open_time": 1775527200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "672e05cd-5c78-5866-b996-228adc91e3ac",
+      "created_at": 1775530799999,
+      "signals": [
+        {
+          "signal_id": "c9c3ed7c-86d2-5471-bef5-51e9f6108f80",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.009864859165362448,
+          "payload": {
+            "bar_timestamp": 1775530799999,
+            "decision_price": 68640.3,
+            "execute_at_open_time": 1775530800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "a877e2c7-f27f-55dd-a872-6f4e10efa187",
+      "created_at": 1775534399999,
+      "signals": [
+        {
+          "signal_id": "1f466edf-4253-51bf-9162-eaf86e6f364d",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.009708506818857512,
+          "payload": {
+            "bar_timestamp": 1775534399999,
+            "decision_price": 68746.3,
+            "execute_at_open_time": 1775534400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "4a0be5e5-2545-59e6-ae86-ebfd8834b0d2",
+      "created_at": 1775537999999,
+      "signals": [
+        {
+          "signal_id": "14eb40ac-b379-5045-bac0-630f338bc426",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.00943845019186363,
+          "payload": {
+            "bar_timestamp": 1775537999999,
+            "decision_price": 68819.3,
+            "execute_at_open_time": 1775538000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7c36ecbb-eaaf-50ce-89bb-617d89040f27",
+      "created_at": 1775541599999,
+      "signals": [
+        {
+          "signal_id": "115b4769-295b-53b4-bfc6-93fb2c2788ee",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.008993054522846709,
+          "payload": {
+            "bar_timestamp": 1775541599999,
+            "decision_price": 68627.5,
+            "execute_at_open_time": 1775541600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "c6a5f5d1-95ab-5a5b-80cf-2c2b5b362397",
+      "created_at": 1775545199999,
+      "signals": [
+        {
+          "signal_id": "48c018ae-3d84-5dad-98fa-ef9dc74eb06f",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.007625460280411648,
+          "payload": {
+            "bar_timestamp": 1775545199999,
+            "decision_price": 68540.0,
+            "execute_at_open_time": 1775545200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "c2defb5c-19c0-5e2d-ac86-1577a2ba188a",
+      "created_at": 1775548799999,
+      "signals": [
+        {
+          "signal_id": "7ff4dea8-d4a8-5be1-ad85-bdaf4d4b5362",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0070534376732795685,
+          "payload": {
+            "bar_timestamp": 1775548799999,
+            "decision_price": 68592.1,
+            "execute_at_open_time": 1775548800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "20bc86c8-6d40-5a4f-8e7f-576a1988b9ca",
+      "created_at": 1775552399999,
+      "signals": [
+        {
+          "signal_id": "ec3303c9-5a4d-56db-862f-dd5213539832",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.006279283499606906,
+          "payload": {
+            "bar_timestamp": 1775552399999,
+            "decision_price": 68907.1,
+            "execute_at_open_time": 1775552400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "15a90344-44e1-51fa-b492-60a376710a3b",
+      "created_at": 1775555999999,
+      "signals": [
+        {
+          "signal_id": "34163441-d98b-568c-a0df-ac6e89ddc291",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.005230204901716748,
+          "payload": {
+            "bar_timestamp": 1775555999999,
+            "decision_price": 69109.8,
+            "execute_at_open_time": 1775556000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "486ba700-e60b-5523-8ae4-df876ad56414",
+      "created_at": 1775559599999,
+      "signals": [
+        {
+          "signal_id": "99403139-2b89-5153-822b-d90241ec4402",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.005454294368814447,
+          "payload": {
+            "bar_timestamp": 1775559599999,
+            "decision_price": 68196.0,
+            "execute_at_open_time": 1775559600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "c4e82b4c-f7cc-58df-9c72-b04f3d4cbeec",
+      "created_at": 1775563199999,
+      "signals": [
+        {
+          "signal_id": "d4b0ef3a-5971-5095-a997-74900f1864ee",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.004956861457715261,
+          "payload": {
+            "bar_timestamp": 1775563199999,
+            "decision_price": 68310.8,
+            "execute_at_open_time": 1775563200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7031bdff-fa98-55bb-ada7-39a892a236a9",
+      "created_at": 1775566799999,
+      "signals": [
+        {
+          "signal_id": "2f33f941-21de-5614-be4d-df63f8e18655",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0046049518545498115,
+          "payload": {
+            "bar_timestamp": 1775566799999,
+            "decision_price": 68367.0,
+            "execute_at_open_time": 1775566800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "6f976fc1-c35e-5cc5-8d94-68d2d0c1637e",
+      "created_at": 1775570399999,
+      "signals": [
+        {
+          "signal_id": "07949e04-4ade-5ab6-9e26-beddce12ada3",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.005672554828993454,
+          "payload": {
+            "bar_timestamp": 1775570399999,
+            "decision_price": 68208.1,
+            "execute_at_open_time": 1775570400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "e15e2923-48bb-5837-8f4d-dcbb9b3ec649",
+      "created_at": 1775573999999,
+      "signals": [
+        {
+          "signal_id": "f408ec8c-b98d-53ef-9213-732af6e23908",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.007931302206039284,
+          "payload": {
+            "bar_timestamp": 1775573999999,
+            "decision_price": 67831.0,
+            "execute_at_open_time": 1775574000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "5d232c23-f927-5654-b63a-f515739022dd",
+      "created_at": 1775577599999,
+      "signals": [
+        {
+          "signal_id": "7b6b97a7-1501-52da-bcb1-7a4fc266a5e6",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0069672900082383745,
+          "payload": {
+            "bar_timestamp": 1775577599999,
+            "decision_price": 68138.4,
+            "execute_at_open_time": 1775577600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "9f3eed6f-7a05-5cb2-977b-4f237b106241",
+      "created_at": 1775581199999,
+      "signals": [
+        {
+          "signal_id": "808cc1e2-8262-5781-96f8-1b8d20ffda2f",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.006131039838414481,
+          "payload": {
+            "bar_timestamp": 1775581199999,
+            "decision_price": 68207.2,
+            "execute_at_open_time": 1775581200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "f16993e9-5e2b-5c03-a892-8ef3be2fb239",
+      "created_at": 1775584799999,
+      "signals": [
+        {
+          "signal_id": "dc6af60c-5c33-5515-8b6f-1a611b19fe3c",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.004661943946793805,
+          "payload": {
+            "bar_timestamp": 1775584799999,
+            "decision_price": 68670.0,
+            "execute_at_open_time": 1775584800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "a6608140-1453-5258-b310-6437bd5517bf",
+      "created_at": 1775588399999,
+      "signals": [
+        {
+          "signal_id": "18e50a24-91e0-5094-b8e5-879b39d948b5",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.003797787709657911,
+          "payload": {
+            "bar_timestamp": 1775588399999,
+            "decision_price": 68413.7,
+            "execute_at_open_time": 1775588400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "18e223cd-5000-5bc2-bb21-f8599df884dd",
+      "created_at": 1775591999999,
+      "signals": [
+        {
+          "signal_id": "df76a760-1dde-56b9-84ab-c3ff61054db7",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0005708539334146643,
+          "payload": {
+            "bar_timestamp": 1775591999999,
+            "decision_price": 68975.9,
+            "execute_at_open_time": 1775592000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "ad5cf62b-58cc-5db1-97d7-34f20c3fb5a1",
+      "created_at": 1775595599999,
+      "signals": [
+        {
+          "signal_id": "d8542ae5-3a3f-5bfb-b14f-31c316342262",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0023767467454683445,
+          "payload": {
+            "bar_timestamp": 1775595599999,
+            "decision_price": 69285.2,
+            "execute_at_open_time": 1775595600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "ba638845-a2ca-5860-8d37-6e38a1e4b31e",
+      "created_at": 1775599199999,
+      "signals": [
+        {
+          "signal_id": "df8e7ef1-8136-5b05-8d24-db2d46dcdd10",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0061593952636142734,
+          "payload": {
+            "bar_timestamp": 1775599199999,
+            "decision_price": 69886.7,
+            "execute_at_open_time": 1775599200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "92e6f733-dc53-56bf-be9e-b7d0abd59ee7",
+      "created_at": 1775602799999,
+      "signals": [
+        {
+          "signal_id": "0cb875be-fa85-5254-83bb-155c6c02a441",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.012254383005457172,
+          "payload": {
+            "bar_timestamp": 1775602799999,
+            "decision_price": 71479.9,
+            "execute_at_open_time": 1775602800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "afc90120-ab3e-5c14-ad48-827e91ba8760",
+      "created_at": 1775606399999,
+      "signals": [
+        {
+          "signal_id": "f45cfe12-0737-53ab-876e-4456d7bf069d",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.020033792883763293,
+          "payload": {
+            "bar_timestamp": 1775606399999,
+            "decision_price": 71890.2,
+            "execute_at_open_time": 1775606400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "6da70899-f7f4-5134-92f5-12d5fa488288",
+      "created_at": 1775609999999,
+      "signals": [
+        {
+          "signal_id": "24587417-6528-54c5-9b4a-9ab4010fcb32",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.025755899164458935,
+          "payload": {
+            "bar_timestamp": 1775609999999,
+            "decision_price": 71681.9,
+            "execute_at_open_time": 1775610000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "1024b0db-1eab-529d-a610-22c3d5a70278",
+      "created_at": 1775613599999,
+      "signals": [
+        {
+          "signal_id": "1d7e99cd-b853-5f79-9a1a-996ad8d2aed2",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.029912707371920512,
+          "payload": {
+            "bar_timestamp": 1775613599999,
+            "decision_price": 71446.5,
+            "execute_at_open_time": 1775613600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "0aaf3327-5f4b-5f93-a2b1-c684e908403d",
+      "created_at": 1775617199999,
+      "signals": [
+        {
+          "signal_id": "e34d7fbc-a471-512f-bc17-2ee82bcb2833",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.03200347530783094,
+          "payload": {
+            "bar_timestamp": 1775617199999,
+            "decision_price": 71330.0,
+            "execute_at_open_time": 1775617200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "2f858261-a903-5460-8d34-28ab63e05c70",
+      "created_at": 1775620799999,
+      "signals": [
+        {
+          "signal_id": "87233049-4cce-5d84-a8d1-f5963e8166a4",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.029388275000990543,
+          "payload": {
+            "bar_timestamp": 1775620799999,
+            "decision_price": 71259.6,
+            "execute_at_open_time": 1775620800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "1170073d-a1b1-5778-83b0-a992d1376112",
+      "created_at": 1775624399999,
+      "signals": [
+        {
+          "signal_id": "a92695b3-9b93-5369-8aee-4b7761e16ab5",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.02641105029282541,
+          "payload": {
+            "bar_timestamp": 1775624399999,
+            "decision_price": 71528.6,
+            "execute_at_open_time": 1775624400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "22624b10-8e6e-5f31-8916-de94f2205dae",
+      "created_at": 1775627999999,
+      "signals": [
+        {
+          "signal_id": "66ab85bc-8465-5df6-9a5e-7a663ae53b4e",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.024560292622291674,
+          "payload": {
+            "bar_timestamp": 1775627999999,
+            "decision_price": 71701.6,
+            "execute_at_open_time": 1775628000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "aeac9d49-f63a-5bfd-9559-50ad3bc2c92e",
+      "created_at": 1775631599999,
+      "signals": [
+        {
+          "signal_id": "112fa655-13d4-5809-be6c-245862a129de",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.022712706440304712,
+          "payload": {
+            "bar_timestamp": 1775631599999,
+            "decision_price": 71697.5,
+            "execute_at_open_time": 1775631600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "ba33813a-e79d-5b31-8e1e-324fa322b822",
+      "created_at": 1775635199999,
+      "signals": [
+        {
+          "signal_id": "80579320-509c-59d8-b9ba-dd6a6824da27",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.021108709905959224,
+          "payload": {
+            "bar_timestamp": 1775635199999,
+            "decision_price": 71612.0,
+            "execute_at_open_time": 1775635200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "f843fc72-dd76-5008-bca7-04432e81c883",
+      "created_at": 1775638799999,
+      "signals": [
+        {
+          "signal_id": "99d4fa27-5062-58d8-820a-f0b92a0e6483",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.020101350870451274,
+          "payload": {
+            "bar_timestamp": 1775638799999,
+            "decision_price": 71776.0,
+            "execute_at_open_time": 1775638800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "7cb4704a-20d4-563a-92eb-c4ee4329cbfd",
+      "created_at": 1775642399999,
+      "signals": [
+        {
+          "signal_id": "47608dbd-2525-5b4a-82d3-64da982ff296",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.01796470532187857,
+          "payload": {
+            "bar_timestamp": 1775642399999,
+            "decision_price": 71655.4,
+            "execute_at_open_time": 1775642400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "da6493a8-df5f-5607-8611-3996748bfa0c",
+      "created_at": 1775645999999,
+      "signals": [
+        {
+          "signal_id": "542fd52f-87ae-5b4f-a6a1-f86e6e854bc6",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.014633994343105979,
+          "payload": {
+            "bar_timestamp": 1775645999999,
+            "decision_price": 71445.7,
+            "execute_at_open_time": 1775646000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "3da6a521-f5b8-5bea-b864-9f27e77e1835",
+      "created_at": 1775649599999,
+      "signals": [
+        {
+          "signal_id": "61356fe0-7ddf-58cd-8029-81ed09d8aa37",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.011983239824872085,
+          "payload": {
+            "bar_timestamp": 1775649599999,
+            "decision_price": 71650.2,
+            "execute_at_open_time": 1775649600000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "3ac12153-ee3b-5366-9699-94228599b430",
+      "created_at": 1775653199999,
+      "signals": [
+        {
+          "signal_id": "e983ec6a-12bd-58c7-a7d6-5780f20d22c5",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.010422216213468106,
+          "payload": {
+            "bar_timestamp": 1775653199999,
+            "decision_price": 72023.6,
+            "execute_at_open_time": 1775653200000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "4f6b641d-80ed-5462-9c2c-d8efc631d8ad",
+      "created_at": 1775656799999,
+      "signals": [
+        {
+          "signal_id": "fe3078d4-30ce-5513-909a-c11b99fb2f5b",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0077683847201672875,
+          "payload": {
+            "bar_timestamp": 1775656799999,
+            "decision_price": 71563.2,
+            "execute_at_open_time": 1775656800000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "65c62ccd-a68e-54cd-a6aa-7e9ff3fc1b91",
+      "created_at": 1775660399999,
+      "signals": [
+        {
+          "signal_id": "62fe0385-a83b-5b03-9e37-4726253bf302",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0038638308277860692,
+          "payload": {
+            "bar_timestamp": 1775660399999,
+            "decision_price": 70888.0,
+            "execute_at_open_time": 1775660400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "62c126fe-2929-58fa-a24a-61942edb6907",
+      "created_at": 1775663999999,
+      "signals": [
+        {
+          "signal_id": "f4ce0884-15e1-530d-8e8d-895b4da70da4",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0017676696541740224,
+          "payload": {
+            "bar_timestamp": 1775663999999,
+            "decision_price": 71274.8,
+            "execute_at_open_time": 1775664000000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "bfb9274c-b0e9-532b-8db2-bc9b9c3b598b",
+      "created_at": 1775667599999,
+      "signals": [
+        {
+          "signal_id": "fc2b33cf-549e-50cc-9c91-b126a1a307df",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 7.716781929706353e-05,
+          "payload": {
+            "bar_timestamp": 1775667599999,
+            "decision_price": 71560.9,
+            "execute_at_open_time": 1775667600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "06245d70-2466-5b5c-b39f-4f2906945e32",
+      "created_at": 1775671199999,
+      "signals": [
+        {
+          "signal_id": "d20280d1-17ae-5572-93cf-936f5f527f69",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0019391284827885865,
+          "payload": {
+            "bar_timestamp": 1775671199999,
+            "decision_price": 71847.5,
+            "execute_at_open_time": 1775671200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "e80884a4-59a8-5b93-87f5-e619943527e9",
+      "created_at": 1775674799999,
+      "signals": [
+        {
+          "signal_id": "45b9c5c7-e677-5487-a806-0ea39d727009",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.00304263455238252,
+          "payload": {
+            "bar_timestamp": 1775674799999,
+            "decision_price": 71064.9,
+            "execute_at_open_time": 1775674800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "a87025d9-2b16-5eb4-8b15-e8bf896104b4",
+      "created_at": 1775678399999,
+      "signals": [
+        {
+          "signal_id": "88959383-0ad9-5abd-b313-d52e6c3beb6d",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0015147268293453358,
+          "payload": {
+            "bar_timestamp": 1775678399999,
+            "decision_price": 71283.0,
+            "execute_at_open_time": 1775678400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "cb02dda0-aa9c-553a-b5d0-37b4fb58236f",
+      "created_at": 1775681999999,
+      "signals": [
+        {
+          "signal_id": "a125e9be-25d9-573f-a3ce-027601246e95",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0011001115496736776,
+          "payload": {
+            "bar_timestamp": 1775681999999,
+            "decision_price": 71336.9,
+            "execute_at_open_time": 1775682000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "65972b00-997c-5232-83a8-7c156fd0effa",
+      "created_at": 1775685599999,
+      "signals": [
+        {
+          "signal_id": "46d3e4e2-3eb9-5859-a7c0-25d8c83833b1",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.001287894082336398,
+          "payload": {
+            "bar_timestamp": 1775685599999,
+            "decision_price": 71509.5,
+            "execute_at_open_time": 1775685600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "13404bfc-7590-5119-ba83-62b3e27c499d",
+      "created_at": 1775689199999,
+      "signals": [
+        {
+          "signal_id": "27b29697-d561-5ecb-bf7b-cef2980bcbf9",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0033774842218990565,
+          "payload": {
+            "bar_timestamp": 1775689199999,
+            "decision_price": 71024.3,
+            "execute_at_open_time": 1775689200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "5e2aa1a7-84cb-5d33-96ab-1624ba7ff9f6",
+      "created_at": 1775692799999,
+      "signals": [
+        {
+          "signal_id": "a6800e5c-b58b-5c71-89d1-9a973f10733f",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.003298048516464653,
+          "payload": {
+            "bar_timestamp": 1775692799999,
+            "decision_price": 71038.1,
+            "execute_at_open_time": 1775692800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "267ae655-121c-5fe2-81c1-3bf4c8df1158",
+      "created_at": 1775696399999,
+      "signals": [
+        {
+          "signal_id": "9fcb6344-741a-5892-b7a5-f96d731c86de",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.004186159182675478,
+          "payload": {
+            "bar_timestamp": 1775696399999,
+            "decision_price": 70779.0,
+            "execute_at_open_time": 1775696400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "2bd72e56-cd17-5fa7-9995-0095166fc67f",
+      "created_at": 1775699999999,
+      "signals": [
+        {
+          "signal_id": "8238be03-056a-599c-ba7e-b69fe07045c2",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.004851006404021959,
+          "payload": {
+            "bar_timestamp": 1775699999999,
+            "decision_price": 70900.0,
+            "execute_at_open_time": 1775700000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "228e8c22-2f77-50e4-8277-96f9abec81ec",
+      "created_at": 1775703599999,
+      "signals": [
+        {
+          "signal_id": "fe7a5e47-9d23-5929-85da-b259227c36ac",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.00573005936468327,
+          "payload": {
+            "bar_timestamp": 1775703599999,
+            "decision_price": 71029.7,
+            "execute_at_open_time": 1775703600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "b5200132-b53f-5f33-a118-fc3c9b25d718",
+      "created_at": 1775707199999,
+      "signals": [
+        {
+          "signal_id": "699297d2-fe0b-58bf-8698-793598f67e2a",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.005453410279276489,
+          "payload": {
+            "bar_timestamp": 1775707199999,
+            "decision_price": 70961.2,
+            "execute_at_open_time": 1775707200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "ebf02dca-2e5f-582c-b5a4-ce6d6d7dc39d",
+      "created_at": 1775710799999,
+      "signals": [
+        {
+          "signal_id": "93c66e61-30fd-5f51-a3d6-45ab5e6db292",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.005524706859445469,
+          "payload": {
+            "bar_timestamp": 1775710799999,
+            "decision_price": 70760.1,
+            "execute_at_open_time": 1775710800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "b3ec7acf-3569-570c-9502-c4e7f101d23d",
+      "created_at": 1775714399999,
+      "signals": [
+        {
+          "signal_id": "88cb38cf-fe9b-5a06-90b3-98a23bcd75fb",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.004531896021074368,
+          "payload": {
+            "bar_timestamp": 1775714399999,
+            "decision_price": 70959.7,
+            "execute_at_open_time": 1775714400000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "8d03b69d-347e-5322-a24c-5106e3111d52",
+      "created_at": 1775717999999,
+      "signals": [
+        {
+          "signal_id": "7a4e1e86-19e2-5dd3-a385-dbddd9ab7c72",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.00394214370227769,
+          "payload": {
+            "bar_timestamp": 1775717999999,
+            "decision_price": 70998.8,
+            "execute_at_open_time": 1775718000000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "546e2b24-90b1-53be-8033-8f5f01079835",
+      "created_at": 1775721599999,
+      "signals": [
+        {
+          "signal_id": "46de3868-96ef-5259-ad9f-3176ae43f740",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0036867474178356786,
+          "payload": {
+            "bar_timestamp": 1775721599999,
+            "decision_price": 70945.0,
+            "execute_at_open_time": 1775721600000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "14901c9a-d8a6-5aba-8119-0eef0689d6a6",
+      "created_at": 1775725199999,
+      "signals": [
+        {
+          "signal_id": "a8f759ff-0e4d-59ce-9ca0-fb22907c8962",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.0024227436837806894,
+          "payload": {
+            "bar_timestamp": 1775725199999,
+            "decision_price": 71207.6,
+            "execute_at_open_time": 1775725200000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "a58d8071-ef9b-57b0-b3ac-a0ad4685fa03",
+      "created_at": 1775728799999,
+      "signals": [
+        {
+          "signal_id": "2187b6f7-9c62-58c9-bb77-2b01e17019d6",
+          "instrument_id": "BTCUSDT",
+          "side": "sell",
+          "strength": 0.00032223882964384275,
+          "payload": {
+            "bar_timestamp": 1775728799999,
+            "decision_price": 71488.7,
+            "execute_at_open_time": 1775728800000,
+            "execution_model": "next_open",
+            "target_position": 0
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "261c151d-8587-5c62-ba70-679c7f1f64d1",
+      "created_at": 1775732399999,
+      "signals": [
+        {
+          "signal_id": "7e28669d-70a7-5ee8-8f4d-2744b423830c",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0002071382016540576,
+          "payload": {
+            "bar_timestamp": 1775732399999,
+            "decision_price": 71234.7,
+            "execute_at_open_time": 1775732400000,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "f8fca0cd-4d54-5ea4-81cf-041aad762504",
+      "created_at": 1775735999999,
+      "signals": [
+        {
+          "signal_id": "1aa7d45f-d3e8-557c-a1bb-12c610b0bf00",
+          "instrument_id": "BTCUSDT",
+          "side": "buy",
+          "strength": 0.0009752664557258625,
+          "payload": {
+            "bar_timestamp": 1775735999999,
+            "decision_price": 71271.2,
+            "execute_at_open_time": null,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    }
+  ],
+  "trades": [
+    {
+      "timestamp": 1775412000000,
+      "decision_timestamp": 1775411999999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 67375.87961101122,
+      "quantity": 0.14827279503871013,
+      "fee": 9.990009988116276,
+      "signal_id": "b05b05b3-abd1-5af7-99b9-a4b5bef8063a",
+      "action": "entry",
+      "execution_model": "next_open",
+      "target_position": 1
+    },
+    {
+      "timestamp": 1775520000000,
+      "decision_timestamp": 1775519999999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 68783.48888709207,
+      "quantity": 0.14827279503871013,
+      "fee": 10.198720149803199,
+      "signal_id": "1ee667db-aa75-5bee-be9b-1a790fbd2761",
+      "action": "exit",
+      "execution_model": "next_open",
+      "target_position": 0
+    },
+    {
+      "timestamp": 1775595600000,
+      "decision_timestamp": 1775595599999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 69319.94346629531,
+      "quantity": 0.1463886713924542,
+      "fee": 10.147654425031007,
+      "signal_id": "d8542ae5-3a3f-5bfb-b14f-31c316342262",
+      "action": "entry",
+      "execution_model": "next_open",
+      "target_position": 1
+    },
+    {
+      "timestamp": 1775667600000,
+      "decision_timestamp": 1775667599999,
+      "instrument_id": "BTCUSDT",
+      "side": "sell",
+      "price": 71525.21759816699,
+      "quantity": 0.1463886713924542,
+      "fee": 10.47048157525185,
+      "signal_id": "fc2b33cf-549e-50cc-9c91-b126a1a307df",
+      "action": "exit",
+      "execution_model": "next_open",
+      "target_position": 0
+    },
+    {
+      "timestamp": 1775732400000,
+      "decision_timestamp": 1775732399999,
+      "instrument_id": "BTCUSDT",
+      "side": "buy",
+      "price": 71270.38474813914,
+      "quantity": 0.14632527043526358,
+      "fee": 10.428658322296746,
+      "signal_id": "7e28669d-70a7-5ee8-8f4d-2744b423830c",
+      "action": "entry",
+      "execution_model": "next_open",
+      "target_position": 1
+    }
+  ],
+  "extras": {
+    "run_id": "ab755333-7803-5ab8-a0a4-3cce5271cc72",
+    "engine": "numba",
+    "execution_assumption": "signal_at_bar_close_fill_next_bar_open",
+    "trades": [
+      {
+        "timestamp": 1775412000000,
+        "decision_timestamp": 1775411999999,
+        "instrument_id": "BTCUSDT",
+        "side": "buy",
+        "price": 67375.87961101122,
+        "quantity": 0.14827279503871013,
+        "fee": 9.990009988116276,
+        "signal_id": "b05b05b3-abd1-5af7-99b9-a4b5bef8063a",
+        "action": "entry",
+        "execution_model": "next_open",
+        "target_position": 1
+      },
+      {
+        "timestamp": 1775520000000,
+        "decision_timestamp": 1775519999999,
+        "instrument_id": "BTCUSDT",
+        "side": "sell",
+        "price": 68783.48888709207,
+        "quantity": 0.14827279503871013,
+        "fee": 10.198720149803199,
+        "signal_id": "1ee667db-aa75-5bee-be9b-1a790fbd2761",
+        "action": "exit",
+        "execution_model": "next_open",
+        "target_position": 0
+      },
+      {
+        "timestamp": 1775595600000,
+        "decision_timestamp": 1775595599999,
+        "instrument_id": "BTCUSDT",
+        "side": "buy",
+        "price": 69319.94346629531,
+        "quantity": 0.1463886713924542,
+        "fee": 10.147654425031007,
+        "signal_id": "d8542ae5-3a3f-5bfb-b14f-31c316342262",
+        "action": "entry",
+        "execution_model": "next_open",
+        "target_position": 1
+      },
+      {
+        "timestamp": 1775667600000,
+        "decision_timestamp": 1775667599999,
+        "instrument_id": "BTCUSDT",
+        "side": "sell",
+        "price": 71525.21759816699,
+        "quantity": 0.1463886713924542,
+        "fee": 10.47048157525185,
+        "signal_id": "fc2b33cf-549e-50cc-9c91-b126a1a307df",
+        "action": "exit",
+        "execution_model": "next_open",
+        "target_position": 0
+      },
+      {
+        "timestamp": 1775732400000,
+        "decision_timestamp": 1775732399999,
+        "instrument_id": "BTCUSDT",
+        "side": "buy",
+        "price": 71270.38474813914,
+        "quantity": 0.14632527043526358,
+        "fee": 10.428658322296746,
+        "signal_id": "7e28669d-70a7-5ee8-8f4d-2744b423830c",
+        "action": "entry",
+        "execution_model": "next_open",
+        "target_position": 1
+      }
+    ],
+    "liquidity_model": {
+      "max_bar_volume_fraction": 0.05,
+      "quote_volume_used": true
+    },
+    "fee_model": {
+      "taker_fee_bps": 10.0,
+      "funding_rate_per_bar": 0.0001,
+      "total_funding_fees": 52.68632808978091
+    },
+    "slippage_model": {
+      "slippage_bps": 5.0,
+      "impact_slippage_bps": 15.0
+    }
+  }
+}

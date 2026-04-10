@@ -361,5 +361,6 @@ class RunSummary:
     run_id: RunId
     status: str
     signal_count: int
+    signals: List[SignalEnvelope] = field(default_factory=list)
     execution_reports: List[ExecutionReport] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)

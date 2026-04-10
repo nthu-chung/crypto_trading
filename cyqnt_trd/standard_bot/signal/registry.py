@@ -86,3 +86,32 @@ class SignalPluginRegistry:
             batch=SignalBatch(signals=merged, batch_id=batch_id, created_at=int(time.time() * 1000)),
             states=next_states,
         )
+
+    def run_pipeline_batch(
+        self,
+        snapshot: DataSnapshot,
+        plugin_chain: List[Dict[str, Any]],
+        *,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        merged = []
+        for invocation in plugin_chain:
+            plugin_id = invocation["plugin_id"]
+            raw_config = invocation.get("config", {})
+            plugin = self.get(plugin_id)
+            config = self._config_factories[plugin_id](raw_config)
+            batch: SignalBatch = plugin.run(snapshot, config, context)
+            merged.extend(batch.signals)
+
+        batch_id = str(
+            uuid.uuid5(
+                REGISTRY_NAMESPACE,
+                "%s|batch|%s|%s"
+                % (
+                    snapshot.meta.snapshot_id,
+                    ",".join(item["plugin_id"] for item in plugin_chain),
+                    len(merged),
+                ),
+            )
+        )
+        return SignalBatch(signals=merged, batch_id=batch_id, created_at=int(time.time() * 1000))

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import uuid
 
+import pytest
+
 from cyqnt_trd.standard_bot.core import (
     DataQuery,
     ExecutionIntent,
@@ -16,6 +18,7 @@ from cyqnt_trd.standard_bot.core import (
 )
 from cyqnt_trd.standard_bot.data import AlignmentPolicy
 from cyqnt_trd.standard_bot.data.adapters import HistoricalJsonMarketDataAdapter
+from cyqnt_trd.standard_bot.data.historical import HistoricalParquetMarketDataAdapter
 from cyqnt_trd.standard_bot.execution import (
     LongOnlySinglePositionRule,
     MaxPositionFractionRule,
@@ -25,6 +28,8 @@ from cyqnt_trd.standard_bot.runtime import MarketOnlyPaperRunner, RunContext
 from cyqnt_trd.standard_bot.signal import (
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
+    MultiTimeframeMaSpreadConfig,
+    MultiTimeframeMaSpreadPlugin,
     SignalPluginRegistry,
 )
 
@@ -129,6 +134,83 @@ def test_market_only_paper_runner_executes_one_step_cycle(tmp_path) -> None:
     assert summary.signal_count >= 1
     assert len(summary.execution_reports) == 1
     assert summary.execution_reports[0].status.value == "filled"
+
+
+def test_market_only_paper_runner_supports_local_resampled_multi_timeframe_data(tmp_path) -> None:
+    pyarrow = pytest.importorskip("pyarrow")
+    pyarrow_parquet = pytest.importorskip("pyarrow.parquet")
+
+    rows = []
+    for index in range(180):
+        open_time = index * 60_000
+        close = 100.0 + float(index // 60) * 20.0 + float(index % 5)
+        rows.append(
+            {
+                "open_time": open_time,
+                "close_time": open_time + 59_999,
+                "open": close,
+                "high": close,
+                "low": close,
+                "close": close,
+                "volume": 10.0,
+                "quote_volume": 1000.0,
+                "trades": 10,
+                "instrument_id": "BTCUSDT",
+                "timeframe": "1m",
+                "confirmed": True,
+            }
+        )
+    table = pyarrow.Table.from_pylist(rows)
+    parquet_path = tmp_path / "futures" / "BTCUSDT"
+    parquet_path.mkdir(parents=True, exist_ok=True)
+    pyarrow_parquet.write_table(table, str(parquet_path / "1m.parquet"))
+
+    registry = SignalPluginRegistry()
+    registry.register(MultiTimeframeMaSpreadPlugin(), lambda raw: MultiTimeframeMaSpreadConfig(**raw))
+    runner = MarketOnlyPaperRunner(
+        market_data=HistoricalParquetMarketDataAdapter(
+            data_root=str(tmp_path),
+            market_type="futures",
+            resample_source_timeframe="1m",
+        ),
+        signal_registry=registry,
+        broker=PaperBrokerAdapter(initial_cash=1000.0, fee_bps=0.0, account_mode="futures"),
+        policy=AlignmentPolicy(policy_id="bar_close_v1", primary_timeframe="5m"),
+        snapshot_tail_bars=120,
+    )
+    context = RunContext(
+        run_id=str(uuid.uuid4()),
+        trigger=MonitorTrigger(trigger_type=TriggerType.MANUAL),
+        data_query=DataQuery(
+            market=MarketQuery(
+                instruments=["BTCUSDT"],
+                timeframes=["5m", "1h"],
+                time_range=TimeRange(tail_bars=24),
+            ),
+            options=QueryOptions(partial_ok=False),
+        ),
+        signal_pipeline=SignalPipelineSpec(
+            plugin_chain=[
+                {
+                    "plugin_id": "multi_timeframe_ma_spread",
+                    "config": {
+                        "instrument_id": "BTCUSDT",
+                        "primary_timeframe": "5m",
+                        "reference_timeframe": "1h",
+                        "primary_ma_period": 3,
+                        "reference_ma_period": 2,
+                        "spread_threshold_bps": 0.0,
+                    },
+                }
+            ]
+        ),
+        dry_run=True,
+    )
+
+    summary = runner.run(context)
+
+    assert summary.status == "dry_run"
+    assert summary.signal_count >= 0
 
 
 def test_max_position_fraction_rule_rejects_oversized_buy() -> None:
