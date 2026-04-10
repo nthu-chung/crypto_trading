@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import signal as signal_module
 import time
 import uuid
 from pathlib import Path
@@ -40,7 +42,15 @@ def _now_ms() -> int:
     return int(time.time() * 1000)
 
 
+def _managed_run_id() -> Optional[str]:
+    return os.getenv("STANDARD_BOT_MANAGED_RUN_ID")
+
+
 def _log(event: dict, *, sink):
+    managed_run_id = _managed_run_id()
+    if managed_run_id and "managed_run_id" not in event:
+        event = dict(event)
+        event["managed_run_id"] = managed_run_id
     line = json.dumps(event, ensure_ascii=False)
     print(line, flush=True)
     if sink is not None:
@@ -141,6 +151,25 @@ def main() -> int:
         Path(args.log_path).parent.mkdir(parents=True, exist_ok=True)
         sink = Path(args.log_path).open("a", encoding="utf-8")
 
+    stop_requested = {"value": False, "signal": None}
+
+    def _request_stop(sig, _frame):  # noqa: ANN001
+        stop_requested["value"] = True
+        stop_requested["signal"] = sig
+        _log(
+            {
+                "event": "stop_requested",
+                "signal": int(sig),
+                "timestamp": _now_ms(),
+            },
+            sink=sink,
+        )
+
+    previous_sigterm = signal_module.getsignal(signal_module.SIGTERM)
+    previous_sigint = signal_module.getsignal(signal_module.SIGINT)
+    signal_module.signal(signal_module.SIGTERM, _request_stop)
+    signal_module.signal(signal_module.SIGINT, _request_stop)
+
     selected = _choose_symbol(args, broker, adapter, plugin)
     symbol = selected["symbol"]
     config = selected["config"]
@@ -173,6 +202,8 @@ def main() -> int:
     cycle = 0
     try:
         while time.time() < end_at:
+            if stop_requested["value"]:
+                break
             cycle += 1
             snapshot, _ = _latest_signal_for_symbol(adapter, plugin, config, symbol, args.interval, args.tail_bars)
             if snapshot is None:
@@ -182,7 +213,7 @@ def main() -> int:
 
             step_result = plugin.step(snapshot, state, config)
             state = step_result.state
-            signal = step_result.signals[-1] if step_result.signals else None
+            latest_signal = step_result.signals[-1] if step_result.signals else None
             account = broker.sync_account()
             position = _position_for_symbol(account, symbol)
 
@@ -193,21 +224,21 @@ def main() -> int:
                 "symbol": symbol,
                 "position": None if position is None else position.__dict__,
                 "signal": None
-                if signal is None
+                if latest_signal is None
                 else {
-                    "side": signal.side.value,
-                    "strength": signal.strength,
-                    "bar_timestamp": signal.payload.get("bar_timestamp"),
+                    "side": latest_signal.side.value,
+                    "strength": latest_signal.strength,
+                    "bar_timestamp": latest_signal.payload.get("bar_timestamp"),
                 },
             }
 
-            if signal is not None:
+            if latest_signal is not None:
                 if position is None:
                     report = broker.place_order(
-                        _build_order(symbol, signal.side, notional=args.notional, suffix="open")
+                        _build_order(symbol, latest_signal.side, notional=args.notional, suffix="open")
                     )
                     event["execution"] = _report_payload(report)
-                elif position.side == "long" and signal.side == TradeSide.SELL:
+                elif position.side == "long" and latest_signal.side == TradeSide.SELL:
                     report = broker.place_order(
                         _build_order(
                             symbol,
@@ -218,7 +249,7 @@ def main() -> int:
                         )
                     )
                     event["execution"] = _report_payload(report)
-                elif position.side == "short" and signal.side == TradeSide.BUY:
+                elif position.side == "short" and latest_signal.side == TradeSide.BUY:
                     report = broker.place_order(
                         _build_order(
                             symbol,
@@ -231,6 +262,8 @@ def main() -> int:
                     event["execution"] = _report_payload(report)
 
             _log(event, sink=sink)
+            if stop_requested["value"]:
+                break
             _sleep_to_next_bar(args.sleep_offset_seconds)
     finally:
         final_account = broker.sync_account()
@@ -251,6 +284,7 @@ def main() -> int:
             {
                 "event": "demo_end",
                 "symbol": symbol,
+                "stop_signal": stop_requested["signal"],
                 "final_position": None
                 if _position_for_symbol(broker.sync_account(), symbol) is None
                 else _position_for_symbol(broker.sync_account(), symbol).__dict__,
@@ -259,6 +293,8 @@ def main() -> int:
         )
         if sink is not None:
             sink.close()
+        signal_module.signal(signal_module.SIGTERM, previous_sigterm)
+        signal_module.signal(signal_module.SIGINT, previous_sigint)
 
     return 0
 

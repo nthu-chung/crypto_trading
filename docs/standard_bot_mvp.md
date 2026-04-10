@@ -193,6 +193,57 @@ python -m cyqnt_trd.standard_bot.entrypoints.mvp_testnet_roundtrip \
   --notional 10
 ```
 
+## Managed background runs
+
+For demos or long-running monitor processes, prefer the local run manager so each
+background process gets a stable `run_id` and can later be stopped or killed by id.
+
+Start a managed testnet MA demo:
+
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_run_manager \
+  start-testnet-ma-demo \
+  --env-file .env \
+  --duration-minutes 10 \
+  --notional 10
+```
+
+List active managed runs:
+
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_run_manager list
+```
+
+Inspect one run:
+
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_run_manager \
+  status \
+  --run-id <run_id>
+```
+
+Gracefully stop one run by id:
+
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_run_manager \
+  stop \
+  --run-id <run_id>
+```
+
+Force kill one run by id:
+
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_run_manager \
+  kill \
+  --run-id <run_id>
+```
+
+Notes:
+
+- Managed metadata and logs are written under `.standard_bot_runs/`.
+- `stop` sends `SIGTERM`; the testnet demo handles this gracefully and still runs its final close path.
+- `kill` sends `SIGKILL`; use it only if graceful stop fails.
+
 ## Files added for the MVP
 
 - `cyqnt_trd/standard_bot/data/adapters.py`
