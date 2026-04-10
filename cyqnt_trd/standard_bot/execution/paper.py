@@ -29,7 +29,11 @@ def _now_ms() -> int:
 @dataclass
 class PaperBrokerAdapter:
     """
-    Minimal paper broker for market-only long/flat execution.
+    Minimal paper broker for market-only execution.
+
+    ``spot`` mode keeps the original long/flat cash semantics used by the MVP.
+    ``futures`` mode models a one-way long/short book with realized PnL and
+    fees settled into ``base_currency``.
     """
 
     account_id: str = "paper"
@@ -37,11 +41,14 @@ class PaperBrokerAdapter:
     initial_cash: float = 10_000.0
     fee_bps: float = 10.0
     slippage_bps: float = 0.0
+    account_mode: str = "spot"
     balances: Dict[str, float] = field(default_factory=dict)
     positions: Dict[str, AccountPosition] = field(default_factory=dict)
     reports: List[ExecutionReport] = field(default_factory=list)
 
     def __post_init__(self) -> None:
+        if self.account_mode not in {"spot", "futures"}:
+            raise ValueError("account_mode must be either 'spot' or 'futures'")
         if self.base_currency not in self.balances:
             self.balances[self.base_currency] = float(self.initial_cash)
 
@@ -54,6 +61,13 @@ class PaperBrokerAdapter:
         quantity = self._resolve_quantity(intent, fill_price)
         if quantity is None or quantity <= 0:
             return self._reject(intent, "missing_quantity")
+
+        if self.account_mode == "futures":
+            if intent.side == TradeSide.BUY:
+                return self._execute_futures_buy(intent, fill_price, quantity)
+            if intent.side == TradeSide.SELL:
+                return self._execute_futures_sell(intent, fill_price, quantity)
+            return self._reject(intent, "unsupported_side")
 
         if intent.side == TradeSide.BUY:
             return self._execute_buy(intent, fill_price, quantity)
@@ -154,6 +168,112 @@ class PaperBrokerAdapter:
                 side="long",
             )
         return self._filled(intent, price=price, quantity=quantity, fee=fee)
+
+    def _execute_futures_buy(self, intent: ExecutionIntent, price: float, quantity: float) -> ExecutionReport:
+        cash = float(self.balances.get(self.base_currency, 0.0))
+        gross = quantity * price
+        fee = gross * self.fee_bps / 10_000.0
+        current = self.positions.get(intent.instrument_id)
+        realized_pnl = 0.0
+        remaining_to_open = quantity
+
+        if current is not None and current.side == "short":
+            closing_qty = min(quantity, current.quantity)
+            entry_price = float(current.avg_entry_price or price)
+            realized_pnl += (entry_price - price) * closing_qty
+            remaining_position = current.quantity - closing_qty
+            remaining_to_open = quantity - closing_qty
+            if remaining_position <= 1e-9:
+                self.positions.pop(intent.instrument_id, None)
+            else:
+                self.positions[intent.instrument_id] = AccountPosition(
+                    instrument_id=intent.instrument_id,
+                    quantity=remaining_position,
+                    avg_entry_price=current.avg_entry_price,
+                    side="short",
+                )
+        elif current is not None and current.side == "long":
+            remaining_to_open = quantity
+
+        self.balances[self.base_currency] = cash + realized_pnl - fee
+        if self.balances[self.base_currency] < -1e-9:
+            self.balances[self.base_currency] = cash
+            if current is not None:
+                self.positions[intent.instrument_id] = current
+            return self._reject(intent, "insufficient_margin")
+
+        if remaining_to_open > 1e-9:
+            self._open_or_increase_position(
+                instrument_id=intent.instrument_id,
+                side="long",
+                quantity=remaining_to_open,
+                price=price,
+            )
+        return self._filled(intent, price=price, quantity=quantity, fee=fee)
+
+    def _execute_futures_sell(self, intent: ExecutionIntent, price: float, quantity: float) -> ExecutionReport:
+        cash = float(self.balances.get(self.base_currency, 0.0))
+        gross = quantity * price
+        fee = gross * self.fee_bps / 10_000.0
+        current = self.positions.get(intent.instrument_id)
+        realized_pnl = 0.0
+        remaining_to_open = quantity
+
+        if current is not None and current.side == "long":
+            closing_qty = min(quantity, current.quantity)
+            entry_price = float(current.avg_entry_price or price)
+            realized_pnl += (price - entry_price) * closing_qty
+            remaining_position = current.quantity - closing_qty
+            remaining_to_open = quantity - closing_qty
+            if remaining_position <= 1e-9:
+                self.positions.pop(intent.instrument_id, None)
+            else:
+                self.positions[intent.instrument_id] = AccountPosition(
+                    instrument_id=intent.instrument_id,
+                    quantity=remaining_position,
+                    avg_entry_price=current.avg_entry_price,
+                    side="long",
+                )
+        elif current is not None and current.side == "short":
+            remaining_to_open = quantity
+
+        self.balances[self.base_currency] = cash + realized_pnl - fee
+        if self.balances[self.base_currency] < -1e-9:
+            self.balances[self.base_currency] = cash
+            if current is not None:
+                self.positions[intent.instrument_id] = current
+            return self._reject(intent, "insufficient_margin")
+
+        if remaining_to_open > 1e-9:
+            self._open_or_increase_position(
+                instrument_id=intent.instrument_id,
+                side="short",
+                quantity=remaining_to_open,
+                price=price,
+            )
+        return self._filled(intent, price=price, quantity=quantity, fee=fee)
+
+    def _open_or_increase_position(self, *, instrument_id: str, side: str, quantity: float, price: float) -> None:
+        current = self.positions.get(instrument_id)
+        if current is not None and current.side == side:
+            next_qty = current.quantity + quantity
+            avg_entry = price
+            if current.avg_entry_price is not None and next_qty > 0:
+                avg_entry = ((current.quantity * current.avg_entry_price) + (quantity * price)) / next_qty
+            self.positions[instrument_id] = AccountPosition(
+                instrument_id=instrument_id,
+                quantity=next_qty,
+                avg_entry_price=avg_entry,
+                side=side,
+            )
+            return
+
+        self.positions[instrument_id] = AccountPosition(
+            instrument_id=instrument_id,
+            quantity=quantity,
+            avg_entry_price=price,
+            side=side,
+        )
 
     def _filled(self, intent: ExecutionIntent, *, price: float, quantity: float, fee: float) -> ExecutionReport:
         report = ExecutionReport(

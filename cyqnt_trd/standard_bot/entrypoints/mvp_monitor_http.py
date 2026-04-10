@@ -16,12 +16,13 @@ from ..data import AlignmentPolicy
 from ..data.adapters import BinanceRestMarketDataAdapter
 from ..execution import (
     BinanceFuturesTestnetBrokerAdapter,
-    LongOnlySinglePositionRule,
     MaxPositionFractionRule,
     PaperBrokerAdapter,
 )
 from ..runtime import MarketOnlyPaperRunner, RunContext
 from .common import build_strategy_pipeline, make_registry
+
+TESTNET_FUTURES_KLINES_URL = "https://testnet.binancefuture.com/fapi/v1/klines"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -37,28 +38,33 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fee-bps", type=float, default=10.0)
     parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--max-position-pct", type=float, default=0.95)
+    parser.add_argument("--secondary-interval", default="1h")
     return parser
 
 
 def make_runner(args):
     load_env_file(args.env_file)
+    base_url_override = None
     if args.broker == "binance_futures_testnet":
         broker = BinanceFuturesTestnetBrokerAdapter(env_path=args.env_file)
+        if args.market_type == "futures":
+            base_url_override = TESTNET_FUTURES_KLINES_URL
     else:
         broker = PaperBrokerAdapter(
             initial_cash=args.initial_capital,
             fee_bps=args.fee_bps,
             slippage_bps=args.slippage_bps,
+            account_mode="futures" if args.market_type == "futures" else "spot",
         )
     return MarketOnlyPaperRunner(
-        market_data=BinanceRestMarketDataAdapter(market_type=args.market_type),
+        market_data=BinanceRestMarketDataAdapter(
+            market_type=args.market_type,
+            base_url_override=base_url_override,
+        ),
         signal_registry=make_registry(),
         broker=broker,
         policy=AlignmentPolicy(policy_id="bar_close_v1", primary_timeframe=args.interval),
-        risk_rules=[
-            MaxPositionFractionRule(max_fraction=args.max_position_pct),
-            LongOnlySinglePositionRule(),
-        ],
+        risk_rules=[MaxPositionFractionRule(max_fraction=args.max_position_pct)],
         snapshot_tail_bars=args.limit,
     )
 
@@ -88,9 +94,13 @@ def handler_factory(args, *, runner_override=None):
                 symbol = str(payload.get("symbol", "BTCUSDT")).upper()
                 interval = str(payload.get("interval", args.interval))
                 strategy = str(payload.get("strategy", "moving_average_cross"))
+                secondary_interval = str(payload.get("secondary_interval", args.secondary_interval))
                 limit = int(payload.get("limit", args.limit))
                 signal_only = bool(payload.get("signal_only", False))
                 dry_run = bool(payload.get("dry_run", args.broker == "paper"))
+                timeframes = [interval]
+                if strategy == "multi_timeframe_ma_spread" and secondary_interval not in timeframes:
+                    timeframes.append(secondary_interval)
 
                 context = RunContext(
                     run_id=str(payload.get("run_id") or uuid.uuid4()),
@@ -103,7 +113,7 @@ def handler_factory(args, *, runner_override=None):
                     data_query=DataQuery(
                         market=MarketQuery(
                             instruments=[symbol],
-                            timeframes=[interval],
+                            timeframes=timeframes,
                             time_range=TimeRange(tail_bars=limit),
                         ),
                         options=QueryOptions(partial_ok=False),
@@ -112,6 +122,7 @@ def handler_factory(args, *, runner_override=None):
                         strategy=strategy,
                         symbol=symbol,
                         interval=interval,
+                        secondary_interval=secondary_interval,
                         fast_window=int(payload.get("fast_window", 5)),
                         slow_window=int(payload.get("slow_window", 20)),
                         entry_threshold=float(payload.get("entry_threshold", 0.0)),
@@ -119,6 +130,9 @@ def handler_factory(args, *, runner_override=None):
                         rsi_period=int(payload.get("rsi_period", 14)),
                         oversold=float(payload.get("oversold", 30.0)),
                         overbought=float(payload.get("overbought", 70.0)),
+                        primary_ma_period=int(payload.get("primary_ma_period", 20)),
+                        reference_ma_period=int(payload.get("reference_ma_period", 20)),
+                        spread_threshold_bps=float(payload.get("spread_threshold_bps", 0.0)),
                     ),
                     dry_run=dry_run,
                 )
@@ -149,6 +163,19 @@ def summary_to_payload(summary) -> dict:
         "status": summary.status,
         "signal_count": summary.signal_count,
         "errors": summary.errors,
+        "signals": [
+            {
+                "signal_id": signal.signal_id,
+                "kind": signal.kind.value,
+                "instrument_id": signal.instrument_id,
+                "side": None if signal.side is None else signal.side.value,
+                "strength": signal.strength,
+                "time_horizon": signal.time_horizon,
+                "valid_until": signal.valid_until,
+                "payload": signal.payload,
+            }
+            for signal in summary.signals
+        ],
         "execution_reports": [
             {
                 "intent_id": report.intent_id,

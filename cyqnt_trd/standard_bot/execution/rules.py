@@ -13,14 +13,14 @@ from ..core import AccountSnapshot, ExecutionIntent, TradeSide
 @dataclass
 class MaxPositionFractionRule:
     """
-    Reject buy intents that exceed a configurable fraction of available cash.
+    Reject directional intents that exceed a configurable fraction of available cash.
     """
 
     max_fraction: float = 0.95
     base_currency: str = "USDT"
 
     def validate(self, intent: ExecutionIntent, account_snapshot: Optional[AccountSnapshot]) -> Optional[str]:
-        if intent.side != TradeSide.BUY or account_snapshot is None:
+        if account_snapshot is None or intent.reduce_only:
             return None
         if not 0 < self.max_fraction <= 1:
             return "invalid_max_fraction"
@@ -30,7 +30,7 @@ class MaxPositionFractionRule:
         if available_cash <= 0:
             return "insufficient_cash"
 
-        requested_notional = intent.notional
+        requested_notional = intent.risk_hints.get("requested_position_notional", intent.notional)
         if requested_notional is None and intent.quantity is not None and market_price is not None:
             requested_notional = float(intent.quantity) * float(market_price)
         if requested_notional is None:
