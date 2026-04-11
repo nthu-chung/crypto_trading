@@ -36,8 +36,10 @@ from ..signal.numba_kernels import (
     moving_average_cross_target_updates,
     multi_timeframe_ma_spread_target_updates,
     price_moving_average_target_updates,
+    rsi_reversion_target_updates,
 )
 from .execution_kernels import simulate_target_positions_next_open
+from .metrics_kernels import compute_equity_statistics
 
 
 SIMULATION_NAMESPACE = uuid.UUID("0bf7f6fd-3ca7-57aa-8266-4f22048d8bf8")
@@ -128,11 +130,14 @@ class NumbaBacktestRunner:
             strengths=strengths,
         )
 
-        equity_curve = self._build_equity_curve(series.timestamps, equity_values, cash_values)
         initial = float(request.initial_capital)
         final_equity = float(equity_values[-1]) if len(equity_values) else initial
         total_return = (final_equity - initial) / initial if initial else 0.0
-        max_drawdown = float(max((point.drawdown or 0.0) for point in equity_curve)) if equity_curve else 0.0
+        drawdowns, max_drawdown, mean_bar_return, bar_return_volatility, sharpe_ratio = compute_equity_statistics(
+            equity_values,
+            self._periods_per_year(request.primary_timeframe),
+        )
+        equity_curve = self._build_equity_curve(series.timestamps, equity_values, cash_values, drawdowns)
         run_id = str(
             uuid.uuid5(
                 SIMULATION_NAMESPACE,
@@ -152,6 +157,9 @@ class NumbaBacktestRunner:
                 "final_equity": float(final_equity),
                 "total_return": float(total_return),
                 "max_drawdown": float(max_drawdown),
+                "sharpe_ratio": float(sharpe_ratio),
+                "mean_bar_return": float(mean_bar_return),
+                "bar_return_volatility": float(bar_return_volatility),
                 "ending_position_qty": float(position_values[-1]) if len(position_values) else 0.0,
             },
             signal_batches=signal_batches,
@@ -182,7 +190,12 @@ class NumbaBacktestRunner:
             raise ValueError("numba backtest runner currently supports exactly one signal plugin")
         strategy_id = plugin_chain[0]["plugin_id"]
         raw_config = dict(plugin_chain[0].get("config", {}))
-        if strategy_id not in {"moving_average_cross", "price_moving_average", "multi_timeframe_ma_spread"}:
+        if strategy_id not in {
+            "moving_average_cross",
+            "price_moving_average",
+            "rsi_reversion",
+            "multi_timeframe_ma_spread",
+        }:
             raise ValueError("numba backtest runner does not support strategy '%s' yet" % strategy_id)
         return strategy_id, raw_config
 
@@ -242,6 +255,13 @@ class NumbaBacktestRunner:
                 primary_series.closes,
                 int(raw_config["period"]),
                 float(raw_config.get("entry_threshold", 0.0)),
+            )
+        if strategy_id == "rsi_reversion":
+            return rsi_reversion_target_updates(
+                primary_series.closes,
+                int(raw_config["period"]),
+                float(raw_config["oversold"]),
+                float(raw_config["overbought"]),
             )
 
         secondary_key = market_bundle.key(instrument_id, str(raw_config["reference_timeframe"]))
@@ -402,30 +422,47 @@ class NumbaBacktestRunner:
             )
         return batches
 
+    def _periods_per_year(self, timeframe: str) -> float:
+        if not timeframe or len(timeframe) < 2:
+            return 0.0
+        unit = timeframe[-1]
+        try:
+            size = float(timeframe[:-1])
+        except ValueError:
+            return 0.0
+        if size <= 0.0:
+            return 0.0
+        if unit == "m":
+            return 365.0 * 24.0 * 60.0 / size
+        if unit == "h":
+            return 365.0 * 24.0 / size
+        if unit == "d":
+            return 365.0 / size
+        if unit == "w":
+            return 365.0 / (7.0 * size)
+        if unit == "M":
+            return 12.0 / size
+        return 0.0
+
     def _build_equity_curve(
         self,
         timestamps: np.ndarray,
         equity_values: np.ndarray,
         cash_values: np.ndarray,
+        drawdowns: np.ndarray,
     ) -> List[EquityPoint]:
         if len(timestamps) == 0:
             return []
-        high_watermark = 0.0
         points: List[EquityPoint] = []
         for index, timestamp in enumerate(timestamps):
             equity = float(equity_values[index])
             cash = float(cash_values[index])
-            if equity > high_watermark:
-                high_watermark = equity
-            drawdown = 0.0
-            if high_watermark > 0.0:
-                drawdown = max(0.0, (high_watermark - equity) / high_watermark)
             points.append(
                 EquityPoint(
                     timestamp=int(timestamp),
                     equity=equity,
                     cash=cash,
-                    drawdown=float(drawdown),
+                    drawdown=float(drawdowns[index]) if index < len(drawdowns) else 0.0,
                 )
             )
         return points

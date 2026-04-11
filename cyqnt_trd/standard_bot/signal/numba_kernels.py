@@ -211,6 +211,28 @@ def rsi_reversion_signal_rows(
 
 
 @njit(cache=True)
+def rsi_reversion_target_updates(
+    closes: np.ndarray,
+    period: int,
+    oversold: float,
+    overbought: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _ = rsi_reversion_signal_rows(
+        closes,
+        period,
+        oversold,
+        overbought,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    for index in range(closes.shape[0]):
+        if directions[index] == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif directions[index] == SIGNAL_SELL:
+            target_updates[index] = TARGET_FLAT
+    return target_updates, strengths
+
+
+@njit(cache=True)
 def multi_timeframe_ma_spread_signal_rows(
     primary_timestamps: np.ndarray,
     primary_closes: np.ndarray,
