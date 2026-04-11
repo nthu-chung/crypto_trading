@@ -500,3 +500,180 @@ tmux kill-session -t stdbot
 OpenClaw 在這個 repo 裡應遵守這條主線：
 
 `自然語言 -> 正式策略規格 -> standard_bot signal pipeline -> local historical/parquet -> numba backtest -> paper/testnet runtime -> 使用者可用 run_id 管理與停止`
+
+---
+
+## 10. 監聽通知規範
+
+Jarvis 介面不能依賴「主動跳通知」這種能力，因此監聽規範不能建立在推播一定會成功上。
+
+正確做法是：一旦啟動背景監聽，必須同時啟動一個 watcher subagent，持續把每輪輪詢結果寫進管理 bot 的 workspace session。之後使用者只要輸入 `現在狀態`，主 agent 就必須從 session 中讀取最新狀態並回報；使用者輸入 `停止`，主 agent 就必須使用 session 中保存的 `run_id` 停掉策略與交易。
+
+### 第 10.1 核心原則
+
+- 不可等到任務結束才回報
+- 不可把「通知成功送達」當作唯一觀測來源
+- 中間狀態必須持續寫入 workspace session
+- session 中必須始終保有可供查詢與停止的最新 `run_id`
+
+### 第 10.2 watcher subagent 的強制規則
+
+若平台支援 subagent，則背景監聽啟動成功後，主 agent 必須立即啟動一個專用 watcher subagent。
+
+watcher subagent 的唯一職責是：
+
+- 定期讀取 monitor 狀態
+- 追蹤 log 更新
+- 維護遞增的 `poll_index`
+- 將每輪結果寫入管理 bot 的 workspace session
+
+watcher subagent 不負責：
+
+- 修改策略
+- 修改參數
+- 直接下單
+- 停止其它 run
+
+這些控制動作仍由主 agent 負責。
+
+### 第 10.3 watcher subagent 啟動時必須拿到的資訊
+
+主 agent 在啟動 watcher subagent 時，必須把以下資訊交給它：
+
+- `run_id`
+- 監聽標的
+- log 路徑
+- status 指令
+- stop / kill 指令
+- 輪詢頻率
+- 背景流程名稱
+
+建議命名：
+
+- 主監聽流程：`<strategy>-monitor`
+- watcher subagent：`<strategy>-watcher`
+
+### 第 10.4 workspace session 內必須保存的欄位
+
+watcher subagent 每次輪詢後，至少要把以下欄位寫入 workspace session：
+
+- `run_id`
+- `poll_index`
+- 輪詢時間
+- 監聽標的
+- 當前價格
+- 信號方向：`buy / sell / hold`
+- 目前持倉
+- 浮動損益或已實現損益
+- 是否觸發止損 / 止盈
+- 若有動作，補充：
+  - 是否送單
+  - 訂單狀態
+  - 失敗原因
+- `status_command`
+- `stop_command`
+- `kill_command`
+- `log_path`
+
+除了「最新狀態」，session 內也應保留最近幾輪的簡要歷史，避免使用者只能看到單一快照。
+
+### 第 10.5 使用者輸入「現在狀態」時應做什麼
+
+當使用者輸入：
+
+- `現在狀態`
+- `status`
+- `目前狀況`
+
+主 agent 不應重新猜測，也不應只看最後結論；而是必須直接讀取 workspace session 中 watcher subagent 寫入的最新狀態，並回報：
+
+- 目前 `run_id`
+- 最新 `poll_index`
+- 最新輪詢時間
+- 當前價格
+- 信號方向
+- 目前持倉與損益
+- 最近是否有下單 / 成交 / 失敗
+- 若需要，再補最近幾輪摘要
+
+### 第 10.6 使用者輸入「停止」時應做什麼
+
+當使用者輸入：
+
+- `停止`
+- `stop`
+- `停止監聽`
+
+主 agent 必須直接從 workspace session 取得目前活躍的 `run_id`，並依序執行：
+
+1. 對主要監聽流程送出 `stop`
+2. 若有 watcher subagent，也一併停止
+3. 確認主流程狀態已更新為 `stopped / exited / killed`
+4. 將停止結果回寫到 workspace session
+5. 回報使用者：
+   - 舊 `run_id`
+   - 最終狀態
+   - 若有未平倉風險或需人工確認，也必須說明
+
+若 `stop` 無效，才可升級為 `kill`。
+
+### 第 10.7 通知頻率與事件規則
+
+watcher subagent 應遵守以下頻率：
+
+- 第一則狀態更新：背景流程啟動後幾秒內就要寫入 session
+- 固定心跳：預設每 `30` 秒至少更新一次
+- 事件更新：以下事件發生時，必須立即寫入 session，不必等下一個固定輪詢點
+  - 新 signal
+  - 下單
+  - 訂單成交 / 拒單
+  - 止損 / 止盈觸發
+  - run 結束
+  - watcher 自己偵測到異常
+
+### 第 10.8 watcher subagent 不可靜默卡住
+
+若 watcher subagent 發生以下情況：
+
+- 已啟動但沒有寫入第一則狀態
+- 固定心跳中斷
+- 腳本卡住
+- 背景流程仍在跑，但 session 久久沒有更新
+
+主 agent 必須：
+
+1. 立即通知使用者 watcher 異常
+2. 自己接管一次最新狀態的讀取與回報
+3. 視情況停止舊 watcher
+4. 用較可靠的方式重啟新的 watcher
+
+若重啟後仍不穩定，主 agent 應退回「自己輪詢、自己更新 session」模式，而不能讓使用者一直等到任務結束。
+
+### 第 10.9 若平台不支援 subagent
+
+若平台不支援 subagent，則主 agent 仍必須自行輪詢並把結果寫入 workspace session。至少應透過以下來源之一取得中間狀態：
+
+- `mvp_run_manager status --run-id <run_id>`
+- tail log
+- monitor HTTP endpoint
+
+不得只在任務完全結束後才給使用者最終摘要。
+
+### 第 10.10 建議的 session 狀態格式
+
+```text
+[monitor state]
+run_id: ...
+poll_index: ...
+time: ...
+symbol: ...
+price: ...
+signal: buy/sell/hold
+position: ...
+pnl: ...
+stop_loss_take_profit: triggered / not_triggered
+action: none / order_submitted / order_filled / order_failed
+status_command: ...
+stop_command: ...
+kill_command: ...
+```
