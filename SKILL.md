@@ -38,6 +38,11 @@ fi
 
 - 回測入口優先使用：
   - `python -m cyqnt_trd.standard_bot.entrypoints.mvp_backtest`
+- 回測底層引擎應視為：
+  - `cyqnt_trd.standard_bot.simulation.numba_runner.NumbaBacktestRunner`
+- 如果 OpenClaw 需要描述或選擇回測引擎，應明確說：
+  - `standard_bot -> mvp_backtest.py -> NumbaBacktestRunner`
+- 若使用者沒有特別要求 legacy 框架，OpenClaw 不得自行改用其他回測器
 - paper / 單次 runtime 入口優先使用：
   - `python -m cyqnt_trd.standard_bot.entrypoints.mvp_paper`
 - HTTP monitor 入口優先使用：
@@ -50,6 +55,8 @@ fi
 
 - `cyqnt_trd/get_data/*` 當成正式回測入口
 - `cyqnt_trd/backtesting/*` 當成主要框架
+- `cyqnt_trd/backtesting/strategy_backtest.py` 當成預設回測器
+- `cyqnt_trd/standard_bot/simulation/runner.py` 的 `SnapshotBacktestRunner` 當成預設歷史批次回測器
 - 未經對齊驗證的臨時 pandas notebook 回測
 
 ---
@@ -60,12 +67,53 @@ OpenClaw 一旦要做回測，應使用目前專案中的這條資料路徑：
 
 `Historical downloader -> local parquet -> local resample -> standard_bot signal -> numba simulation`
 
+### OpenClaw 應如何操作 standard_bot
+
+OpenClaw 不應把 `standard_bot` 當成一組零散 Python 檔案自由拼裝，而應把它視為一條固定工作流：
+
+1. 先把使用者需求轉成正式策略規格
+2. 決定模式：
+   - 回測：`mvp_backtest`
+   - paper：`mvp_paper`
+   - monitor：`mvp_monitor_http` 或 `mvp_run_manager`
+   - testnet execution：`mvp_testnet_execution` / `mvp_testnet_roundtrip`
+3. 決定資料來源：
+   - 優先本地 historical parquet
+   - 缺資料時才 `--download-missing`
+4. 回測時固定使用：
+   - `python -m cyqnt_trd.standard_bot.entrypoints.mvp_backtest`
+   - `--engine numba`
+5. 若要描述底層回測引擎，明確說：
+   - `NumbaBacktestRunner`
+6. 若要長時間執行，固定透過：
+   - `python -m cyqnt_trd.standard_bot.entrypoints.mvp_run_manager`
+7. 若涉及外部訂單：
+   - 先等使用者 `CONFIRM`
+   - 再由這台 canonical machine 的 repo runtime 執行
+
+OpenClaw 不應預設直接：
+
+- import 舊的 `cyqnt_trd/backtesting/*`
+- import 舊的 `cyqnt_trd/trading_signal/*`
+- 自行 new 一個 legacy backtester
+- 用 notebook/pandas 臨時重寫回測邏輯
+- 繞過 `mvp_backtest.py` 去拼一套未驗證的 data + signal + simulation pipeline
+
+如果 OpenClaw 必須在對話中簡短描述目前主線框架，標準說法應為：
+
+`standard_bot -> mvp_backtest.py -> NumbaBacktestRunner -> output JSON`
+
 ### 具體規則
 
 - 歷史資料優先存本地，不要每次直接打 API
 - 儲存粒度優先為 `1m`
 - 高週期如 `5m / 15m / 1h` 優先從本地 `1m` 重採樣得到
 - 回測引擎優先使用 `--engine numba`
+- 回測時應優先走 `mvp_backtest.py`，而不是直接自行拼裝 legacy `Backtester`
+- 若 OpenClaw 必須在程式碼層說明框架，應描述為：
+  - `entrypoint: mvp_backtest.py`
+  - `engine: NumbaBacktestRunner`
+  - `data path: historical parquet + local resample`
 - 不要先建立大量 Python snapshot 物件再做歷史批次回測
 
 ### 時序與反作弊規則

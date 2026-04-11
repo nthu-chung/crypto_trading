@@ -16,9 +16,15 @@ from cyqnt_trd.standard_bot.data import AlignmentPolicy, HistoricalSnapshotAssem
 from cyqnt_trd.standard_bot.signal import (
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
+    RsiReversionConfig,
+    RsiReversionPlugin,
     SignalPluginRegistry,
 )
-from cyqnt_trd.standard_bot.signal.numba_kernels import TARGET_KEEP, moving_average_cross_target_updates
+from cyqnt_trd.standard_bot.signal.numba_kernels import (
+    TARGET_KEEP,
+    moving_average_cross_target_updates,
+    rsi_reversion_target_updates,
+)
 from cyqnt_trd.standard_bot.simulation import NumbaBacktestRunner
 
 
@@ -214,3 +220,100 @@ def test_numba_runner_supports_moving_average_cross_backtests() -> None:
 
     assert result.metrics["signal_count"] >= 1.0
     assert "signal_at_bar_close_fill_next_bar_open" == result.extras["execution_assumption"]
+
+
+def test_numba_rsi_reversion_matches_incremental_plugin_decisions() -> None:
+    closes = [100.0, 99.0, 98.0, 97.0, 96.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    snapshots = HistoricalSnapshotAssembler(
+        policy=AlignmentPolicy(policy_id="bar_close_v1", primary_timeframe="1m"),
+        tail_bars=20,
+    ).build(bundle)
+
+    registry = SignalPluginRegistry()
+    registry.register(RsiReversionPlugin(), lambda raw: RsiReversionConfig(**raw))
+    step_states = {}
+    step_decisions = []
+
+    for snapshot in snapshots:
+        result = registry.run_pipeline_step(
+            snapshot,
+            [
+                {
+                    "plugin_id": "rsi_reversion",
+                    "config": {
+                        "instrument_id": "BTCUSDT",
+                        "timeframe": "1m",
+                        "period": 3,
+                        "oversold": 30.0,
+                        "overbought": 70.0,
+                    },
+                }
+            ],
+            previous_states=step_states,
+        )
+        step_states = result.states
+        trade_signals = result.batch.trade_signals()
+        if trade_signals:
+            step_decisions.append((snapshot.meta.decision_as_of, trade_signals[-1].side.value))
+
+    updates, _ = rsi_reversion_target_updates(
+        np.asarray(closes, dtype=np.float64),
+        3,
+        30.0,
+        70.0,
+    )
+    numba_decisions = []
+    timestamps = [60_000 * (index + 1) for index in range(len(closes))]
+    for index, update in enumerate(updates):
+        if update == TARGET_KEEP:
+            continue
+        numba_decisions.append((timestamps[index], "buy" if int(update) == 1 else "sell"))
+
+    assert step_decisions == numba_decisions
+
+
+def test_numba_runner_supports_rsi_reversion_backtests() -> None:
+    closes = [100.0, 99.0, 98.0, 97.0, 96.0, 95.0, 96.0, 97.0, 98.0, 99.0, 100.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    request = _request(
+        strategy="rsi_reversion",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "1m",
+            "period": 3,
+            "oversold": 30.0,
+            "overbought": 70.0,
+        },
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["signal_count"] >= 1.0
+    assert result.extras["execution_assumption"] == "signal_at_bar_close_fill_next_bar_open"
+
+
+def test_numba_runner_reports_sharpe_and_bar_return_metrics() -> None:
+    bundle = _market_bundle(
+        opens=[100.0, 100.0, 100.0, 100.0, 102.0, 104.0, 106.0],
+        closes=[100.0, 100.0, 110.0, 115.0, 118.0, 120.0, 122.0],
+    )
+    request = _request(
+        strategy="moving_average_cross",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "1m",
+            "fast_window": 2,
+            "slow_window": 3,
+            "entry_threshold": 0.0,
+        },
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert "sharpe_ratio" in result.metrics
+    assert "mean_bar_return" in result.metrics
+    assert "bar_return_volatility" in result.metrics
+    assert result.metrics["sharpe_ratio"] > 0.0
