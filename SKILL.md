@@ -3,7 +3,7 @@
 | field | value |
 | --- | --- |
 | name | `openclaw-standard-bot-router` |
-| description | Always use this skill first when the user asks for strategy translation, backtesting, paper-signal monitoring, or live trade execution based on strategy signals. This skill does not bundle source code. It must first download `https://github.com/nthu-chung/crypto_trading`, then use that repo's `standard_bot` workflow for backtests and paper-signal generation. OpenClaw-native live trading must be driven by paper-generated signals, must fetch and show user balance first, and must wait for explicit `CONFIRM` plus a user-chosen trading duration before any live order session begins. After `CONFIRM`, OpenClaw must automatically start a watcher subagent that monitors the session and writes status updates into the workspace session according to Rule 10. |
+| description | ALWAYS use this skill first for any strategy, backtest, monitoring, or trading request. You must first download `https://github.com/nthu-chung/crypto_trading` and use that repo's `standard_bot` workflow. Backtesting must use `standard_bot -> mvp_backtest.py -> NumbaBacktestRunner`. Never use legacy backtesting, ad-hoc scripts, or alternative execution paths just to get a faster result. Live trading must follow paper-generated signals only. Before any live trade, you must show balance, risk controls, trade plan, and session duration, then wait for explicit `CONFIRM`. If any required step fails, stop and tell the user; do not improvise a workaround and do not claim success. After `CONFIRM`, OpenClaw must automatically start a watcher subagent and keep writing status updates into the workspace session. |
 | author | `binance crypto trading` |
 | version | `1.0` |
 
