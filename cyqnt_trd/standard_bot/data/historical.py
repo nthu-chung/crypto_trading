@@ -15,6 +15,11 @@ from ..core import Bar, BundleMeta, MarketBundle, MarketQuery
 from .alignment import timeframe_to_ms
 
 try:
+    import polars as pl
+except ImportError:  # pragma: no cover - exercised in environments without polars
+    pl = None
+
+try:
     import pyarrow as pa
     import pyarrow.parquet as pq
 except ImportError:  # pragma: no cover - exercised in environments without pyarrow
@@ -42,6 +47,10 @@ PARQUET_COLUMNS = [
 def ensure_pyarrow_available() -> None:
     if pa is None or pq is None:
         raise RuntimeError("pyarrow is required for parquet historical storage; install pyarrow first")
+
+
+def polars_available() -> bool:
+    return pl is not None
 
 
 def build_history_path(data_root: str, market_type: str, instrument_id: str, timeframe: str) -> Path:
@@ -193,6 +202,16 @@ def read_parquet_frame(
         table = parquet_file.read_row_groups(selected_row_groups, columns=columns or PARQUET_COLUMNS)
     if table.num_rows == 0:
         return pd.DataFrame(columns=columns or PARQUET_COLUMNS)
+    if polars_available():
+        frame = pl.from_arrow(table).sort("close_time")
+        if start_ts is not None:
+            frame = frame.filter(pl.col("close_time") >= int(start_ts))
+        if end_ts is not None:
+            frame = frame.filter(pl.col("close_time") <= int(end_ts))
+        if tail_rows is not None:
+            frame = frame.tail(int(tail_rows))
+        return frame.to_pandas()
+
     frame = table.to_pandas()
     frame = frame.sort_values("close_time", kind="stable").reset_index(drop=True)
     if start_ts is not None:
@@ -216,6 +235,53 @@ def resample_frame_from_1m(frame: pd.DataFrame, target_timeframe: str) -> pd.Dat
         raise ValueError("target timeframe %s is not a multiple of 1m" % target_timeframe)
 
     expected_rows = target_ms // base_ms
+    if polars_available():
+        aggregated = (
+            pl.from_pandas(frame)
+            .sort("open_time")
+            .with_columns(((pl.col("open_time") // target_ms) * target_ms).alias("bucket_open_time"))
+            .group_by("bucket_open_time", maintain_order=True)
+            .agg(
+                pl.col("open").first().alias("open"),
+                pl.col("high").max().alias("high"),
+                pl.col("low").min().alias("low"),
+                pl.col("close").last().alias("close"),
+                pl.col("volume").sum().alias("volume"),
+                pl.col("quote_volume").sum().alias("quote_volume"),
+                pl.col("trades").sum().alias("trades"),
+                pl.len().alias("row_count"),
+                pl.col("instrument_id").last().alias("instrument_id"),
+            )
+            .filter(pl.col("row_count") == expected_rows)
+        )
+        if aggregated.is_empty():
+            return pd.DataFrame(columns=PARQUET_COLUMNS)
+        aggregated = (
+            aggregated.with_columns(
+                pl.col("bucket_open_time").cast(pl.Int64).alias("open_time"),
+                (pl.col("bucket_open_time").cast(pl.Int64) + target_ms - 1).alias("close_time"),
+                pl.lit(target_timeframe).alias("timeframe"),
+                pl.lit(True).alias("confirmed"),
+            )
+            .select(
+                [
+                    "open_time",
+                    "close_time",
+                    "open",
+                    "high",
+                    "low",
+                    "close",
+                    "volume",
+                    "quote_volume",
+                    "trades",
+                    "instrument_id",
+                    "timeframe",
+                    "confirmed",
+                ]
+            )
+        )
+        return aggregated.to_pandas()
+
     working = frame.sort_values("open_time", kind="stable").copy()
     working["bucket_open_time"] = (working["open_time"] // target_ms) * target_ms
 

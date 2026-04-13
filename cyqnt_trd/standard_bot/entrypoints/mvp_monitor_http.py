@@ -15,7 +15,10 @@ from ..core import DataQuery, MarketQuery, MonitorTrigger, QueryOptions, TimeRan
 from ..data import AlignmentPolicy
 from ..data.adapters import BinanceRestMarketDataAdapter
 from ..execution import (
+    BinanceFuturesMainnetBrokerAdapter,
     BinanceFuturesTestnetBrokerAdapter,
+    InstrumentWhitelistRule,
+    MaxAbsoluteNotionalRule,
     MaxPositionFractionRule,
     PaperBrokerAdapter,
 )
@@ -29,7 +32,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the standard bot monitor over HTTP")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8787)
-    parser.add_argument("--broker", choices=["paper", "binance_futures_testnet"], default="paper")
+    parser.add_argument(
+        "--broker",
+        choices=["paper", "binance_futures_testnet", "binance_futures_mainnet"],
+        default="paper",
+    )
     parser.add_argument("--env-file", default=".env")
     parser.add_argument("--interval", default="1h")
     parser.add_argument("--limit", type=int, default=120)
@@ -39,6 +46,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--max-position-pct", type=float, default=0.95)
     parser.add_argument("--secondary-interval", default="1h")
+    parser.add_argument("--allow-mainnet-live", action="store_true")
+    parser.add_argument("--mainnet-max-notional", type=float, default=100.0)
+    parser.add_argument("--mainnet-symbol-whitelist", nargs="+", default=["BTCUSDT"])
     return parser
 
 
@@ -49,12 +59,22 @@ def make_runner(args):
         broker = BinanceFuturesTestnetBrokerAdapter(env_path=args.env_file)
         if args.market_type == "futures":
             base_url_override = TESTNET_FUTURES_KLINES_URL
+    elif args.broker == "binance_futures_mainnet":
+        broker = BinanceFuturesMainnetBrokerAdapter(env_path=args.env_file)
     else:
         broker = PaperBrokerAdapter(
             initial_cash=args.initial_capital,
             fee_bps=args.fee_bps,
             slippage_bps=args.slippage_bps,
             account_mode="futures" if args.market_type == "futures" else "spot",
+        )
+    risk_rules = [MaxPositionFractionRule(max_fraction=args.max_position_pct)]
+    if args.broker == "binance_futures_mainnet":
+        risk_rules.extend(
+            [
+                InstrumentWhitelistRule(instruments=args.mainnet_symbol_whitelist),
+                MaxAbsoluteNotionalRule(max_notional=args.mainnet_max_notional),
+            ]
         )
     return MarketOnlyPaperRunner(
         market_data=BinanceRestMarketDataAdapter(
@@ -64,7 +84,7 @@ def make_runner(args):
         signal_registry=make_registry(),
         broker=broker,
         policy=AlignmentPolicy(policy_id="bar_close_v1", primary_timeframe=args.interval),
-        risk_rules=[MaxPositionFractionRule(max_fraction=args.max_position_pct)],
+        risk_rules=risk_rules,
         snapshot_tail_bars=args.limit,
     )
 
@@ -97,7 +117,27 @@ def handler_factory(args, *, runner_override=None):
                 secondary_interval = str(payload.get("secondary_interval", args.secondary_interval))
                 limit = int(payload.get("limit", args.limit))
                 signal_only = bool(payload.get("signal_only", False))
-                dry_run = bool(payload.get("dry_run", args.broker == "paper"))
+                dry_run = bool(payload.get("dry_run", args.broker in {"paper", "binance_futures_mainnet"}))
+                confirm_mainnet = bool(payload.get("confirm_mainnet", False))
+                if args.broker == "binance_futures_mainnet" and not signal_only and not dry_run:
+                    if not args.allow_mainnet_live:
+                        self._send(
+                            403,
+                            {
+                                "error": "mainnet_live_disabled",
+                                "detail": "restart monitor with --allow-mainnet-live to permit live execution",
+                            },
+                        )
+                        return
+                    if not confirm_mainnet:
+                        self._send(
+                            403,
+                            {
+                                "error": "mainnet_confirmation_required",
+                                "detail": "set confirm_mainnet=true in the /run payload for live execution",
+                            },
+                        )
+                        return
                 timeframes = [interval]
                 if strategy == "multi_timeframe_ma_spread" and secondary_interval not in timeframes:
                     timeframes.append(secondary_interval)

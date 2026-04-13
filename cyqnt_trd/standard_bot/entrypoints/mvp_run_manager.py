@@ -31,7 +31,11 @@ def build_parser() -> argparse.ArgumentParser:
     start_demo.add_argument("--log-path", default=None)
 
     start_monitor = subparsers.add_parser("start-monitor", help="Start the HTTP monitor in the background")
-    start_monitor.add_argument("--broker", choices=["paper", "binance_futures_testnet"], default="paper")
+    start_monitor.add_argument(
+        "--broker",
+        choices=["paper", "binance_futures_testnet", "binance_futures_mainnet"],
+        default="paper",
+    )
     start_monitor.add_argument("--env-file", default=".env")
     start_monitor.add_argument("--host", default="127.0.0.1")
     start_monitor.add_argument("--port", type=int, default=8787)
@@ -43,6 +47,9 @@ def build_parser() -> argparse.ArgumentParser:
     start_monitor.add_argument("--slippage-bps", type=float, default=0.0)
     start_monitor.add_argument("--max-position-pct", type=float, default=0.95)
     start_monitor.add_argument("--secondary-interval", default="1h")
+    start_monitor.add_argument("--allow-mainnet-live", action="store_true")
+    start_monitor.add_argument("--mainnet-max-notional", type=float, default=100.0)
+    start_monitor.add_argument("--mainnet-symbol-whitelist", nargs="+", default=["BTCUSDT"])
     start_monitor.add_argument("--run-id", default=None)
     start_monitor.add_argument("--log-path", default=None)
 
@@ -99,7 +106,7 @@ def _demo_command(args: argparse.Namespace) -> list[str]:
 
 
 def _monitor_command(args: argparse.Namespace) -> list[str]:
-    return [
+    command = [
         sys.executable,
         "-m",
         "cyqnt_trd.standard_bot.entrypoints.mvp_monitor_http",
@@ -128,6 +135,12 @@ def _monitor_command(args: argparse.Namespace) -> list[str]:
         "--secondary-interval",
         args.secondary_interval,
     ]
+    if args.allow_mainnet_live:
+        command.append("--allow-mainnet-live")
+    command.extend(["--mainnet-max-notional", str(args.mainnet_max_notional)])
+    if args.mainnet_symbol_whitelist:
+        command.extend(["--mainnet-symbol-whitelist", *args.mainnet_symbol_whitelist])
+    return command
 
 
 def main() -> int:

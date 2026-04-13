@@ -171,3 +171,81 @@ def test_monitor_run_endpoint_supports_multi_timeframe_strategy() -> None:
         server.shutdown()
         server.server_close()
         thread.join(timeout=5)
+
+
+def test_mainnet_monitor_defaults_to_dry_run_when_payload_omits_flag() -> None:
+    runner = DummyRunner(summary=RunSummary(run_id="run-mainnet", status="dry_run", signal_count=1))
+    args = SimpleNamespace(
+        broker="binance_futures_mainnet",
+        interval="1h",
+        limit=120,
+        market_type="futures",
+        env_file=".env",
+        initial_capital=10_000.0,
+        fee_bps=10.0,
+        slippage_bps=0.0,
+        max_position_pct=0.95,
+        secondary_interval="1h",
+        allow_mainnet_live=False,
+        mainnet_max_notional=100.0,
+        mainnet_symbol_whitelist=["BTCUSDT"],
+    )
+    server_cls = __import__("http.server", fromlist=["ThreadingHTTPServer"]).ThreadingHTTPServer
+    server = server_cls(("127.0.0.1", 0), handler_factory(args, runner_override=runner))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with _request(
+            "http://127.0.0.1:%s/run" % server.server_port,
+            method="POST",
+            payload={"symbol": "BTCUSDT", "strategy": "moving_average_cross"},
+        ) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        assert payload["status"] == "dry_run"
+        assert runner.contexts
+        assert runner.contexts[0].dry_run is True
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_mainnet_monitor_rejects_live_run_without_server_allow_flag() -> None:
+    runner = DummyRunner(summary=RunSummary(run_id="run-mainnet", status="ok", signal_count=1))
+    args = SimpleNamespace(
+        broker="binance_futures_mainnet",
+        interval="1h",
+        limit=120,
+        market_type="futures",
+        env_file=".env",
+        initial_capital=10_000.0,
+        fee_bps=10.0,
+        slippage_bps=0.0,
+        max_position_pct=0.95,
+        secondary_interval="1h",
+        allow_mainnet_live=False,
+        mainnet_max_notional=100.0,
+        mainnet_symbol_whitelist=["BTCUSDT"],
+    )
+    server_cls = __import__("http.server", fromlist=["ThreadingHTTPServer"]).ThreadingHTTPServer
+    server = server_cls(("127.0.0.1", 0), handler_factory(args, runner_override=runner))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        try:
+            _request(
+                "http://127.0.0.1:%s/run" % server.server_port,
+                method="POST",
+                payload={"symbol": "BTCUSDT", "dry_run": False, "signal_only": False, "confirm_mainnet": True},
+            )
+        except urllib.error.HTTPError as exc:
+            payload = json.loads(exc.read().decode("utf-8"))
+            assert exc.code == 403
+            assert payload["error"] == "mainnet_live_disabled"
+        else:
+            raise AssertionError("expected HTTPError")
+        assert runner.contexts == []
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
