@@ -33,6 +33,7 @@ from ..signal.numba_kernels import (
     NUMBA_AVAILABLE,
     TARGET_KEEP,
     TARGET_LONG,
+    donchian_breakout_target_updates,
     moving_average_cross_target_updates,
     multi_timeframe_ma_spread_target_updates,
     price_moving_average_target_updates,
@@ -51,6 +52,8 @@ class EncodedSeries:
     timestamps: np.ndarray
     open_times: np.ndarray
     opens: np.ndarray
+    highs: np.ndarray
+    lows: np.ndarray
     closes: np.ndarray
     volumes: np.ndarray
     quote_volumes: np.ndarray
@@ -191,6 +194,7 @@ class NumbaBacktestRunner:
         strategy_id = plugin_chain[0]["plugin_id"]
         raw_config = dict(plugin_chain[0].get("config", {}))
         if strategy_id not in {
+            "donchian_breakout",
             "moving_average_cross",
             "price_moving_average",
             "rsi_reversion",
@@ -214,6 +218,8 @@ class NumbaBacktestRunner:
             dtype=np.int64,
         )
         opens = np.asarray([float(bar.open) for bar in bars], dtype=np.float64)
+        highs = np.asarray([float(bar.high) for bar in bars], dtype=np.float64)
+        lows = np.asarray([float(bar.low) for bar in bars], dtype=np.float64)
         closes = np.asarray([float(bar.close) for bar in bars], dtype=np.float64)
         volumes = np.asarray([float(bar.volume) for bar in bars], dtype=np.float64)
         quote_volumes = np.asarray(
@@ -229,6 +235,8 @@ class NumbaBacktestRunner:
             timestamps=timestamps,
             open_times=open_times,
             opens=opens,
+            highs=highs,
+            lows=lows,
             closes=closes,
             volumes=volumes,
             quote_volumes=quote_volumes,
@@ -243,6 +251,14 @@ class NumbaBacktestRunner:
         primary_series: EncodedSeries,
         instrument_id: str,
     ) -> Tuple[np.ndarray, np.ndarray]:
+        if strategy_id == "donchian_breakout":
+            return donchian_breakout_target_updates(
+                primary_series.closes,
+                primary_series.highs,
+                primary_series.lows,
+                int(raw_config["lookback_window"]),
+                float(raw_config.get("breakout_buffer_bps", 0.0)),
+            )
         if strategy_id == "moving_average_cross":
             return moving_average_cross_target_updates(
                 primary_series.closes,

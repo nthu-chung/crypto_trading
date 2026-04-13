@@ -27,6 +27,7 @@ from ..core import (
 from .encoders import encode_close_series, series_for
 from .interfaces import SignalState, StepSignalResult
 from .numba_kernels import (
+    donchian_breakout_signal_rows,
     SIGNAL_BUY,
     SIGNAL_NONE,
     SIGNAL_SELL,
@@ -185,6 +186,22 @@ class RsiReversionConfig:
             raise ValueError("overbought must be within (0, 100)")
         if self.oversold >= self.overbought:
             raise ValueError("oversold must be less than overbought")
+
+
+@dataclass
+class DonchianBreakoutConfig:
+    instrument_id: str
+    timeframe: str
+    lookback_window: int = 20
+    breakout_buffer_bps: float = 0.0
+    time_horizon: str = "trend"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.lookback_window < 2:
+            raise ValueError("lookback_window must be >= 2")
+        if self.breakout_buffer_bps < 0:
+            raise ValueError("breakout_buffer_bps must be >= 0")
 
 
 @dataclass
@@ -802,8 +819,194 @@ class MultiTimeframeMaSpreadPlugin:
         )
 
 
+class DonchianBreakoutPlugin:
+    plugin_id = "donchian_breakout"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: DonchianBreakoutConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return _build_batch(self.plugin_id, snapshot, [])
+
+        timestamps = np.asarray([int(bar.timestamp) for bar in bars], dtype=np.int64)
+        closes = np.asarray([float(bar.close) for bar in bars], dtype=np.float64)
+        highs = np.asarray([float(bar.high) for bar in bars], dtype=np.float64)
+        lows = np.asarray([float(bar.low) for bar in bars], dtype=np.float64)
+        directions, strengths, upper_band_values, lower_band_values, breakout_bps_values = donchian_breakout_signal_rows(
+            closes,
+            highs,
+            lows,
+            config.lookback_window,
+            config.breakout_buffer_bps,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.lookback_window,
+            config.breakout_buffer_bps,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            target_position = 1 if int(direction) == int(SIGNAL_BUY) else -1
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(timestamps[index]),
+                            "upper_band": float(upper_band_values[index]),
+                            "lower_band": float(lower_band_values[index]),
+                            "breakout_bps": float(breakout_bps_values[index]),
+                            "breakout_buffer_bps": float(config.breakout_buffer_bps),
+                            "lookback_window": int(config.lookback_window),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=target_position,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={
+                "cursor": None,
+                "last_direction": int(SIGNAL_NONE),
+                "timestamp_window": [],
+                "close_window": [],
+                "high_window": [],
+                "low_window": [],
+            },
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: DonchianBreakoutConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        timestamp_window = [int(value) for value in state.values.get("timestamp_window", [])]
+        close_window = [float(value) for value in state.values.get("close_window", [])]
+        high_window = [float(value) for value in state.values.get("high_window", [])]
+        low_window = [float(value) for value in state.values.get("low_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.lookback_window,
+            config.breakout_buffer_bps,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            timestamp_window.append(int(bar.timestamp))
+            close_window.append(float(bar.close))
+            high_window.append(float(bar.high))
+            low_window.append(float(bar.low))
+            max_length = config.lookback_window + 1
+            if len(timestamp_window) > max_length:
+                timestamp_window = timestamp_window[-max_length:]
+            close_window = _trim_window(close_window, max_length)
+            high_window = _trim_window(high_window, max_length)
+            low_window = _trim_window(low_window, max_length)
+
+            directions, strengths, upper_band_values, lower_band_values, breakout_bps_values = donchian_breakout_signal_rows(
+                np.asarray(close_window, dtype=np.float64),
+                np.asarray(high_window, dtype=np.float64),
+                np.asarray(low_window, dtype=np.float64),
+                config.lookback_window,
+                config.breakout_buffer_bps,
+            )
+            last_index = len(close_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    target_position = 1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "upper_band": float(upper_band_values[last_index]),
+                                    "lower_band": float(lower_band_values[last_index]),
+                                    "breakout_bps": float(breakout_bps_values[last_index]),
+                                    "breakout_buffer_bps": float(config.breakout_buffer_bps),
+                                    "lookback_window": int(config.lookback_window),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=target_position,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "timestamp_window": timestamp_window,
+                    "close_window": close_window,
+                    "high_window": high_window,
+                    "low_window": low_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
 def register_builtin_plugins(registry) -> None:
     registry.register(MovingAverageCrossPlugin(), lambda raw: MovingAverageCrossConfig(**raw))
     registry.register(PriceMovingAveragePlugin(), lambda raw: PriceMovingAverageConfig(**raw))
     registry.register(RsiReversionPlugin(), lambda raw: RsiReversionConfig(**raw))
+    registry.register(DonchianBreakoutPlugin(), lambda raw: DonchianBreakoutConfig(**raw))
     registry.register(MultiTimeframeMaSpreadPlugin(), lambda raw: MultiTimeframeMaSpreadConfig(**raw))

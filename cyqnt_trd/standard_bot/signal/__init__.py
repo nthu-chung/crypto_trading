@@ -13,6 +13,8 @@ from .interfaces import (
 from .encoders import EncodedCloseSeries, encode_close_series, series_for
 from .numba_kernels import NUMBA_AVAILABLE
 from .plugins import (
+    DonchianBreakoutConfig,
+    DonchianBreakoutPlugin,
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
     MultiTimeframeMaSpreadConfig,
@@ -27,6 +29,8 @@ from .registry import PipelineStepResult, SignalPluginRegistry
 
 __all__ = [
     "BatchSignalPlugin",
+    "DonchianBreakoutConfig",
+    "DonchianBreakoutPlugin",
     "EncodedCloseSeries",
     "IncrementalSignalPlugin",
     "MovingAverageCrossConfig",
