@@ -31,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--engine", choices=["python", "numba"], default="numba")
     parser.add_argument(
         "--strategy",
-        choices=["moving_average_cross", "price_moving_average", "rsi_reversion", "multi_timeframe_ma_spread"],
+        choices=["moving_average_cross", "price_moving_average", "rsi_reversion", "donchian_breakout", "multi_timeframe_ma_spread"],
         default="moving_average_cross",
     )
     parser.add_argument("--secondary-interval", default="1h")
@@ -41,6 +41,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rsi-period", type=int, default=14)
     parser.add_argument("--oversold", type=float, default=30.0)
     parser.add_argument("--overbought", type=float, default=70.0)
+    parser.add_argument("--donchian-window", type=int, default=20)
+    parser.add_argument("--breakout-buffer-bps", type=float, default=0.0)
     parser.add_argument("--primary-ma-period", type=int, default=20)
     parser.add_argument("--reference-ma-period", type=int, default=20)
     parser.add_argument("--spread-threshold-bps", type=float, default=0.0)
@@ -107,6 +109,8 @@ def main() -> int:
         rsi_period=args.rsi_period,
         oversold=args.oversold,
         overbought=args.overbought,
+        donchian_window=args.donchian_window,
+        breakout_buffer_bps=args.breakout_buffer_bps,
         primary_ma_period=args.primary_ma_period,
         reference_ma_period=args.reference_ma_period,
         spread_threshold_bps=args.spread_threshold_bps,

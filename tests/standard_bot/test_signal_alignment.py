@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from cyqnt_trd.standard_bot.core import Bar, BundleMeta, MarketBundle
 from cyqnt_trd.standard_bot.data import AlignmentPolicy, HistoricalSnapshotAssembler
 from cyqnt_trd.standard_bot.signal import (
+    DonchianBreakoutConfig,
+    DonchianBreakoutPlugin,
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
     PriceMovingAverageConfig,
@@ -109,4 +111,17 @@ def test_rsi_reversion_batch_matches_step() -> None:
             overbought=70.0,
         ),
         [100.0, 96.0, 93.0, 88.0, 85.0, 81.0, 78.0, 84.0, 90.0, 96.0, 102.0],
+    )
+
+
+def test_donchian_breakout_batch_matches_step() -> None:
+    _batch_step_alignment(
+        DonchianBreakoutPlugin(),
+        DonchianBreakoutConfig(
+            instrument_id="BTCUSDT",
+            timeframe="1m",
+            lookback_window=3,
+            breakout_buffer_bps=0.0,
+        ),
+        [100.0, 101.0, 102.0, 103.0, 104.0, 95.0, 90.0, 91.0, 92.0],
     )

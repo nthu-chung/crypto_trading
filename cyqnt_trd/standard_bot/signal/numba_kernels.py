@@ -233,6 +233,89 @@ def rsi_reversion_target_updates(
 
 
 @njit(cache=True)
+def donchian_breakout_signal_rows(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    lookback_window: int,
+    breakout_buffer_bps: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(closes.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(closes.shape[0], dtype=np.float64)
+    upper_band_values = np.zeros(closes.shape[0], dtype=np.float64)
+    lower_band_values = np.zeros(closes.shape[0], dtype=np.float64)
+    breakout_bps_values = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or lookback_window < 1:
+        return directions, strengths, upper_band_values, lower_band_values, breakout_bps_values
+
+    upper_multiplier = 1.0 + breakout_buffer_bps / 10_000.0
+    lower_multiplier = 1.0 - breakout_buffer_bps / 10_000.0
+
+    for index in range(closes.shape[0]):
+        if index < lookback_window:
+            continue
+
+        upper_band = highs[index - lookback_window]
+        lower_band = lows[index - lookback_window]
+        for window_index in range(index - lookback_window + 1, index):
+            if highs[window_index] > upper_band:
+                upper_band = highs[window_index]
+            if lows[window_index] < lower_band:
+                lower_band = lows[window_index]
+
+        upper_band_values[index] = upper_band
+        lower_band_values[index] = lower_band
+
+        upper_trigger = upper_band * upper_multiplier
+        lower_trigger = lower_band * lower_multiplier
+        close_value = closes[index]
+
+        if upper_trigger > 0.0 and close_value > upper_trigger:
+            breakout_bps = ((close_value - upper_trigger) / upper_trigger) * 10_000.0
+            directions[index] = SIGNAL_BUY
+            strengths[index] = abs(breakout_bps)
+            breakout_bps_values[index] = breakout_bps
+        elif lower_trigger > 0.0 and close_value < lower_trigger:
+            breakout_bps = ((lower_trigger - close_value) / lower_trigger) * 10_000.0
+            directions[index] = SIGNAL_SELL
+            strengths[index] = abs(breakout_bps)
+            breakout_bps_values[index] = -breakout_bps
+    return directions, strengths, upper_band_values, lower_band_values, breakout_bps_values
+
+
+@njit(cache=True)
+def donchian_breakout_target_updates(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    lookback_window: int,
+    breakout_buffer_bps: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _, _ = donchian_breakout_signal_rows(
+        closes,
+        highs,
+        lows,
+        lookback_window,
+        breakout_buffer_bps,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(closes.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
 def multi_timeframe_ma_spread_signal_rows(
     primary_timestamps: np.ndarray,
     primary_closes: np.ndarray,

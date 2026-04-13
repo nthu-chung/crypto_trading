@@ -164,6 +164,20 @@ OpenClaw 不應預設直接：
 - 費用 / 滑點 / 成交假設
 - 產出的 JSON 路徑
 
+### 回測結果的標準資料來源
+
+- demo、摘要、簡報、對話回報時，優先從 `docs/backtests/*.json` 讀正式輸出，不要只從 terminal print 抄數字
+- 若有 `--output-json`，應把它視為該次回測的標準結果檔
+- 重要欄位優先從 JSON 的 `metrics` 與頂層欄位讀取：
+  - 收益率：`total_return` 或 `metrics.total_return`
+  - 最大回撤：`metrics.max_drawdown`
+  - Sharpe：`metrics.sharpe_ratio`
+  - 交易次數：`metrics.trade_count`
+  - signal 次數：`metrics.signal_count`
+  - 最終資金：`metrics.final_equity`
+- 若需要勝率 `win_rate`，且 JSON 沒有現成欄位，才允許根據 `trades` 重建 closed trades 後計算，並必須明說是「由 trades 推導」
+- 回報時至少要附上 JSON 檔路徑，方便其他 AI 與使用者交叉檢查
+
 ### 目前建議的回測命令模板
 
 ```bash
@@ -253,6 +267,71 @@ execution model：
 fee/slippage：
 liquidity cap：
 回測期間：
+```
+
+### 若自然語言無法直接映射到現有 numba 策略
+
+自然語言轉成正式規格後，**不一定能直接走 `NumbaBacktestRunner`**。原因通常是：
+
+- 目前沒有對應的 `standard_bot` plugin
+- 有 plugin，但還沒接進 numba fast path
+- 策略本身包含複雜條件，尚未整理成固定維度、可陣列化的 kernel
+
+OpenClaw 在這種情況下，必須依照下面的策略路由規則處理。
+
+### 策略路由規則
+
+1. 先嘗試把自然語言映射到**既有 numba 策略**
+   - `moving_average_cross`
+   - `price_moving_average`
+   - `rsi_reversion`
+   - `multi_timeframe_ma_spread`
+2. 如果能映射到上述策略：
+   - 直接使用 `mvp_backtest --engine numba`
+3. 如果不能映射到上述策略，但已存在 `standard_bot` plugin：
+   - 允許先使用 `mvp_backtest --engine python`
+   - 不得因此退回 legacy `cyqnt_trd/backtesting/*`
+4. 如果連 `standard_bot` plugin 都沒有：
+   - 可以讓其他 AI 新增 plugin
+   - 但只能新增在 `standard_bot` 架構內
+   - 先做 `python engine` 驗證
+   - 驗證通過後，再評估是否補 `numba`
+
+### 其他 AI 可以新增策略 / plugin，但必須遵守
+
+- 新策略必須落在 `cyqnt_trd/standard_bot` 內，不可另開野生框架
+- 不可直接改用 `cyqnt_trd/backtesting/strategy_backtest.py`
+- 不可直接改用 `cyqnt_trd/trading_signal/*` 當主要實作
+- 不可先寫 notebook 或臨時腳本來取代正式 plugin
+- 新 plugin 必須先對齊：
+  - `plugin_id`
+  - config schema
+  - `run(snapshot, config) -> SignalBatch`
+  - `step(...)` 或等價的增量邏輯
+
+### 新 plugin 的建議順序
+
+1. 先把自然語言整理成正式規格
+2. 在 `standard_bot` 新增 plugin
+3. 先讓它可以用 `mvp_backtest --engine python` 跑通
+4. 補測試：
+   - batch / step 對齊
+   - PIT 不偷看未來
+   - smoke backtest
+5. 若策略值得保留、且為量價類固定維度邏輯，再補 numba kernel
+6. 補進 `NumbaBacktestRunner`
+
+### 簡化決策樹
+
+```text
+自然語言
+-> 正式策略規格
+-> 能否映射到既有 numba plugin？
+   -> 可以：mvp_backtest --engine numba
+   -> 不可以：
+      -> 是否已有 standard_bot plugin？
+         -> 可以：mvp_backtest --engine python
+         -> 不可以：先新增 standard_bot plugin，再驗證，再決定是否補 numba
 ```
 
 ---

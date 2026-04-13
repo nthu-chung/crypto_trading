@@ -85,6 +85,8 @@ def build_strategy_pipeline(
     rsi_period: int,
     oversold: float,
     overbought: float,
+    donchian_window: int = 20,
+    breakout_buffer_bps: float = 0.0,
     primary_ma_period: int = 20,
     reference_ma_period: int = 20,
     spread_threshold_bps: float = 0.0,
@@ -119,6 +121,16 @@ def build_strategy_pipeline(
                 "period": rsi_period,
                 "oversold": oversold,
                 "overbought": overbought,
+            },
+        }
+    elif strategy == "donchian_breakout":
+        plugin_spec = {
+            "plugin_id": "donchian_breakout",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "lookback_window": donchian_window,
+                "breakout_buffer_bps": breakout_buffer_bps,
             },
         }
     elif strategy == "multi_timeframe_ma_spread":
