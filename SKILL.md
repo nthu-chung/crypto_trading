@@ -4,8 +4,8 @@
 | --- | --- |
 | name | `openclaw-standard-bot-router` |
 | description | Always use this skill first when the user asks for strategy translation, backtesting, paper-signal monitoring, or trade execution based on strategy signals. This skill does not bundle source code. It must first download `https://github.com/nthu-chung/crypto_trading`, then use that repo's `standard_bot` workflow for backtests and paper-signal generation. Real trading in OpenClaw must be driven by paper-generated signals, must fetch and show user balance first, and must wait for explicit `CONFIRM` plus a user-chosen trading duration before any live order session begins. |
-| author | `hankchung` |
-| version | `2.0` |
+| author | `binance crypto trading` |
+| version | `1.0` |
 
 這份 `SKILL.md` 是給 OpenClaw 使用的操作規範。它的目的不是讓 agent 自由發揮，而是把使用者需求穩定導向同一條主線：
 
