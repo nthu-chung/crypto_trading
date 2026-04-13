@@ -57,3 +57,27 @@ class BinanceTestnetCredentials:
         if not api_key or not api_secret:
             raise ValueError("BINANCE_TESTNET_API_KEY and BINANCE_TESTNET_API_SECRET are required")
         return cls(api_key=api_key, api_secret=api_secret)
+
+
+@dataclass
+class BinanceMainnetCredentials:
+    api_key: str
+    api_secret: str
+
+    @classmethod
+    def from_env(cls, env_path: str = ".env") -> "BinanceMainnetCredentials":
+        load_env_file(env_path)
+        api_key = (
+            os.getenv("BINANCE_MAINNET_API_KEY", "").strip()
+            or os.getenv("BINANCE_API_KEY", "").strip()
+        )
+        api_secret = (
+            os.getenv("BINANCE_MAINNET_API_SECRET", "").strip()
+            or os.getenv("BINANCE_SECRET_KEY", "").strip()
+        )
+        if not api_key or not api_secret:
+            raise ValueError(
+                "BINANCE_MAINNET_API_KEY/BINANCE_API_KEY and "
+                "BINANCE_MAINNET_API_SECRET/BINANCE_SECRET_KEY are required"
+            )
+        return cls(api_key=api_key, api_secret=api_secret)

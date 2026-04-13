@@ -20,7 +20,14 @@ from ..core import (
 )
 from ..data import AlignmentPolicy, HistoricalSnapshotAssembler
 from ..data.adapters import BinanceRestMarketDataAdapter
-from ..execution import BinanceFuturesTestnetBrokerAdapter, MaxPositionFractionRule, PaperBrokerAdapter
+from ..execution import (
+    BinanceFuturesMainnetBrokerAdapter,
+    BinanceFuturesTestnetBrokerAdapter,
+    InstrumentWhitelistRule,
+    MaxAbsoluteNotionalRule,
+    MaxPositionFractionRule,
+    PaperBrokerAdapter,
+)
 from ..runtime import MarketOnlyPaperRunner, RunContext
 from .common import build_strategy_pipeline, make_registry
 
@@ -29,7 +36,11 @@ TESTNET_FUTURES_KLINES_URL = "https://testnet.binancefuture.com/fapi/v1/klines"
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Check latest batch-vs-runtime signal consistency")
-    parser.add_argument("--broker", choices=["paper", "binance_futures_testnet"], default="paper")
+    parser.add_argument(
+        "--broker",
+        choices=["paper", "binance_futures_testnet", "binance_futures_mainnet"],
+        default="paper",
+    )
     parser.add_argument("--env-file", default=".env")
     parser.add_argument("--symbol", default="BTCUSDT")
     parser.add_argument("--interval", default="5m")
@@ -57,6 +68,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fee-bps", type=float, default=10.0)
     parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--max-position-pct", type=float, default=0.95)
+    parser.add_argument("--mainnet-max-notional", type=float, default=100.0)
+    parser.add_argument("--mainnet-symbol-whitelist", nargs="+", default=["BTCUSDT"])
     parser.add_argument("--dry-run", action="store_true")
     return parser
 
@@ -146,6 +159,8 @@ def main() -> int:
     )
     if args.broker == "binance_futures_testnet":
         broker = BinanceFuturesTestnetBrokerAdapter(env_path=args.env_file)
+    elif args.broker == "binance_futures_mainnet":
+        broker = BinanceFuturesMainnetBrokerAdapter(env_path=args.env_file)
     else:
         broker = PaperBrokerAdapter(
             initial_cash=args.initial_capital,
@@ -207,7 +222,17 @@ def main() -> int:
         signal_registry=registry,
         broker=broker,
         policy=policy,
-        risk_rules=[MaxPositionFractionRule(max_fraction=args.max_position_pct)],
+        risk_rules=(
+            [MaxPositionFractionRule(max_fraction=args.max_position_pct)]
+            + (
+                [
+                    InstrumentWhitelistRule(instruments=args.mainnet_symbol_whitelist),
+                    MaxAbsoluteNotionalRule(max_notional=args.mainnet_max_notional),
+                ]
+                if args.broker == "binance_futures_mainnet"
+                else []
+            )
+        ),
         snapshot_tail_bars=args.limit,
     )
     summary = runner.run(
