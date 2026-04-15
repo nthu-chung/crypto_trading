@@ -98,7 +98,7 @@ echo "TWINE_PASSWORD: ${TWINE_PASSWORD:0:15}..."
 ```bash
 # 设置 token（替换为您的实际 token）
 export TWINE_USERNAME=__token__
-export TWINE_PASSWORD=pypi-AgEIcHlwaS5vcmcCJGI5YjY3YjE3LWE4YzEtNDY3ZC1hYjY3LWI5YjY3YjE3YjY3YjE3
+export TWINE_PASSWORD=pypi-your-actual-token-here
 
 # 测试上传到 TestPyPI（推荐先测试）
 python3 -m twine upload --repository testpypi dist/*
@@ -106,6 +106,5 @@ python3 -m twine upload --repository testpypi dist/*
 # 如果成功，再上传到正式 PyPI
 python3 -m twine upload dist/*
 ```
-
 
 

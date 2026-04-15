@@ -1,116 +1,131 @@
-# cyqnt_trd
+# cyqnt-trd
 
-一个用于加密货币交易的工具包，包含数据获取、交易信号生成和回测功能。
+`cyqnt-trd` is a cryptocurrency trading toolkit centered on the `standard_bot` workflow for:
 
-## 功能特性
+- historical data download to local parquet
+- local resample from `1m` into higher timeframes
+- Numba-accelerated backtesting
+- paper signal generation
+- monitor / run-manager driven execution flows
 
-- **数据获取**: 从 Binance 获取期货和现货K线数据
-- **交易信号**: 提供多种技术指标因子和信号策略
-- **回测框架**: 支持因子测试和策略回测
+The current recommended path is:
 
-## 安装
+`historical parquet -> local resample -> standard_bot signal -> NumbaBacktestRunner`
 
-### 方式1: 作为可编辑包安装（推荐用于开发）
+## Install
 
-```bash
-cd /path/to/cyqnt_trd
-pip install -e .
-```
-
-### 方式2: 直接安装
+### From PyPI
 
 ```bash
-cd /path/to/cyqnt_trd
-pip install .
+pip install cyqnt-trd
 ```
 
-### 方式3: 从源码安装
+### For development
 
 ```bash
-cd /path/to/cyqnt_trd
-python setup.py install
+git clone https://github.com/nthu-chung/crypto_trading
+cd crypto_trading
+python3 -m venv .venv-standard-bot
+source .venv-standard-bot/bin/activate
+python -m pip install -U pip
+python -m pip install -r requirements.txt -r requirements-standard-bot-mvp.txt
 ```
 
-## 依赖
+## Recommended Standard Bot Entry Points
 
-主要依赖包：
-- pandas >= 1.5.0
-- numpy >= 1.23.0
-- matplotlib >= 3.5.0
-- requests >= 2.28.0
-
-Binance SDK 依赖（需要单独安装）：
-- binance-sdk-spot
-- binance-sdk-derivatives-trading-usds-futures
-- binance-sdk-algo
-- binance-common
-
-安装依赖：
-```bash
-pip install -r requirements.txt
-```
-
-## 使用方法
-
-### 作为 Python Package 使用
-
-安装后，可以直接导入使用：
-
-```python
-# 导入数据获取模块
-from cyqnt_trd.get_data import get_and_save_futures_klines, get_and_save_klines
-
-# 导入交易信号模块
-from cyqnt_trd.trading_signal.factor import ma_factor, rsi_factor
-from cyqnt_trd.trading_signal.signal import ma_signal, factor_based_signal
-
-# 导入回测框架
-from cyqnt_trd.backtesting import BacktestFramework, FactorTester, StrategyBacktester
-
-# 使用示例
-data = get_and_save_futures_klines("BTCUSDT", interval="1h", limit=100)
-framework = BacktestFramework(data_path="data/BTCUSDT_1h.json")
-result = framework.test_factor(ma_factor, short_window=5, long_window=20)
-```
-
-### 运行示例脚本
+### Backtest
 
 ```bash
-# 作为模块运行
-python -m cyqnt_trd.trading_signal.example_usage
-
-# 运行测试脚本
-python -m cyqnt_trd.test_script.realtime_price_tracker
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_backtest \
+  --engine numba \
+  --market-type futures \
+  --strategy multi_timeframe_ma_spread \
+  --symbol BTCUSDT \
+  --interval 5m \
+  --secondary-interval 1h \
+  --primary-ma-period 20 \
+  --reference-ma-period 20 \
+  --spread-threshold-bps 0 \
+  --historical-dir data/mtf_90d \
+  --start-ts 1768003200000 \
+  --end-ts 1775779200000 \
+  --download-missing \
+  --output-json docs/backtests/btc_mtf_ma_cross_5m_1h_20_20_90d.json
 ```
 
-## 项目结构
+### Paper Signal
 
-```
-cyqnt_trd/
-├── cyqnt_trd/          # 主包目录
-│   ├── __init__.py         # 包初始化文件
-│   ├── get_data/           # 数据获取模块
-│   │   ├── __init__.py
-│   │   ├── get_futures_data.py
-│   │   └── get_trending_data.py
-│   ├── trading_signal/     # 交易信号模块
-│   │   ├── __init__.py
-│   │   ├── factor/         # 因子模块
-│   │   ├── signal/         # 信号策略模块
-│   │   └── selected_alpha/ # Alpha因子模块
-│   ├── backtesting/        # 回测框架
-│   │   ├── __init__.py
-│   │   ├── framework.py
-│   │   ├── factor_test.py
-│   │   └── strategy_backtest.py
-│   └── test_script/        # 测试脚本
-├── pyproject.toml          # 包配置文件
-├── requirements.txt        # 依赖列表
-└── README.md              # 说明文档
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_paper \
+  --market-type futures \
+  --strategy multi_timeframe_ma_spread \
+  --symbol BTCUSDT \
+  --interval 5m \
+  --secondary-interval 1h \
+  --primary-ma-period 20 \
+  --reference-ma-period 20 \
+  --spread-threshold-bps 0 \
+  --historical-dir data/mtf_90d \
+  --dry-run
 ```
 
-## 许可证
+### Monitor / Background Session
+
+```bash
+python -m cyqnt_trd.standard_bot.entrypoints.mvp_monitor_http \
+  --broker paper \
+  --host 127.0.0.1 \
+  --port 8787
+```
+
+## Data Workflow
+
+The preferred data workflow is:
+
+1. Download Binance K bars into local parquet
+2. Store the finest useful granularity, usually `1m`
+3. Resample locally into `5m`, `15m`, `1h`, etc.
+4. Run `standard_bot` on local parquet instead of using raw API responses as final backtest input
+
+This keeps:
+
+- point-in-time alignment clearer
+- local backtests repeatable
+- paper signal and backtest logic consistent
+
+## Current Strategy Families On The Mainline
+
+The `standard_bot` mainline currently includes Numba-backed support for:
+
+- `moving_average_cross`
+- `price_moving_average`
+- `rsi_reversion`
+- `multi_timeframe_ma_spread`
+- `donchian_breakout`
+
+## Package Notes
+
+- The preferred historical backtest engine is `NumbaBacktestRunner`
+- The preferred CLI entrypoint is `cyqnt_trd.standard_bot.entrypoints.mvp_backtest`
+- Legacy `cyqnt_trd/backtesting/*` still exists for compatibility, but is not the recommended path for new work
+
+## Requirements
+
+Key dependencies include:
+
+- `pandas>=2.2.0`
+- `polars>=1.0,<2.0`
+- `numba>=0.60,<0.62`
+- `pyarrow>=16.1.0`
+- `requests>=2.32.0`
+
+Binance SDK dependencies:
+
+- `binance-sdk-spot`
+- `binance-sdk-derivatives-trading-usds-futures`
+- `binance-sdk-algo`
+- `binance-common`
+
+## License
 
 MIT License
-
-Copyright (c) 2025 Haowen Wang

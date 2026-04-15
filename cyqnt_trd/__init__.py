@@ -9,7 +9,7 @@ Cyqnt Trading Package
 - backtesting: 回测框架，支持因子测试和策略回测
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.9.dev"
 
 _OPTIONAL_IMPORT_ERRORS = {}
 
