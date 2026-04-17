@@ -30,10 +30,14 @@ from ..core import (
     TradeSide,
 )
 from ..signal.numba_kernels import (
+    adx_trend_strength_target_updates,
+    atr_breakout_target_updates,
+    bollinger_mean_reversion_target_updates,
     NUMBA_AVAILABLE,
     TARGET_KEEP,
     TARGET_LONG,
     donchian_breakout_target_updates,
+    macd_trend_follow_target_updates,
     moving_average_cross_target_updates,
     multi_timeframe_ma_spread_target_updates,
     price_moving_average_target_updates,
@@ -194,7 +198,11 @@ class NumbaBacktestRunner:
         strategy_id = plugin_chain[0]["plugin_id"]
         raw_config = dict(plugin_chain[0].get("config", {}))
         if strategy_id not in {
+            "adx_trend_strength",
+            "atr_breakout",
+            "bollinger_mean_reversion",
             "donchian_breakout",
+            "macd_trend_follow",
             "moving_average_cross",
             "price_moving_average",
             "rsi_reversion",
@@ -258,6 +266,37 @@ class NumbaBacktestRunner:
                 primary_series.lows,
                 int(raw_config["lookback_window"]),
                 float(raw_config.get("breakout_buffer_bps", 0.0)),
+            )
+        if strategy_id == "adx_trend_strength":
+            return adx_trend_strength_target_updates(
+                primary_series.closes,
+                primary_series.highs,
+                primary_series.lows,
+                int(raw_config["period"]),
+                float(raw_config.get("adx_threshold", 25.0)),
+            )
+        if strategy_id == "atr_breakout":
+            return atr_breakout_target_updates(
+                primary_series.closes,
+                primary_series.highs,
+                primary_series.lows,
+                int(raw_config["ma_period"]),
+                int(raw_config["atr_period"]),
+                float(raw_config.get("atr_multiplier", 2.0)),
+            )
+        if strategy_id == "bollinger_mean_reversion":
+            return bollinger_mean_reversion_target_updates(
+                primary_series.closes,
+                int(raw_config["period"]),
+                float(raw_config.get("stddev_multiplier", 2.0)),
+            )
+        if strategy_id == "macd_trend_follow":
+            return macd_trend_follow_target_updates(
+                primary_series.closes,
+                int(raw_config["fast_period"]),
+                int(raw_config["slow_period"]),
+                int(raw_config["signal_period"]),
+                float(raw_config.get("histogram_threshold", 0.0)),
             )
         if strategy_id == "moving_average_cross":
             return moving_average_cross_target_updates(

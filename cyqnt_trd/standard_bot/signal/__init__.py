@@ -13,8 +13,16 @@ from .interfaces import (
 from .encoders import EncodedCloseSeries, encode_close_series, series_for
 from .numba_kernels import NUMBA_AVAILABLE
 from .plugins import (
+    AdxTrendStrengthConfig,
+    AdxTrendStrengthPlugin,
+    AtrBreakoutConfig,
+    AtrBreakoutPlugin,
+    BollingerMeanReversionConfig,
+    BollingerMeanReversionPlugin,
     DonchianBreakoutConfig,
     DonchianBreakoutPlugin,
+    MacdTrendFollowConfig,
+    MacdTrendFollowPlugin,
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
     MultiTimeframeMaSpreadConfig,
@@ -28,11 +36,19 @@ from .plugins import (
 from .registry import PipelineStepResult, SignalPluginRegistry
 
 __all__ = [
+    "AdxTrendStrengthConfig",
+    "AdxTrendStrengthPlugin",
+    "AtrBreakoutConfig",
+    "AtrBreakoutPlugin",
     "BatchSignalPlugin",
+    "BollingerMeanReversionConfig",
+    "BollingerMeanReversionPlugin",
     "DonchianBreakoutConfig",
     "DonchianBreakoutPlugin",
     "EncodedCloseSeries",
     "IncrementalSignalPlugin",
+    "MacdTrendFollowConfig",
+    "MacdTrendFollowPlugin",
     "MovingAverageCrossConfig",
     "MovingAverageCrossPlugin",
     "MultiTimeframeMaSpreadConfig",

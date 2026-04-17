@@ -5,8 +5,16 @@ from dataclasses import dataclass
 from cyqnt_trd.standard_bot.core import Bar, BundleMeta, MarketBundle
 from cyqnt_trd.standard_bot.data import AlignmentPolicy, HistoricalSnapshotAssembler
 from cyqnt_trd.standard_bot.signal import (
+    AdxTrendStrengthConfig,
+    AdxTrendStrengthPlugin,
+    AtrBreakoutConfig,
+    AtrBreakoutPlugin,
+    BollingerMeanReversionConfig,
+    BollingerMeanReversionPlugin,
     DonchianBreakoutConfig,
     DonchianBreakoutPlugin,
+    MacdTrendFollowConfig,
+    MacdTrendFollowPlugin,
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
     PriceMovingAverageConfig,
@@ -124,4 +132,59 @@ def test_donchian_breakout_batch_matches_step() -> None:
             breakout_buffer_bps=0.0,
         ),
         [100.0, 101.0, 102.0, 103.0, 104.0, 95.0, 90.0, 91.0, 92.0],
+    )
+
+
+def test_adx_trend_strength_batch_matches_step() -> None:
+    _batch_step_alignment(
+        AdxTrendStrengthPlugin(),
+        AdxTrendStrengthConfig(
+            instrument_id="BTCUSDT",
+            timeframe="1m",
+            period=3,
+            adx_threshold=20.0,
+        ),
+        [100.0, 104.0, 108.0, 112.0, 116.0, 109.0, 102.0, 96.0, 92.0, 90.0],
+    )
+
+
+def test_atr_breakout_batch_matches_step() -> None:
+    _batch_step_alignment(
+        AtrBreakoutPlugin(),
+        AtrBreakoutConfig(
+            instrument_id="BTCUSDT",
+            timeframe="1m",
+            ma_period=3,
+            atr_period=3,
+            atr_multiplier=0.5,
+        ),
+        [100.0, 101.0, 100.0, 104.0, 110.0, 95.0, 90.0, 96.0, 102.0],
+    )
+
+
+def test_bollinger_mean_reversion_batch_matches_step() -> None:
+    _batch_step_alignment(
+        BollingerMeanReversionPlugin(),
+        BollingerMeanReversionConfig(
+            instrument_id="BTCUSDT",
+            timeframe="1m",
+            period=3,
+            stddev_multiplier=1.0,
+        ),
+        [100.0, 100.0, 100.0, 92.0, 98.0, 104.0, 108.0, 101.0, 95.0],
+    )
+
+
+def test_macd_trend_follow_batch_matches_step() -> None:
+    _batch_step_alignment(
+        MacdTrendFollowPlugin(),
+        MacdTrendFollowConfig(
+            instrument_id="BTCUSDT",
+            timeframe="1m",
+            fast_period=3,
+            slow_period=6,
+            signal_period=3,
+            histogram_threshold=0.0001,
+        ),
+        [100.0, 101.0, 102.0, 104.0, 108.0, 112.0, 109.0, 105.0, 101.0, 98.0],
     )
