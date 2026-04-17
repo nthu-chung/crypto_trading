@@ -29,7 +29,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--market-type", choices=["spot", "futures"], default="spot")
     parser.add_argument(
         "--strategy",
-        choices=["moving_average_cross", "price_moving_average", "rsi_reversion", "donchian_breakout", "multi_timeframe_ma_spread"],
+        choices=[
+            "moving_average_cross",
+            "price_moving_average",
+            "rsi_reversion",
+            "donchian_breakout",
+            "adx_trend_strength",
+            "atr_breakout",
+            "bollinger_mean_reversion",
+            "macd_trend_follow",
+            "multi_timeframe_ma_spread",
+        ],
         default="moving_average_cross",
     )
     parser.add_argument("--fast-window", type=int, default=5)
@@ -40,6 +50,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--overbought", type=float, default=70.0)
     parser.add_argument("--donchian-window", type=int, default=20)
     parser.add_argument("--breakout-buffer-bps", type=float, default=0.0)
+    parser.add_argument("--adx-period", type=int, default=14)
+    parser.add_argument("--adx-threshold", type=float, default=25.0)
+    parser.add_argument("--atr-ma-period", type=int, default=20)
+    parser.add_argument("--atr-period", type=int, default=14)
+    parser.add_argument("--atr-multiplier", type=float, default=2.0)
+    parser.add_argument("--bollinger-period", type=int, default=20)
+    parser.add_argument("--bollinger-stddev-multiplier", type=float, default=2.0)
+    parser.add_argument("--macd-fast-period", type=int, default=12)
+    parser.add_argument("--macd-slow-period", type=int, default=26)
+    parser.add_argument("--macd-signal-period", type=int, default=9)
+    parser.add_argument("--macd-histogram-threshold", type=float, default=0.0)
     parser.add_argument("--secondary-interval", default="1h")
     parser.add_argument("--primary-ma-period", type=int, default=20)
     parser.add_argument("--reference-ma-period", type=int, default=20)
@@ -117,6 +138,17 @@ def main() -> int:
             overbought=args.overbought,
             donchian_window=args.donchian_window,
             breakout_buffer_bps=args.breakout_buffer_bps,
+            adx_period=args.adx_period,
+            adx_threshold=args.adx_threshold,
+            atr_ma_period=args.atr_ma_period,
+            atr_period=args.atr_period,
+            atr_multiplier=args.atr_multiplier,
+            bollinger_period=args.bollinger_period,
+            bollinger_stddev_multiplier=args.bollinger_stddev_multiplier,
+            macd_fast_period=args.macd_fast_period,
+            macd_slow_period=args.macd_slow_period,
+            macd_signal_period=args.macd_signal_period,
+            macd_histogram_threshold=args.macd_histogram_threshold,
             primary_ma_period=args.primary_ma_period,
             reference_ma_period=args.reference_ma_period,
             spread_threshold_bps=args.spread_threshold_bps,

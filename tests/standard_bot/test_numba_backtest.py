@@ -14,8 +14,16 @@ from cyqnt_trd.standard_bot.core import (
 )
 from cyqnt_trd.standard_bot.data import AlignmentPolicy, HistoricalSnapshotAssembler
 from cyqnt_trd.standard_bot.signal import (
+    AdxTrendStrengthConfig,
+    AdxTrendStrengthPlugin,
+    AtrBreakoutConfig,
+    AtrBreakoutPlugin,
+    BollingerMeanReversionConfig,
+    BollingerMeanReversionPlugin,
     DonchianBreakoutConfig,
     DonchianBreakoutPlugin,
+    MacdTrendFollowConfig,
+    MacdTrendFollowPlugin,
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
     RsiReversionConfig,
@@ -23,8 +31,12 @@ from cyqnt_trd.standard_bot.signal import (
     SignalPluginRegistry,
 )
 from cyqnt_trd.standard_bot.signal.numba_kernels import (
+    adx_trend_strength_target_updates,
+    atr_breakout_target_updates,
+    bollinger_mean_reversion_target_updates,
     TARGET_KEEP,
     donchian_breakout_target_updates,
+    macd_trend_follow_target_updates,
     moving_average_cross_target_updates,
     rsi_reversion_target_updates,
 )
@@ -398,3 +410,137 @@ def test_numba_runner_supports_donchian_breakout_backtests() -> None:
     trades = result.extras["trades"]
     assert trades[0]["action"] == "open_long"
     assert trades[-1]["action"] == "flip_to_short"
+
+
+def test_numba_adx_trend_strength_matches_incremental_plugin_decisions() -> None:
+    closes = [100.0, 104.0, 108.0, 112.0, 116.0, 109.0, 102.0, 96.0, 92.0, 90.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    snapshots = HistoricalSnapshotAssembler(
+        policy=AlignmentPolicy(policy_id="bar_close_v1", primary_timeframe="1m"),
+        tail_bars=20,
+    ).build(bundle)
+
+    registry = SignalPluginRegistry()
+    registry.register(AdxTrendStrengthPlugin(), lambda raw: AdxTrendStrengthConfig(**raw))
+    step_states = {}
+    step_decisions = []
+
+    for snapshot in snapshots:
+        result = registry.run_pipeline_step(
+            snapshot,
+            [
+                {
+                    "plugin_id": "adx_trend_strength",
+                    "config": {
+                        "instrument_id": "BTCUSDT",
+                        "timeframe": "1m",
+                        "period": 3,
+                        "adx_threshold": 20.0,
+                    },
+                }
+            ],
+            previous_states=step_states,
+        )
+        step_states = result.states
+        trade_signals = result.batch.trade_signals()
+        if trade_signals:
+            step_decisions.append((snapshot.meta.decision_as_of, trade_signals[-1].side.value))
+
+    updates, _ = adx_trend_strength_target_updates(
+        np.asarray(closes, dtype=np.float64),
+        np.asarray(closes, dtype=np.float64),
+        np.asarray(closes, dtype=np.float64),
+        3,
+        20.0,
+    )
+    numba_decisions = []
+    timestamps = [60_000 * (index + 1) for index in range(len(closes))]
+    for index, update in enumerate(updates):
+        if update == TARGET_KEEP:
+            continue
+        numba_decisions.append((timestamps[index], "buy" if int(update) == 1 else "sell"))
+
+    assert step_decisions == numba_decisions
+
+
+def test_numba_runner_supports_adx_trend_strength_backtests() -> None:
+    closes = [100.0, 104.0, 108.0, 112.0, 116.0, 109.0, 102.0, 96.0, 92.0, 90.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    request = _request(
+        strategy="adx_trend_strength",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "1m",
+            "period": 3,
+            "adx_threshold": 20.0,
+        },
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["signal_count"] >= 1.0
+    assert result.extras["execution_assumption"] == "signal_at_bar_close_fill_next_bar_open"
+
+
+def test_numba_runner_supports_atr_breakout_backtests() -> None:
+    closes = [100.0, 101.0, 100.0, 104.0, 110.0, 95.0, 90.0, 96.0, 102.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    request = _request(
+        strategy="atr_breakout",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "1m",
+            "ma_period": 3,
+            "atr_period": 3,
+            "atr_multiplier": 0.5,
+        },
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["signal_count"] >= 1.0
+    assert result.extras["execution_assumption"] == "signal_at_bar_close_fill_next_bar_open"
+
+
+def test_numba_runner_supports_bollinger_mean_reversion_backtests() -> None:
+    closes = [100.0, 100.0, 100.0, 92.0, 98.0, 104.0, 108.0, 101.0, 95.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    request = _request(
+        strategy="bollinger_mean_reversion",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "1m",
+            "period": 3,
+            "stddev_multiplier": 1.0,
+        },
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["signal_count"] >= 1.0
+    assert result.extras["execution_assumption"] == "signal_at_bar_close_fill_next_bar_open"
+
+
+def test_numba_runner_supports_macd_trend_follow_backtests() -> None:
+    closes = [100.0, 101.0, 102.0, 104.0, 108.0, 112.0, 109.0, 105.0, 101.0, 98.0]
+    bundle = _market_bundle(opens=closes, closes=closes)
+    request = _request(
+        strategy="macd_trend_follow",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "1m",
+            "fast_period": 3,
+            "slow_period": 6,
+            "signal_period": 3,
+            "histogram_threshold": 0.0001,
+        },
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["signal_count"] >= 1.0
+    assert result.extras["execution_assumption"] == "signal_at_bar_close_fill_next_bar_open"

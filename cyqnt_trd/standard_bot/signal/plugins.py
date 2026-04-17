@@ -27,7 +27,11 @@ from ..core import (
 from .encoders import encode_close_series, series_for
 from .interfaces import SignalState, StepSignalResult
 from .numba_kernels import (
+    adx_trend_strength_signal_rows,
+    atr_breakout_signal_rows,
+    bollinger_mean_reversion_signal_rows,
     donchian_breakout_signal_rows,
+    macd_trend_follow_signal_rows,
     SIGNAL_BUY,
     SIGNAL_NONE,
     SIGNAL_SELL,
@@ -202,6 +206,79 @@ class DonchianBreakoutConfig:
             raise ValueError("lookback_window must be >= 2")
         if self.breakout_buffer_bps < 0:
             raise ValueError("breakout_buffer_bps must be >= 0")
+
+
+@dataclass
+class AdxTrendStrengthConfig:
+    instrument_id: str
+    timeframe: str
+    period: int = 14
+    adx_threshold: float = 25.0
+    time_horizon: str = "trend"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.period < 2:
+            raise ValueError("period must be >= 2")
+        if self.adx_threshold < 0.0:
+            raise ValueError("adx_threshold must be >= 0")
+
+
+@dataclass
+class AtrBreakoutConfig:
+    instrument_id: str
+    timeframe: str
+    ma_period: int = 20
+    atr_period: int = 14
+    atr_multiplier: float = 2.0
+    time_horizon: str = "trend"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.ma_period < 1:
+            raise ValueError("ma_period must be >= 1")
+        if self.atr_period < 1:
+            raise ValueError("atr_period must be >= 1")
+        if self.atr_multiplier <= 0.0:
+            raise ValueError("atr_multiplier must be > 0")
+
+
+@dataclass
+class BollingerMeanReversionConfig:
+    instrument_id: str
+    timeframe: str
+    period: int = 20
+    stddev_multiplier: float = 2.0
+    time_horizon: str = "mean_reversion"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.period < 2:
+            raise ValueError("period must be >= 2")
+        if self.stddev_multiplier <= 0.0:
+            raise ValueError("stddev_multiplier must be > 0")
+
+
+@dataclass
+class MacdTrendFollowConfig:
+    instrument_id: str
+    timeframe: str
+    fast_period: int = 12
+    slow_period: int = 26
+    signal_period: int = 9
+    histogram_threshold: float = 0.0
+    time_horizon: str = "trend"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.fast_period < 1:
+            raise ValueError("fast_period must be >= 1")
+        if self.slow_period <= self.fast_period:
+            raise ValueError("slow_period must be greater than fast_period")
+        if self.signal_period < 1:
+            raise ValueError("signal_period must be >= 1")
+        if self.histogram_threshold < 0.0:
+            raise ValueError("histogram_threshold must be >= 0")
 
 
 @dataclass
@@ -1004,9 +1081,663 @@ class DonchianBreakoutPlugin:
         )
 
 
+class AdxTrendStrengthPlugin:
+    plugin_id = "adx_trend_strength"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: AdxTrendStrengthConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return _build_batch(self.plugin_id, snapshot, [])
+
+        timestamps = np.asarray([int(bar.timestamp) for bar in bars], dtype=np.int64)
+        closes = np.asarray([float(bar.close) for bar in bars], dtype=np.float64)
+        highs = np.asarray([float(bar.high) for bar in bars], dtype=np.float64)
+        lows = np.asarray([float(bar.low) for bar in bars], dtype=np.float64)
+        directions, strengths, adx_values, plus_di_values, minus_di_values = adx_trend_strength_signal_rows(
+            closes,
+            highs,
+            lows,
+            config.period,
+            config.adx_threshold,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.period,
+            config.adx_threshold,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(timestamps[index]),
+                            "adx": float(adx_values[index]),
+                            "plus_di": float(plus_di_values[index]),
+                            "minus_di": float(minus_di_values[index]),
+                            "adx_threshold": float(config.adx_threshold),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=1 if int(direction) == int(SIGNAL_BUY) else -1,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={
+                "cursor": None,
+                "last_direction": int(SIGNAL_NONE),
+                "close_window": [],
+                "high_window": [],
+                "low_window": [],
+            },
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: AdxTrendStrengthConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        close_window = [float(value) for value in state.values.get("close_window", [])]
+        high_window = [float(value) for value in state.values.get("high_window", [])]
+        low_window = [float(value) for value in state.values.get("low_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.period,
+            config.adx_threshold,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            close_window.append(float(bar.close))
+            high_window.append(float(bar.high))
+            low_window.append(float(bar.low))
+            directions, strengths, adx_values, plus_di_values, minus_di_values = adx_trend_strength_signal_rows(
+                np.asarray(close_window, dtype=np.float64),
+                np.asarray(high_window, dtype=np.float64),
+                np.asarray(low_window, dtype=np.float64),
+                config.period,
+                config.adx_threshold,
+            )
+            last_index = len(close_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "adx": float(adx_values[last_index]),
+                                    "plus_di": float(plus_di_values[last_index]),
+                                    "minus_di": float(minus_di_values[last_index]),
+                                    "adx_threshold": float(config.adx_threshold),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "close_window": close_window,
+                    "high_window": high_window,
+                    "low_window": low_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
+class AtrBreakoutPlugin:
+    plugin_id = "atr_breakout"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: AtrBreakoutConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return _build_batch(self.plugin_id, snapshot, [])
+
+        timestamps = np.asarray([int(bar.timestamp) for bar in bars], dtype=np.int64)
+        closes = np.asarray([float(bar.close) for bar in bars], dtype=np.float64)
+        highs = np.asarray([float(bar.high) for bar in bars], dtype=np.float64)
+        lows = np.asarray([float(bar.low) for bar in bars], dtype=np.float64)
+        directions, strengths, ma_values, atr_values, upper_channel, lower_channel = atr_breakout_signal_rows(
+            closes,
+            highs,
+            lows,
+            config.ma_period,
+            config.atr_period,
+            config.atr_multiplier,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.ma_period,
+            config.atr_period,
+            config.atr_multiplier,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(timestamps[index]),
+                            "ma": float(ma_values[index]),
+                            "atr": float(atr_values[index]),
+                            "upper_channel": float(upper_channel[index]),
+                            "lower_channel": float(lower_channel[index]),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=1 if int(direction) == int(SIGNAL_BUY) else -1,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={
+                "cursor": None,
+                "last_direction": int(SIGNAL_NONE),
+                "close_window": [],
+                "high_window": [],
+                "low_window": [],
+            },
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: AtrBreakoutConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        close_window = [float(value) for value in state.values.get("close_window", [])]
+        high_window = [float(value) for value in state.values.get("high_window", [])]
+        low_window = [float(value) for value in state.values.get("low_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.ma_period,
+            config.atr_period,
+            config.atr_multiplier,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            close_window.append(float(bar.close))
+            high_window.append(float(bar.high))
+            low_window.append(float(bar.low))
+            directions, strengths, ma_values, atr_values, upper_channel, lower_channel = atr_breakout_signal_rows(
+                np.asarray(close_window, dtype=np.float64),
+                np.asarray(high_window, dtype=np.float64),
+                np.asarray(low_window, dtype=np.float64),
+                config.ma_period,
+                config.atr_period,
+                config.atr_multiplier,
+            )
+            last_index = len(close_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "ma": float(ma_values[last_index]),
+                                    "atr": float(atr_values[last_index]),
+                                    "upper_channel": float(upper_channel[last_index]),
+                                    "lower_channel": float(lower_channel[last_index]),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "close_window": close_window,
+                    "high_window": high_window,
+                    "low_window": low_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
+class BollingerMeanReversionPlugin:
+    plugin_id = "bollinger_mean_reversion"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: BollingerMeanReversionConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        encoded = encode_close_series(snapshot, config.instrument_id, config.timeframe)
+        if encoded.closes.size == 0:
+            return _build_batch(self.plugin_id, snapshot, [])
+        directions, strengths, mid_values, upper_values, lower_values = bollinger_mean_reversion_signal_rows(
+            encoded.closes,
+            config.period,
+            config.stddev_multiplier,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.period,
+            config.stddev_multiplier,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(encoded.timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(encoded.timestamps[index]),
+                            "mid_band": float(mid_values[index]),
+                            "upper_band": float(upper_values[index]),
+                            "lower_band": float(lower_values[index]),
+                            "stddev_multiplier": float(config.stddev_multiplier),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=1 if int(direction) == int(SIGNAL_BUY) else -1,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={"cursor": None, "last_direction": int(SIGNAL_NONE), "close_window": []},
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: BollingerMeanReversionConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        close_window = [float(value) for value in state.values.get("close_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.period,
+            config.stddev_multiplier,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            close_window.append(float(bar.close))
+            directions, strengths, mid_values, upper_values, lower_values = bollinger_mean_reversion_signal_rows(
+                np.asarray(close_window, dtype=np.float64),
+                config.period,
+                config.stddev_multiplier,
+            )
+            last_index = len(close_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "mid_band": float(mid_values[last_index]),
+                                    "upper_band": float(upper_values[last_index]),
+                                    "lower_band": float(lower_values[last_index]),
+                                    "stddev_multiplier": float(config.stddev_multiplier),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "close_window": close_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
+class MacdTrendFollowPlugin:
+    plugin_id = "macd_trend_follow"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: MacdTrendFollowConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        encoded = encode_close_series(snapshot, config.instrument_id, config.timeframe)
+        if encoded.closes.size == 0:
+            return _build_batch(self.plugin_id, snapshot, [])
+        directions, strengths, macd_line, signal_line, histogram = macd_trend_follow_signal_rows(
+            encoded.closes,
+            config.fast_period,
+            config.slow_period,
+            config.signal_period,
+            config.histogram_threshold,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.fast_period,
+            config.slow_period,
+            config.signal_period,
+            config.histogram_threshold,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(encoded.timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(encoded.timestamps[index]),
+                            "macd_line": float(macd_line[index]),
+                            "signal_line": float(signal_line[index]),
+                            "histogram": float(histogram[index]),
+                            "histogram_threshold": float(config.histogram_threshold),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=1 if int(direction) == int(SIGNAL_BUY) else -1,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={"cursor": None, "last_direction": int(SIGNAL_NONE), "close_window": []},
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: MacdTrendFollowConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        close_window = [float(value) for value in state.values.get("close_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.fast_period,
+            config.slow_period,
+            config.signal_period,
+            config.histogram_threshold,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            close_window.append(float(bar.close))
+            directions, strengths, macd_line, signal_line, histogram = macd_trend_follow_signal_rows(
+                np.asarray(close_window, dtype=np.float64),
+                config.fast_period,
+                config.slow_period,
+                config.signal_period,
+                config.histogram_threshold,
+            )
+            last_index = len(close_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "macd_line": float(macd_line[last_index]),
+                                    "signal_line": float(signal_line[last_index]),
+                                    "histogram": float(histogram[last_index]),
+                                    "histogram_threshold": float(config.histogram_threshold),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "close_window": close_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
 def register_builtin_plugins(registry) -> None:
     registry.register(MovingAverageCrossPlugin(), lambda raw: MovingAverageCrossConfig(**raw))
     registry.register(PriceMovingAveragePlugin(), lambda raw: PriceMovingAverageConfig(**raw))
     registry.register(RsiReversionPlugin(), lambda raw: RsiReversionConfig(**raw))
     registry.register(DonchianBreakoutPlugin(), lambda raw: DonchianBreakoutConfig(**raw))
+    registry.register(AdxTrendStrengthPlugin(), lambda raw: AdxTrendStrengthConfig(**raw))
+    registry.register(AtrBreakoutPlugin(), lambda raw: AtrBreakoutConfig(**raw))
+    registry.register(BollingerMeanReversionPlugin(), lambda raw: BollingerMeanReversionConfig(**raw))
+    registry.register(MacdTrendFollowPlugin(), lambda raw: MacdTrendFollowConfig(**raw))
     registry.register(MultiTimeframeMaSpreadPlugin(), lambda raw: MultiTimeframeMaSpreadConfig(**raw))

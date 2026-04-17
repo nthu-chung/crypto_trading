@@ -36,6 +36,105 @@ SIGNAL_BUY = np.int8(1)
 
 
 @njit(cache=True)
+def _ema_series(values: np.ndarray, period: int) -> np.ndarray:
+    ema_values = np.zeros(values.shape[0], dtype=np.float64)
+    if values.shape[0] == 0 or period < 1:
+        return ema_values
+
+    alpha = 2.0 / (period + 1.0)
+    ema = values[0]
+    ema_values[0] = ema
+    for index in range(1, values.shape[0]):
+        ema = alpha * values[index] + (1.0 - alpha) * ema
+        ema_values[index] = ema
+    return ema_values
+
+
+@njit(cache=True)
+def _true_range_series(
+    highs: np.ndarray,
+    lows: np.ndarray,
+    closes: np.ndarray,
+) -> np.ndarray:
+    true_ranges = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0:
+        return true_ranges
+
+    true_ranges[0] = highs[0] - lows[0]
+    for index in range(1, closes.shape[0]):
+        high_low = highs[index] - lows[index]
+        high_close = abs(highs[index] - closes[index - 1])
+        low_close = abs(lows[index] - closes[index - 1])
+        true_range = high_low
+        if high_close > true_range:
+            true_range = high_close
+        if low_close > true_range:
+            true_range = low_close
+        true_ranges[index] = true_range
+    return true_ranges
+
+
+@njit(cache=True)
+def _adx_components(
+    highs: np.ndarray,
+    lows: np.ndarray,
+    closes: np.ndarray,
+    period: int,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    adx_values = np.zeros(closes.shape[0], dtype=np.float64)
+    plus_di_values = np.zeros(closes.shape[0], dtype=np.float64)
+    minus_di_values = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or period < 2:
+        return adx_values, plus_di_values, minus_di_values
+
+    plus_dm = np.zeros(closes.shape[0], dtype=np.float64)
+    minus_dm = np.zeros(closes.shape[0], dtype=np.float64)
+    true_ranges = _true_range_series(highs, lows, closes)
+    dx_values = np.zeros(closes.shape[0], dtype=np.float64)
+
+    for index in range(1, closes.shape[0]):
+        up_move = highs[index] - highs[index - 1]
+        down_move = lows[index - 1] - lows[index]
+        if up_move > down_move and up_move > 0.0:
+            plus_dm[index] = up_move
+        elif down_move > up_move and down_move > 0.0:
+            minus_dm[index] = down_move
+
+    tr_prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    plus_prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    minus_prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    dx_prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    for index in range(closes.shape[0]):
+        tr_prefix[index + 1] = tr_prefix[index] + true_ranges[index]
+        plus_prefix[index + 1] = plus_prefix[index] + plus_dm[index]
+        minus_prefix[index + 1] = minus_prefix[index] + minus_dm[index]
+
+    for index in range(closes.shape[0]):
+        if index + 1 < period:
+            continue
+        tr_sum = tr_prefix[index + 1] - tr_prefix[index + 1 - period]
+        if tr_sum <= 0.0:
+            continue
+        plus_sum = plus_prefix[index + 1] - plus_prefix[index + 1 - period]
+        minus_sum = minus_prefix[index + 1] - minus_prefix[index + 1 - period]
+        plus_di = 100.0 * plus_sum / tr_sum
+        minus_di = 100.0 * minus_sum / tr_sum
+        plus_di_values[index] = plus_di
+        minus_di_values[index] = minus_di
+        denominator = plus_di + minus_di
+        if denominator > 0.0:
+            dx_values[index] = 100.0 * abs(plus_di - minus_di) / denominator
+        dx_prefix[index + 1] = dx_prefix[index] + dx_values[index]
+
+    for index in range(closes.shape[0]):
+        if index + 1 < 2 * period - 1:
+            continue
+        adx_values[index] = (dx_prefix[index + 1] - dx_prefix[index + 1 - period]) / period
+
+    return adx_values, plus_di_values, minus_di_values
+
+
+@njit(cache=True)
 def moving_average_cross_signal_rows(
     closes: np.ndarray,
     fast_window: int,
@@ -297,6 +396,295 @@ def donchian_breakout_target_updates(
         lows,
         lookback_window,
         breakout_buffer_bps,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(closes.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
+def adx_trend_strength_signal_rows(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    period: int,
+    adx_threshold: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(closes.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(closes.shape[0], dtype=np.float64)
+    adx_values, plus_di_values, minus_di_values = _adx_components(highs, lows, closes, period)
+    di_spread_values = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or period < 2:
+        return directions, strengths, adx_values, plus_di_values, minus_di_values
+
+    for index in range(closes.shape[0]):
+        adx_value = adx_values[index]
+        if adx_value <= adx_threshold:
+            continue
+        di_spread = plus_di_values[index] - minus_di_values[index]
+        di_spread_values[index] = di_spread
+        if di_spread > 0.0:
+            directions[index] = SIGNAL_BUY
+            strengths[index] = ((adx_value - adx_threshold) / max(adx_threshold, 1e-9)) + abs(di_spread) / 100.0
+        elif di_spread < 0.0:
+            directions[index] = SIGNAL_SELL
+            strengths[index] = ((adx_value - adx_threshold) / max(adx_threshold, 1e-9)) + abs(di_spread) / 100.0
+    return directions, strengths, adx_values, plus_di_values, minus_di_values
+
+
+@njit(cache=True)
+def adx_trend_strength_target_updates(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    period: int,
+    adx_threshold: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _, _ = adx_trend_strength_signal_rows(
+        closes,
+        highs,
+        lows,
+        period,
+        adx_threshold,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(closes.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
+def atr_breakout_signal_rows(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    ma_period: int,
+    atr_period: int,
+    atr_multiplier: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(closes.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(closes.shape[0], dtype=np.float64)
+    ma_values = np.zeros(closes.shape[0], dtype=np.float64)
+    atr_values = np.zeros(closes.shape[0], dtype=np.float64)
+    upper_channel = np.zeros(closes.shape[0], dtype=np.float64)
+    lower_channel = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or ma_period < 1 or atr_period < 1 or atr_multiplier < 0.0:
+        return directions, strengths, ma_values, atr_values, upper_channel, lower_channel
+
+    tr_values = _true_range_series(highs, lows, closes)
+    close_prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    tr_prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    for index in range(closes.shape[0]):
+        close_prefix[index + 1] = close_prefix[index] + closes[index]
+        tr_prefix[index + 1] = tr_prefix[index] + tr_values[index]
+
+    min_index = ma_period
+    if atr_period > min_index:
+        min_index = atr_period
+    for index in range(closes.shape[0]):
+        if index + 1 < min_index:
+            continue
+
+        ma_value = (close_prefix[index + 1] - close_prefix[index + 1 - ma_period]) / ma_period
+        atr_value = (tr_prefix[index + 1] - tr_prefix[index + 1 - atr_period]) / atr_period
+        ma_values[index] = ma_value
+        atr_values[index] = atr_value
+        upper = ma_value + atr_multiplier * atr_value
+        lower = ma_value - atr_multiplier * atr_value
+        upper_channel[index] = upper
+        lower_channel[index] = lower
+
+        if atr_value <= 0.0:
+            continue
+        if closes[index] > upper:
+            directions[index] = SIGNAL_BUY
+            strengths[index] = (closes[index] - upper) / atr_value
+        elif closes[index] < lower:
+            directions[index] = SIGNAL_SELL
+            strengths[index] = (lower - closes[index]) / atr_value
+    return directions, strengths, ma_values, atr_values, upper_channel, lower_channel
+
+
+@njit(cache=True)
+def atr_breakout_target_updates(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    ma_period: int,
+    atr_period: int,
+    atr_multiplier: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _, _, _ = atr_breakout_signal_rows(
+        closes,
+        highs,
+        lows,
+        ma_period,
+        atr_period,
+        atr_multiplier,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(closes.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
+def bollinger_mean_reversion_signal_rows(
+    closes: np.ndarray,
+    period: int,
+    stddev_multiplier: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(closes.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(closes.shape[0], dtype=np.float64)
+    mid_values = np.zeros(closes.shape[0], dtype=np.float64)
+    upper_values = np.zeros(closes.shape[0], dtype=np.float64)
+    lower_values = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or period < 2 or stddev_multiplier <= 0.0:
+        return directions, strengths, mid_values, upper_values, lower_values
+
+    prefix = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    prefix_sq = np.zeros(closes.shape[0] + 1, dtype=np.float64)
+    for index in range(closes.shape[0]):
+        prefix[index + 1] = prefix[index] + closes[index]
+        prefix_sq[index + 1] = prefix_sq[index] + closes[index] * closes[index]
+
+    for index in range(closes.shape[0]):
+        if index + 1 < period:
+            continue
+        total = prefix[index + 1] - prefix[index + 1 - period]
+        total_sq = prefix_sq[index + 1] - prefix_sq[index + 1 - period]
+        mean = total / period
+        variance = (total_sq / period) - mean * mean
+        if variance < 0.0:
+            variance = 0.0
+        stddev = np.sqrt(variance)
+        mid_values[index] = mean
+        upper_values[index] = mean + stddev_multiplier * stddev
+        lower_values[index] = mean - stddev_multiplier * stddev
+        if stddev <= 0.0:
+            continue
+        if closes[index] < lower_values[index]:
+            directions[index] = SIGNAL_BUY
+            strengths[index] = abs((closes[index] - mean) / stddev)
+        elif closes[index] > upper_values[index]:
+            directions[index] = SIGNAL_SELL
+            strengths[index] = abs((closes[index] - mean) / stddev)
+    return directions, strengths, mid_values, upper_values, lower_values
+
+
+@njit(cache=True)
+def bollinger_mean_reversion_target_updates(
+    closes: np.ndarray,
+    period: int,
+    stddev_multiplier: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _, _ = bollinger_mean_reversion_signal_rows(
+        closes,
+        period,
+        stddev_multiplier,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(closes.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
+def macd_trend_follow_signal_rows(
+    closes: np.ndarray,
+    fast_period: int,
+    slow_period: int,
+    signal_period: int,
+    histogram_threshold: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(closes.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(closes.shape[0], dtype=np.float64)
+    macd_line = np.zeros(closes.shape[0], dtype=np.float64)
+    signal_line = np.zeros(closes.shape[0], dtype=np.float64)
+    histogram = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or fast_period < 1 or slow_period <= fast_period or signal_period < 1:
+        return directions, strengths, macd_line, signal_line, histogram
+
+    fast_ema = _ema_series(closes, fast_period)
+    slow_ema = _ema_series(closes, slow_period)
+    for index in range(closes.shape[0]):
+        macd_line[index] = fast_ema[index] - slow_ema[index]
+    signal_line = _ema_series(macd_line, signal_period)
+
+    warmup = slow_period + signal_period - 1
+    for index in range(closes.shape[0]):
+        histogram[index] = macd_line[index] - signal_line[index]
+        if index + 1 < warmup:
+            continue
+        histogram_ratio = histogram[index] / max(abs(closes[index]), 1e-9)
+        if histogram_ratio > histogram_threshold:
+            directions[index] = SIGNAL_BUY
+            strengths[index] = abs(histogram_ratio)
+        elif histogram_ratio < -histogram_threshold:
+            directions[index] = SIGNAL_SELL
+            strengths[index] = abs(histogram_ratio)
+    return directions, strengths, macd_line, signal_line, histogram
+
+
+@njit(cache=True)
+def macd_trend_follow_target_updates(
+    closes: np.ndarray,
+    fast_period: int,
+    slow_period: int,
+    signal_period: int,
+    histogram_threshold: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _, _ = macd_trend_follow_signal_rows(
+        closes,
+        fast_period,
+        slow_period,
+        signal_period,
+        histogram_threshold,
     )
     target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
     previous_direction = SIGNAL_NONE

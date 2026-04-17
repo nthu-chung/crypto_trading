@@ -87,6 +87,17 @@ def build_strategy_pipeline(
     overbought: float,
     donchian_window: int = 20,
     breakout_buffer_bps: float = 0.0,
+    adx_period: int = 14,
+    adx_threshold: float = 25.0,
+    atr_ma_period: int = 20,
+    atr_period: int = 14,
+    atr_multiplier: float = 2.0,
+    bollinger_period: int = 20,
+    bollinger_stddev_multiplier: float = 2.0,
+    macd_fast_period: int = 12,
+    macd_slow_period: int = 26,
+    macd_signal_period: int = 9,
+    macd_histogram_threshold: float = 0.0,
     primary_ma_period: int = 20,
     reference_ma_period: int = 20,
     spread_threshold_bps: float = 0.0,
@@ -131,6 +142,49 @@ def build_strategy_pipeline(
                 "timeframe": interval,
                 "lookback_window": donchian_window,
                 "breakout_buffer_bps": breakout_buffer_bps,
+            },
+        }
+    elif strategy == "adx_trend_strength":
+        plugin_spec = {
+            "plugin_id": "adx_trend_strength",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "period": adx_period,
+                "adx_threshold": adx_threshold,
+            },
+        }
+    elif strategy == "atr_breakout":
+        plugin_spec = {
+            "plugin_id": "atr_breakout",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "ma_period": atr_ma_period,
+                "atr_period": atr_period,
+                "atr_multiplier": atr_multiplier,
+            },
+        }
+    elif strategy == "bollinger_mean_reversion":
+        plugin_spec = {
+            "plugin_id": "bollinger_mean_reversion",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "period": bollinger_period,
+                "stddev_multiplier": bollinger_stddev_multiplier,
+            },
+        }
+    elif strategy == "macd_trend_follow":
+        plugin_spec = {
+            "plugin_id": "macd_trend_follow",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "fast_period": macd_fast_period,
+                "slow_period": macd_slow_period,
+                "signal_period": macd_signal_period,
+                "histogram_threshold": macd_histogram_threshold,
             },
         }
     elif strategy == "multi_timeframe_ma_spread":
