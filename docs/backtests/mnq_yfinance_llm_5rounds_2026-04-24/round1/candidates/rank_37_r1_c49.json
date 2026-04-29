@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r1_c49",
+  "strategy": "macd_trend_follow",
+  "params": {
+    "fast_period": 12,
+    "slow_period": 26,
+    "signal_period": 9,
+    "histogram_threshold": 0.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -3.0044139016471094,
+  "total_return": -0.05982592501698004,
+  "max_drawdown": 0.07590570552732293,
+  "trade_count": 1007,
+  "signal_count": 1009,
+  "final_equity": 94017.407498302,
+  "win_rate": 0.3359840954274354,
+  "rank": 37,
+  "selected_for_next_round": false
+}

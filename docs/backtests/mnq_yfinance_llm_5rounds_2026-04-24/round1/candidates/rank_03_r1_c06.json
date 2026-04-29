@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c06",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 20,
+    "slow_window": 50,
+    "entry_threshold": 0.0005
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": 4.37484226754599,
+  "total_return": 0.10804289623295874,
+  "max_drawdown": 0.03144201455997632,
+  "trade_count": 198,
+  "signal_count": 9686,
+  "final_equity": 110804.28962329587,
+  "win_rate": 0.35714285714285715,
+  "rank": 3,
+  "selected_for_next_round": true
+}

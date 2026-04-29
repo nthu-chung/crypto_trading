@@ -33,7 +33,9 @@ from ..signal.numba_kernels import (
     adx_trend_strength_target_updates,
     atr_breakout_target_updates,
     bollinger_mean_reversion_target_updates,
+    liquidation_reversal_target_updates,
     NUMBA_AVAILABLE,
+    oi_funding_breakout_target_updates,
     TARGET_KEEP,
     TARGET_LONG,
     donchian_breakout_target_updates,
@@ -61,6 +63,10 @@ class EncodedSeries:
     closes: np.ndarray
     volumes: np.ndarray
     quote_volumes: np.ndarray
+    oi_change_bps: np.ndarray
+    funding_rate_bps: np.ndarray
+    long_liq_notional_usd: np.ndarray
+    short_liq_notional_usd: np.ndarray
 
 class NumbaBacktestRunner:
     def run(
@@ -90,6 +96,10 @@ class NumbaBacktestRunner:
         slippage_bps = float(request.slippage_model.get("slippage_bps", 0.0))
         impact_slippage_bps = float(request.slippage_model.get("impact_slippage_bps", 0.0))
         max_bar_volume_fraction = float(request.slippage_model.get("max_bar_volume_fraction", 0.10))
+        contract_multiplier = float(request.extras.get("contract_multiplier", 1.0))
+        quantity_step = float(request.extras.get("quantity_step", 0.0))
+        min_quantity = float(request.extras.get("min_quantity", 0.0))
+        fixed_fee_per_contract = float(request.fee_model.get("fixed_fee_per_contract", 0.0))
         funding_rate_per_bar = float(request.fee_model.get("funding_rate_per_bar", 0.0))
         if "funding_bps_per_bar" in request.fee_model:
             funding_rate_per_bar = float(request.fee_model["funding_bps_per_bar"]) / 10_000.0
@@ -116,6 +126,10 @@ class NumbaBacktestRunner:
             impact_slippage_bps,
             funding_rate_per_bar,
             max_bar_volume_fraction,
+            contract_multiplier,
+            quantity_step,
+            min_quantity,
+            fixed_fee_per_contract,
         )
 
         trade_rows = self._build_trade_rows(
@@ -178,9 +192,13 @@ class NumbaBacktestRunner:
                 "liquidity_model": {
                     "max_bar_volume_fraction": max_bar_volume_fraction,
                     "quote_volume_used": True,
+                    "contract_multiplier": contract_multiplier,
+                    "quantity_step": quantity_step,
+                    "min_quantity": min_quantity,
                 },
                 "fee_model": {
                     "taker_fee_bps": taker_fee_bps,
+                    "fixed_fee_per_contract": fixed_fee_per_contract,
                     "funding_rate_per_bar": funding_rate_per_bar,
                     "total_funding_fees": float(np.sum(funding_fee_values)),
                 },
@@ -204,6 +222,8 @@ class NumbaBacktestRunner:
             "donchian_breakout",
             "macd_trend_follow",
             "moving_average_cross",
+            "oi_funding_breakout",
+            "liquidation_reversal",
             "price_moving_average",
             "rsi_reversion",
             "multi_timeframe_ma_spread",
@@ -239,6 +259,42 @@ class NumbaBacktestRunner:
             ],
             dtype=np.float64,
         )
+        oi_change_bps = np.asarray(
+            [
+                float(bar.extras.get("oi_change_bps"))
+                if bar.extras.get("oi_change_bps") is not None
+                else np.nan
+                for bar in bars
+            ],
+            dtype=np.float64,
+        )
+        funding_rate_bps = np.asarray(
+            [
+                float(bar.extras.get("funding_rate_bps"))
+                if bar.extras.get("funding_rate_bps") is not None
+                else np.nan
+                for bar in bars
+            ],
+            dtype=np.float64,
+        )
+        long_liq_notional_usd = np.asarray(
+            [
+                float(bar.extras.get("long_liq_notional_usd"))
+                if bar.extras.get("long_liq_notional_usd") is not None
+                else 0.0
+                for bar in bars
+            ],
+            dtype=np.float64,
+        )
+        short_liq_notional_usd = np.asarray(
+            [
+                float(bar.extras.get("short_liq_notional_usd"))
+                if bar.extras.get("short_liq_notional_usd") is not None
+                else 0.0
+                for bar in bars
+            ],
+            dtype=np.float64,
+        )
         return EncodedSeries(
             timestamps=timestamps,
             open_times=open_times,
@@ -248,6 +304,10 @@ class NumbaBacktestRunner:
             closes=closes,
             volumes=volumes,
             quote_volumes=quote_volumes,
+            oi_change_bps=oi_change_bps,
+            funding_rate_bps=funding_rate_bps,
+            long_liq_notional_usd=long_liq_notional_usd,
+            short_liq_notional_usd=short_liq_notional_usd,
         )
 
     def _build_signal_targets(
@@ -266,6 +326,26 @@ class NumbaBacktestRunner:
                 primary_series.lows,
                 int(raw_config["lookback_window"]),
                 float(raw_config.get("breakout_buffer_bps", 0.0)),
+            )
+        if strategy_id == "oi_funding_breakout":
+            return oi_funding_breakout_target_updates(
+                primary_series.closes,
+                primary_series.highs,
+                primary_series.lows,
+                primary_series.oi_change_bps,
+                primary_series.funding_rate_bps,
+                int(raw_config["lookback_window"]),
+                float(raw_config.get("breakout_buffer_bps", 0.0)),
+                float(raw_config.get("oi_threshold_bps", 0.0)),
+                float(raw_config.get("max_funding_rate_bps", 100.0)),
+            )
+        if strategy_id == "liquidation_reversal":
+            return liquidation_reversal_target_updates(
+                primary_series.long_liq_notional_usd,
+                primary_series.short_liq_notional_usd,
+                float(raw_config.get("long_liquidation_threshold_usd", 100_000.0)),
+                float(raw_config.get("short_liquidation_threshold_usd", 100_000.0)),
+                float(raw_config.get("liquidation_imbalance_ratio", 0.60)),
             )
         if strategy_id == "adx_trend_strength":
             return adx_trend_strength_target_updates(

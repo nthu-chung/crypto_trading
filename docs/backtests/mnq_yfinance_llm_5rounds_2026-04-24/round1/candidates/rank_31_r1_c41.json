@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c41",
+  "strategy": "atr_breakout",
+  "params": {
+    "ma_period": 34,
+    "atr_period": 14,
+    "atr_multiplier": 2.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -1.9961986804307683,
+  "total_return": -0.0505602960700127,
+  "max_drawdown": 0.08821619221356432,
+  "trade_count": 239,
+  "signal_count": 851,
+  "final_equity": 94943.97039299873,
+  "win_rate": 0.31277533039647576,
+  "rank": 31,
+  "selected_for_next_round": false
+}

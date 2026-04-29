@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r2_c43",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 21,
+    "slow_window": 40,
+    "entry_threshold": 0.001
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c06"
+  ],
+  "sharpe_ratio": 3.5433030679251414,
+  "total_return": 0.08423013257633749,
+  "max_drawdown": 0.04232071662301819,
+  "trade_count": 130,
+  "signal_count": 4603,
+  "final_equity": 108423.01325763375,
+  "win_rate": 0.375,
+  "rank": 10,
+  "selected_for_next_round": false
+}

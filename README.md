@@ -20,6 +20,25 @@ The current recommended path is:
 pip install cyqnt-trd
 ```
 
+The package supports Python `>=3.8,<3.12`, which includes Binance AI's Python `3.11.2`.
+
+For HTTPS requests, `cyqnt-trd` resolves the CA bundle in this order:
+
+1. `REQUESTS_CA_BUNDLE`
+2. `SSL_CERT_FILE`
+3. `CURL_CA_BUNDLE`
+4. Linux system CA bundle: `/etc/ssl/certs/ca-certificates.crt`
+5. `certifi`
+6. `requests` default verification behavior
+
+For special Linux deployments where Binance endpoints are signed by an internal CA that exists only in the
+system trust store, set the deployment CA bundle via environment variables, for example:
+
+```bash
+export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+```
+
 ### For development
 
 ```bash
@@ -113,17 +132,18 @@ The `standard_bot` mainline currently includes Numba-backed support for:
 
 Key dependencies include:
 
-- `pandas>=2.2.0`
-- `polars>=1.0,<2.0`
-- `numba>=0.60,<0.62`
-- `pyarrow>=16.1.0`
-- `requests>=2.32.0`
+- `pandas==2.3.3`
+- `polars==1.0.0`
+- `numba==0.60.0`
+- `pyarrow==21.0.0`
+- `requests==2.32.5`
 
 Binance SDK dependencies:
 
-- `binance-sdk-spot`
-- `binance-sdk-derivatives-trading-usds-futures`
-- `binance-sdk-algo`
+- `binance-sdk-spot==8.2.1`
+- `binance-sdk-derivatives-trading-usds-futures==10.0.1`
+- `binance-sdk-algo==2.6.0`
+- `binance-common==3.8.0`
 - `binance-common`
 
 ## License

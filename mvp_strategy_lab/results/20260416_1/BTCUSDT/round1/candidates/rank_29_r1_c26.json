@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r1_c26",
+  "strategy": "price_moving_average",
+  "params": {
+    "period": 13,
+    "entry_threshold": 0.001
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c06"
+  ],
+  "sharpe_ratio": -7.7483607939724815,
+  "total_return": -0.5460736694970901,
+  "max_drawdown": 0.5485424299492372,
+  "trade_count": 875,
+  "signal_count": 1122,
+  "final_equity": 4539.263305029099,
+  "win_rate": 0.30513595166163143,
+  "rank": 29,
+  "selected_for_next_round": false
+}

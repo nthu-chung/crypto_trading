@@ -14,6 +14,7 @@ import requests
 
 from .alignment import timeframe_to_ms
 from .historical import build_history_path, ensure_pyarrow_available
+from ._ssl_utils import resolve_ca_bundle
 from .adapters import _FUTURES_KLINES_URL, _SPOT_KLINES_URL
 
 try:
@@ -179,6 +180,11 @@ class HistoricalBinanceDownloader:
             "limit": int(self.chunk_limit),
         }
         session = self.session or requests
-        response = session.get(self.base_url, params=params, timeout=self.timeout)
+        response = session.get(
+            self.base_url,
+            params=params,
+            timeout=self.timeout,
+            verify=resolve_ca_bundle(),
+        )
         response.raise_for_status()
         return response.json()

@@ -1,0 +1,19 @@
+{
+  "candidate_id": "r1_c36",
+  "strategy": "adx_trend_strength",
+  "params": {
+    "period": 14,
+    "adx_threshold": 25.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -6.1793413700654,
+  "total_return": -0.1164857796090102,
+  "max_drawdown": 0.11858180862642721,
+  "trade_count": 802,
+  "signal_count": 956,
+  "final_equity": 88351.42203909898,
+  "win_rate": 0.3525,
+  "rank": 50,
+  "selected_for_next_round": false
+}

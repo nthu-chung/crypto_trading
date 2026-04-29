@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r3_c12",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 20,
+    "slow_window": 85,
+    "entry_threshold": 0.0015
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r2_c35"
+  ],
+  "sharpe_ratio": -1.9564971440571164,
+  "total_return": -0.22960741402173662,
+  "max_drawdown": 0.33895589936320486,
+  "trade_count": 765,
+  "signal_count": 19354,
+  "final_equity": 7703.925859782634,
+  "win_rate": 0.2713178294573643,
+  "rank": 33,
+  "selected_for_next_round": true
+}

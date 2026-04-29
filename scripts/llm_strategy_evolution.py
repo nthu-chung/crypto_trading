@@ -39,7 +39,7 @@ if str(REPO_ROOT) not in sys.path:
 from cyqnt_trd.standard_bot.core import BacktestRequest, MarketQuery, TimeRange
 from cyqnt_trd.standard_bot.data.alignment import timeframe_to_ms
 from cyqnt_trd.standard_bot.data.historical import HistoricalParquetMarketDataAdapter, build_history_path, parquet_time_coverage
-from cyqnt_trd.standard_bot.entrypoints.common import build_strategy_pipeline
+from cyqnt_trd.standard_bot.entrypoints.common import build_strategy_pipeline, infer_contract_multiplier
 from cyqnt_trd.standard_bot.simulation import NumbaBacktestRunner
 
 
@@ -86,7 +86,7 @@ def candidate_result_from_dict(payload: Dict) -> CandidateResult:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="LLM-style strategy evolution over standard_bot numba backtests")
     parser.add_argument("--symbol", default="BTCUSDT")
-    parser.add_argument("--market-type", choices=["spot", "futures"], default="futures")
+    parser.add_argument("--market-type", choices=["spot", "futures", "cme"], default="futures")
     parser.add_argument("--primary-timeframe", default="5m")
     parser.add_argument("--secondary-timeframe", default="1h")
     parser.add_argument("--historical-dir", default="data/mtf_90d")
@@ -96,9 +96,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--family-cap", type=int, default=5)
     parser.add_argument("--initial-capital", type=float, default=10_000.0)
     parser.add_argument("--taker-fee-bps", type=float, default=10.0)
+    parser.add_argument("--fixed-fee-per-contract", type=float, default=0.0)
     parser.add_argument("--slippage-bps", type=float, default=0.0)
     parser.add_argument("--impact-slippage-bps", type=float, default=0.0)
     parser.add_argument("--max-bar-volume-fraction", type=float, default=0.10)
+    parser.add_argument("--contract-multiplier", type=float, default=None)
+    parser.add_argument("--quantity-step", type=float, default=0.0)
+    parser.add_argument("--min-quantity", type=float, default=0.0)
+    parser.add_argument("--resample-source-timeframe", default="1m")
     parser.add_argument("--seed", type=int, default=20260416)
     parser.add_argument("--seed-json", default=None)
     parser.add_argument("--seed-round", default="final", help="Use 'final' or a 1-based round number from --seed-json")
@@ -112,24 +117,56 @@ def build_parser() -> argparse.ArgumentParser:
 
 def base_seed_candidates() -> List[StrategyCandidate]:
     return [
-        StrategyCandidate("r1_c01", "moving_average_cross", {"fast_window": 5, "slow_window": 20, "entry_threshold": 0.0}, "seed"),
-        StrategyCandidate("r1_c02", "moving_average_cross", {"fast_window": 10, "slow_window": 40, "entry_threshold": 0.0005}, "seed"),
-        StrategyCandidate("r1_c03", "moving_average_cross", {"fast_window": 20, "slow_window": 80, "entry_threshold": 0.0010}, "seed"),
-        StrategyCandidate("r1_c04", "rsi_reversion", {"period": 7, "oversold": 25.0, "overbought": 75.0}, "seed"),
-        StrategyCandidate("r1_c05", "rsi_reversion", {"period": 14, "oversold": 30.0, "overbought": 70.0}, "seed"),
-        StrategyCandidate("r1_c06", "price_moving_average", {"period": 10, "entry_threshold": 0.0005}, "seed"),
-        StrategyCandidate("r1_c07", "multi_timeframe_ma_spread", {"primary_ma_period": 10, "reference_ma_period": 20, "spread_threshold_bps": 0.0}, "seed"),
-        StrategyCandidate("r1_c08", "multi_timeframe_ma_spread", {"primary_ma_period": 20, "reference_ma_period": 50, "spread_threshold_bps": 20.0}, "seed"),
-        StrategyCandidate("r1_c09", "donchian_breakout", {"lookback_window": 20, "breakout_buffer_bps": 0.0}, "seed"),
-        StrategyCandidate("r1_c10", "donchian_breakout", {"lookback_window": 55, "breakout_buffer_bps": 10.0}, "seed"),
-        StrategyCandidate("r1_c11", "adx_trend_strength", {"period": 14, "adx_threshold": 25.0}, "seed"),
-        StrategyCandidate("r1_c12", "adx_trend_strength", {"period": 20, "adx_threshold": 30.0}, "seed"),
-        StrategyCandidate("r1_c13", "atr_breakout", {"ma_period": 20, "atr_period": 14, "atr_multiplier": 1.5}, "seed"),
-        StrategyCandidate("r1_c14", "atr_breakout", {"ma_period": 50, "atr_period": 14, "atr_multiplier": 2.5}, "seed"),
-        StrategyCandidate("r1_c15", "bollinger_mean_reversion", {"period": 20, "stddev_multiplier": 2.0}, "seed"),
-        StrategyCandidate("r1_c16", "bollinger_mean_reversion", {"period": 30, "stddev_multiplier": 2.5}, "seed"),
-        StrategyCandidate("r1_c17", "macd_trend_follow", {"fast_period": 12, "slow_period": 26, "signal_period": 9, "histogram_threshold": 0.0}, "seed"),
-        StrategyCandidate("r1_c18", "macd_trend_follow", {"fast_period": 8, "slow_period": 21, "signal_period": 5, "histogram_threshold": 0.0005}, "seed"),
+        StrategyCandidate("r1_c01", "moving_average_cross", {"fast_window": 3, "slow_window": 9, "entry_threshold": 0.0}, "seed"),
+        StrategyCandidate("r1_c02", "moving_average_cross", {"fast_window": 5, "slow_window": 13, "entry_threshold": 0.0}, "seed"),
+        StrategyCandidate("r1_c03", "moving_average_cross", {"fast_window": 8, "slow_window": 21, "entry_threshold": 0.0}, "seed"),
+        StrategyCandidate("r1_c04", "moving_average_cross", {"fast_window": 10, "slow_window": 30, "entry_threshold": 0.0002}, "seed"),
+        StrategyCandidate("r1_c05", "moving_average_cross", {"fast_window": 13, "slow_window": 34, "entry_threshold": 0.0003}, "seed"),
+        StrategyCandidate("r1_c06", "moving_average_cross", {"fast_window": 20, "slow_window": 50, "entry_threshold": 0.0005}, "seed"),
+        StrategyCandidate("r1_c07", "moving_average_cross", {"fast_window": 34, "slow_window": 89, "entry_threshold": 0.0005}, "seed"),
+        StrategyCandidate("r1_c08", "moving_average_cross", {"fast_window": 5, "slow_window": 34, "entry_threshold": 0.0010}, "seed"),
+        StrategyCandidate("r1_c09", "price_moving_average", {"period": 8, "entry_threshold": 0.0002}, "seed"),
+        StrategyCandidate("r1_c10", "price_moving_average", {"period": 13, "entry_threshold": 0.0003}, "seed"),
+        StrategyCandidate("r1_c11", "price_moving_average", {"period": 21, "entry_threshold": 0.0005}, "seed"),
+        StrategyCandidate("r1_c12", "price_moving_average", {"period": 34, "entry_threshold": 0.0005}, "seed"),
+        StrategyCandidate("r1_c13", "price_moving_average", {"period": 55, "entry_threshold": 0.0010}, "seed"),
+        StrategyCandidate("r1_c14", "rsi_reversion", {"period": 5, "oversold": 20.0, "overbought": 80.0}, "seed"),
+        StrategyCandidate("r1_c15", "rsi_reversion", {"period": 7, "oversold": 25.0, "overbought": 75.0}, "seed"),
+        StrategyCandidate("r1_c16", "rsi_reversion", {"period": 9, "oversold": 30.0, "overbought": 70.0}, "seed"),
+        StrategyCandidate("r1_c17", "rsi_reversion", {"period": 14, "oversold": 30.0, "overbought": 70.0}, "seed"),
+        StrategyCandidate("r1_c18", "rsi_reversion", {"period": 14, "oversold": 35.0, "overbought": 65.0}, "seed"),
+        StrategyCandidate("r1_c19", "rsi_reversion", {"period": 21, "oversold": 30.0, "overbought": 70.0}, "seed"),
+        StrategyCandidate("r1_c20", "multi_timeframe_ma_spread", {"primary_ma_period": 5, "reference_ma_period": 5, "spread_threshold_bps": 0.0}, "seed"),
+        StrategyCandidate("r1_c21", "multi_timeframe_ma_spread", {"primary_ma_period": 8, "reference_ma_period": 8, "spread_threshold_bps": 2.0}, "seed"),
+        StrategyCandidate("r1_c22", "multi_timeframe_ma_spread", {"primary_ma_period": 10, "reference_ma_period": 10, "spread_threshold_bps": 5.0}, "seed"),
+        StrategyCandidate("r1_c23", "multi_timeframe_ma_spread", {"primary_ma_period": 13, "reference_ma_period": 13, "spread_threshold_bps": 5.0}, "seed"),
+        StrategyCandidate("r1_c24", "multi_timeframe_ma_spread", {"primary_ma_period": 20, "reference_ma_period": 20, "spread_threshold_bps": 10.0}, "seed"),
+        StrategyCandidate("r1_c25", "multi_timeframe_ma_spread", {"primary_ma_period": 5, "reference_ma_period": 20, "spread_threshold_bps": 0.0}, "seed"),
+        StrategyCandidate("r1_c26", "multi_timeframe_ma_spread", {"primary_ma_period": 8, "reference_ma_period": 21, "spread_threshold_bps": 2.0}, "seed"),
+        StrategyCandidate("r1_c27", "multi_timeframe_ma_spread", {"primary_ma_period": 20, "reference_ma_period": 34, "spread_threshold_bps": 10.0}, "seed"),
+        StrategyCandidate("r1_c28", "donchian_breakout", {"lookback_window": 10, "breakout_buffer_bps": 0.0}, "seed"),
+        StrategyCandidate("r1_c29", "donchian_breakout", {"lookback_window": 20, "breakout_buffer_bps": 0.0}, "seed"),
+        StrategyCandidate("r1_c30", "donchian_breakout", {"lookback_window": 30, "breakout_buffer_bps": 5.0}, "seed"),
+        StrategyCandidate("r1_c31", "donchian_breakout", {"lookback_window": 55, "breakout_buffer_bps": 10.0}, "seed"),
+        StrategyCandidate("r1_c32", "donchian_breakout", {"lookback_window": 80, "breakout_buffer_bps": 10.0}, "seed"),
+        StrategyCandidate("r1_c33", "donchian_breakout", {"lookback_window": 120, "breakout_buffer_bps": 20.0}, "seed"),
+        StrategyCandidate("r1_c34", "adx_trend_strength", {"period": 7, "adx_threshold": 18.0}, "seed"),
+        StrategyCandidate("r1_c35", "adx_trend_strength", {"period": 14, "adx_threshold": 22.0}, "seed"),
+        StrategyCandidate("r1_c36", "adx_trend_strength", {"period": 14, "adx_threshold": 25.0}, "seed"),
+        StrategyCandidate("r1_c37", "adx_trend_strength", {"period": 20, "adx_threshold": 30.0}, "seed"),
+        StrategyCandidate("r1_c38", "adx_trend_strength", {"period": 28, "adx_threshold": 35.0}, "seed"),
+        StrategyCandidate("r1_c39", "atr_breakout", {"ma_period": 10, "atr_period": 7, "atr_multiplier": 1.0}, "seed"),
+        StrategyCandidate("r1_c40", "atr_breakout", {"ma_period": 20, "atr_period": 14, "atr_multiplier": 1.5}, "seed"),
+        StrategyCandidate("r1_c41", "atr_breakout", {"ma_period": 34, "atr_period": 14, "atr_multiplier": 2.0}, "seed"),
+        StrategyCandidate("r1_c42", "atr_breakout", {"ma_period": 50, "atr_period": 21, "atr_multiplier": 2.5}, "seed"),
+        StrategyCandidate("r1_c43", "atr_breakout", {"ma_period": 80, "atr_period": 21, "atr_multiplier": 3.0}, "seed"),
+        StrategyCandidate("r1_c44", "bollinger_mean_reversion", {"period": 10, "stddev_multiplier": 1.5}, "seed"),
+        StrategyCandidate("r1_c45", "bollinger_mean_reversion", {"period": 20, "stddev_multiplier": 2.0}, "seed"),
+        StrategyCandidate("r1_c46", "bollinger_mean_reversion", {"period": 30, "stddev_multiplier": 2.5}, "seed"),
+        StrategyCandidate("r1_c47", "bollinger_mean_reversion", {"period": 50, "stddev_multiplier": 3.0}, "seed"),
+        StrategyCandidate("r1_c48", "macd_trend_follow", {"fast_period": 8, "slow_period": 21, "signal_period": 5, "histogram_threshold": 0.0}, "seed"),
+        StrategyCandidate("r1_c49", "macd_trend_follow", {"fast_period": 12, "slow_period": 26, "signal_period": 9, "histogram_threshold": 0.0}, "seed"),
+        StrategyCandidate("r1_c50", "macd_trend_follow", {"fast_period": 16, "slow_period": 39, "signal_period": 9, "histogram_threshold": 0.0002}, "seed"),
     ]
 
 
@@ -402,7 +439,7 @@ def build_population_from_survivors(
     return population
 
 
-def compute_win_rate(trades: Sequence[dict]) -> float | None:
+def compute_win_rate(trades: Sequence[dict], *, contract_multiplier: float = 1.0) -> float | None:
     if not trades:
         return None
     closed = []
@@ -426,9 +463,9 @@ def compute_win_rate(trades: Sequence[dict]) -> float | None:
         quantity = float(exit_trade["quantity"])
         fees = float(entry.get("fee", 0.0)) + float(exit_trade.get("fee", 0.0))
         if entry["side"] == "buy":
-            pnl = (exit_price - entry_price) * quantity - fees
+            pnl = (exit_price - entry_price) * quantity * contract_multiplier - fees
         else:
-            pnl = (entry_price - exit_price) * quantity - fees
+            pnl = (entry_price - exit_price) * quantity * contract_multiplier - fees
         if pnl > 0:
             wins += 1
     return wins / len(closed)
@@ -444,9 +481,14 @@ def create_request(
     end_ts: int,
     initial_capital: float,
     taker_fee_bps: float,
+    fixed_fee_per_contract: float,
     slippage_bps: float,
     impact_slippage_bps: float,
     max_bar_volume_fraction: float,
+    market_type: str,
+    contract_multiplier: float,
+    quantity_step: float,
+    min_quantity: float,
 ) -> BacktestRequest:
     pipeline = build_strategy_pipeline(
         strategy=candidate.strategy,
@@ -488,6 +530,7 @@ def create_request(
         fee_model={
             "commission_bps": taker_fee_bps,
             "taker_fee_bps": taker_fee_bps,
+            "fixed_fee_per_contract": fixed_fee_per_contract,
             "funding_bps_per_bar": 0.0,
         },
         slippage_model={
@@ -495,7 +538,14 @@ def create_request(
             "impact_slippage_bps": impact_slippage_bps,
             "max_bar_volume_fraction": max_bar_volume_fraction,
         },
-        extras={"engine": "numba", "experiment": "llm_strategy_evolution"},
+        extras={
+            "engine": "numba",
+            "experiment": "llm_strategy_evolution",
+            "market_type": market_type,
+            "contract_multiplier": contract_multiplier,
+            "quantity_step": quantity_step,
+            "min_quantity": min_quantity,
+        },
     )
 
 
@@ -709,27 +759,58 @@ def main() -> int:
     rng = random.Random(args.seed)
 
     data_root = Path(args.historical_dir)
-    history_path = build_history_path(str(data_root), args.market_type, args.symbol.upper(), "1m")
-    if not history_path.exists():
-        raise FileNotFoundError(f"missing local historical source: {history_path}")
-    start_ts, end_ts = parquet_time_coverage(history_path)
-    if start_ts is None or end_ts is None:
-        raise RuntimeError(f"unable to determine parquet coverage for {history_path}")
-    safe_query_start_ts = int(start_ts) + max(
+    direct_paths = [
+        build_history_path(str(data_root), args.market_type, args.symbol.upper(), args.primary_timeframe),
+        build_history_path(str(data_root), args.market_type, args.symbol.upper(), args.secondary_timeframe),
+    ]
+    history_paths: List[str] = []
+    if all(path.exists() for path in direct_paths):
+        coverages = []
+        for path in direct_paths:
+            start_ts, end_ts = parquet_time_coverage(path)
+            if start_ts is None or end_ts is None:
+                raise RuntimeError(f"unable to determine parquet coverage for {path}")
+            coverages.append((int(start_ts), int(end_ts)))
+            history_paths.append(str(path))
+        query_start_ts = max(start for start, _ in coverages)
+        query_end_ts = min(end for _, end in coverages)
+    else:
+        source_path = build_history_path(
+            str(data_root),
+            args.market_type,
+            args.symbol.upper(),
+            args.resample_source_timeframe,
+        )
+        if not source_path.exists():
+            missing_direct = ", ".join(str(path) for path in direct_paths if not path.exists())
+            raise FileNotFoundError(
+                "missing direct bars (%s) and missing local resample source: %s"
+                % (missing_direct, source_path)
+            )
+        start_ts, end_ts = parquet_time_coverage(source_path)
+        if start_ts is None or end_ts is None:
+            raise RuntimeError(f"unable to determine parquet coverage for {source_path}")
+        query_start_ts = int(start_ts)
+        query_end_ts = int(end_ts)
+        history_paths.append(str(source_path))
+
+    safe_query_start_ts = int(query_start_ts) + max(
         timeframe_to_ms(args.primary_timeframe),
         timeframe_to_ms(args.secondary_timeframe),
     )
+    if safe_query_start_ts >= int(query_end_ts):
+        raise RuntimeError("not enough historical coverage after timeframe warmup buffer")
 
     adapter = HistoricalParquetMarketDataAdapter(
         data_root=str(data_root),
         market_type=args.market_type,
-        resample_source_timeframe="1m",
+        resample_source_timeframe=args.resample_source_timeframe,
     )
     market_bundle = adapter.fetch_market(
         MarketQuery(
             instruments=[args.symbol.upper()],
             timeframes=[args.primary_timeframe, args.secondary_timeframe],
-            time_range=TimeRange(start_ts=safe_query_start_ts, end_ts=int(end_ts)),
+            time_range=TimeRange(start_ts=safe_query_start_ts, end_ts=int(query_end_ts)),
         )
     )
 
@@ -741,6 +822,11 @@ def main() -> int:
     backtest_start_ts = int(primary_bars[0].timestamp)
     backtest_end_ts = int(primary_bars[-1].timestamp)
     runner = NumbaBacktestRunner()
+    contract_multiplier = (
+        float(args.contract_multiplier)
+        if args.contract_multiplier is not None
+        else infer_contract_multiplier(market_type=args.market_type, symbol=args.symbol.upper())
+    )
 
     seed_source = None
     if args.seed_json:
@@ -778,13 +864,18 @@ def main() -> int:
                 end_ts=backtest_end_ts,
                 initial_capital=args.initial_capital,
                 taker_fee_bps=args.taker_fee_bps,
+                fixed_fee_per_contract=args.fixed_fee_per_contract,
                 slippage_bps=args.slippage_bps,
                 impact_slippage_bps=args.impact_slippage_bps,
                 max_bar_volume_fraction=args.max_bar_volume_fraction,
+                market_type=args.market_type,
+                contract_multiplier=contract_multiplier,
+                quantity_step=args.quantity_step,
+                min_quantity=args.min_quantity,
             )
             result = runner.run(request=request, market_bundle=market_bundle)
             trades = result.extras.get("trades", [])
-            win_rate = compute_win_rate(trades)
+            win_rate = compute_win_rate(trades, contract_multiplier=contract_multiplier)
             sharpe = float(result.metrics.get("sharpe_ratio", float("-inf")))
             if math.isnan(sharpe):
                 sharpe = float("-inf")
@@ -866,10 +957,14 @@ def main() -> int:
             "initial_capital": args.initial_capital,
             "family_cap": args.family_cap,
             "taker_fee_bps": args.taker_fee_bps,
+            "fixed_fee_per_contract": args.fixed_fee_per_contract,
             "slippage_bps": args.slippage_bps,
             "impact_slippage_bps": args.impact_slippage_bps,
             "max_bar_volume_fraction": args.max_bar_volume_fraction,
-            "history_path": str(history_path),
+            "contract_multiplier": contract_multiplier,
+            "quantity_step": args.quantity_step,
+            "min_quantity": args.min_quantity,
+            "history_paths": history_paths,
             "backtest_start_ts": backtest_start_ts,
             "backtest_end_ts": backtest_end_ts,
             "seed_source": seed_source,

@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r3_c10",
+  "strategy": "atr_breakout",
+  "params": {
+    "ma_period": 80,
+    "atr_period": 21,
+    "atr_multiplier": 3.0
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r2_c06"
+  ],
+  "sharpe_ratio": 2.6212850410658888,
+  "total_return": 0.07586735543520569,
+  "max_drawdown": 0.06963077224904618,
+  "trade_count": 110,
+  "signal_count": 520,
+  "final_equity": 107586.73554352057,
+  "win_rate": 0.35714285714285715,
+  "rank": 22,
+  "selected_for_next_round": true
+}

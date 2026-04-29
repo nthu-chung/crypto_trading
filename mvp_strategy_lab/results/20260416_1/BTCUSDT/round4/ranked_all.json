@@ -1,0 +1,1087 @@
+[
+  {
+    "candidate_id": "r4_c01",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 63,
+      "breakout_buffer_bps": 40.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c01"
+    ],
+    "sharpe_ratio": 3.6157153541194726,
+    "total_return": 0.5814126690951218,
+    "max_drawdown": 0.19190992439238105,
+    "trade_count": 95,
+    "signal_count": 101,
+    "final_equity": 15814.126690951218,
+    "win_rate": 0.5862068965517241,
+    "rank": 1,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c21",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 68,
+      "breakout_buffer_bps": 35.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c01"
+    ],
+    "sharpe_ratio": 3.089926478529085,
+    "total_return": 0.47270168347797953,
+    "max_drawdown": 0.22494478227691342,
+    "trade_count": 114,
+    "signal_count": 126,
+    "final_equity": 14727.016834779795,
+    "win_rate": 0.5263157894736842,
+    "rank": 2,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c42",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 60,
+      "breakout_buffer_bps": 40.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c41"
+    ],
+    "sharpe_ratio": 2.917190635921284,
+    "total_return": 0.4368975778662934,
+    "max_drawdown": 0.22953926077332318,
+    "trade_count": 97,
+    "signal_count": 103,
+    "final_equity": 14368.975778662934,
+    "win_rate": 0.5757575757575758,
+    "rank": 3,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c24",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 67,
+      "breakout_buffer_bps": 40.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c02"
+    ],
+    "sharpe_ratio": 2.909786875856755,
+    "total_return": 0.4357583784244252,
+    "max_drawdown": 0.2470503882790385,
+    "trade_count": 92,
+    "signal_count": 98,
+    "final_equity": 14357.583784244252,
+    "win_rate": 0.5172413793103449,
+    "rank": 4,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c02",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 58,
+      "breakout_buffer_bps": 40.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c41"
+    ],
+    "sharpe_ratio": 2.5582193750943087,
+    "total_return": 0.36790169386893173,
+    "max_drawdown": 0.22953926077332318,
+    "trade_count": 99,
+    "signal_count": 105,
+    "final_equity": 13679.016938689318,
+    "win_rate": 0.5428571428571428,
+    "rank": 5,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c03",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 55,
+      "breakout_buffer_bps": 40.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c46"
+    ],
+    "sharpe_ratio": 2.1396013528344615,
+    "total_return": 0.29152092309209493,
+    "max_drawdown": 0.2723631974525058,
+    "trade_count": 101,
+    "signal_count": 108,
+    "final_equity": 12915.20923092095,
+    "win_rate": 0.5135135135135135,
+    "rank": 6,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c04",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 65,
+      "breakout_buffer_bps": 30.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c02"
+    ],
+    "sharpe_ratio": 1.6962348232447384,
+    "total_return": 0.21587447446822572,
+    "max_drawdown": 0.27425308445984903,
+    "trade_count": 148,
+    "signal_count": 164,
+    "final_equity": 12158.744744682257,
+    "win_rate": 0.3877551020408163,
+    "rank": 7,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c30",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 55,
+      "breakout_buffer_bps": 35.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c05"
+    ],
+    "sharpe_ratio": 1.5319092488150094,
+    "total_return": 0.18828954736795842,
+    "max_drawdown": 0.2506439145836993,
+    "trade_count": 127,
+    "signal_count": 140,
+    "final_equity": 11882.895473679584,
+    "win_rate": 0.4583333333333333,
+    "rank": 8,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c05",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 23,
+      "reference_ma_period": 65,
+      "spread_threshold_bps": 70.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c23"
+    ],
+    "sharpe_ratio": 1.224429912924978,
+    "total_return": 0.13259959899725637,
+    "max_drawdown": 0.26447034938556047,
+    "trade_count": 83,
+    "signal_count": 91,
+    "final_equity": 11325.995989972564,
+    "win_rate": 0.36363636363636365,
+    "rank": 9,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c22",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 60,
+      "breakout_buffer_bps": 45.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c41"
+    ],
+    "sharpe_ratio": 1.1702323524054614,
+    "total_return": 0.13049874399494055,
+    "max_drawdown": 0.23250761952988788,
+    "trade_count": 72,
+    "signal_count": 76,
+    "final_equity": 11304.987439949406,
+    "win_rate": 0.4482758620689655,
+    "rank": 10,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c47",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 21,
+      "reference_ma_period": 57,
+      "spread_threshold_bps": 80.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c24"
+    ],
+    "sharpe_ratio": 1.1326501811187892,
+    "total_return": 0.11965967453869034,
+    "max_drawdown": 0.22571049175942726,
+    "trade_count": 91,
+    "signal_count": 109,
+    "final_equity": 11196.596745386903,
+    "win_rate": 0.45161290322580644,
+    "rank": 11,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c45",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 18,
+      "reference_ma_period": 60,
+      "spread_threshold_bps": 90.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c23"
+    ],
+    "sharpe_ratio": 1.1175926058722512,
+    "total_return": 0.1174749975027562,
+    "max_drawdown": 0.2467804531780872,
+    "trade_count": 90,
+    "signal_count": 109,
+    "final_equity": 11174.749975027562,
+    "win_rate": 0.3793103448275862,
+    "rank": 12,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c41",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 53,
+      "breakout_buffer_bps": 45.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c01"
+    ],
+    "sharpe_ratio": 1.0730979006250816,
+    "total_return": 0.11545818845565954,
+    "max_drawdown": 0.24271860988768695,
+    "trade_count": 75,
+    "signal_count": 80,
+    "final_equity": 11154.581884556595,
+    "win_rate": 0.4482758620689655,
+    "rank": 13,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c26",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 19,
+      "reference_ma_period": 68,
+      "spread_threshold_bps": 70.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c03"
+    ],
+    "sharpe_ratio": 0.938289501258051,
+    "total_return": 0.09143268419961041,
+    "max_drawdown": 0.28625684370279564,
+    "trade_count": 81,
+    "signal_count": 92,
+    "final_equity": 10914.326841996104,
+    "win_rate": 0.3939393939393939,
+    "rank": 14,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c50",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 67,
+      "breakout_buffer_bps": 15.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c05"
+    ],
+    "sharpe_ratio": 0.8871103721164733,
+    "total_return": 0.08759810012191083,
+    "max_drawdown": 0.19745589194596785,
+    "trade_count": 310,
+    "signal_count": 351,
+    "final_equity": 10875.981001219108,
+    "win_rate": 0.37373737373737376,
+    "rank": 15,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c06",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 22,
+      "reference_ma_period": 70,
+      "spread_threshold_bps": 50.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c03"
+    ],
+    "sharpe_ratio": 0.811263791578187,
+    "total_return": 0.07356122768358073,
+    "max_drawdown": 0.3050892699561412,
+    "trade_count": 74,
+    "signal_count": 80,
+    "final_equity": 10735.612276835807,
+    "win_rate": 0.3939393939393939,
+    "rank": 16,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c46",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 17,
+      "reference_ma_period": 75,
+      "spread_threshold_bps": 55.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c03"
+    ],
+    "sharpe_ratio": 0.7705241273701792,
+    "total_return": 0.06784069350723039,
+    "max_drawdown": 0.31918028852374264,
+    "trade_count": 77,
+    "signal_count": 87,
+    "final_equity": 10678.406935072304,
+    "win_rate": 0.3142857142857143,
+    "rank": 17,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c27",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 21,
+      "reference_ma_period": 57,
+      "spread_threshold_bps": 60.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c24"
+    ],
+    "sharpe_ratio": 0.6062362926026273,
+    "total_return": 0.045487888245385695,
+    "max_drawdown": 0.21596704835771957,
+    "trade_count": 91,
+    "signal_count": 95,
+    "final_equity": 10454.878882453857,
+    "win_rate": 0.41025641025641024,
+    "rank": 18,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c07",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 24,
+      "reference_ma_period": 62,
+      "spread_threshold_bps": 60.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c24"
+    ],
+    "sharpe_ratio": 0.5604562912552619,
+    "total_return": 0.03928619019986163,
+    "max_drawdown": 0.24655754344774494,
+    "trade_count": 79,
+    "signal_count": 83,
+    "final_equity": 10392.861901998616,
+    "win_rate": 0.358974358974359,
+    "rank": 19,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c08",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 10,
+      "reference_ma_period": 27,
+      "spread_threshold_bps": 30.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c50"
+    ],
+    "sharpe_ratio": 0.4289073817696517,
+    "total_return": 0.021591385322660788,
+    "max_drawdown": 0.20171890468785902,
+    "trade_count": 227,
+    "signal_count": 237,
+    "final_equity": 10215.913853226608,
+    "win_rate": 0.31313131313131315,
+    "rank": 20,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c09",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 25,
+      "reference_ma_period": 60,
+      "spread_threshold_bps": 40.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c04"
+    ],
+    "sharpe_ratio": 0.3007702010944979,
+    "total_return": 0.00490207181575588,
+    "max_drawdown": 0.23818100984807755,
+    "trade_count": 79,
+    "signal_count": 80,
+    "final_equity": 10049.020718157559,
+    "win_rate": 0.3617021276595745,
+    "rank": 21,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c25",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 22,
+      "reference_ma_period": 75,
+      "spread_threshold_bps": 60.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c23"
+    ],
+    "sharpe_ratio": 0.2755735716580473,
+    "total_return": 0.001738009052770758,
+    "max_drawdown": 0.33917912281816015,
+    "trade_count": 71,
+    "signal_count": 76,
+    "final_equity": 10017.380090527708,
+    "win_rate": 0.3225806451612903,
+    "rank": 22,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c10",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 57,
+      "breakout_buffer_bps": 15.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c05"
+    ],
+    "sharpe_ratio": 0.24725689352741984,
+    "total_return": -0.004669221828963237,
+    "max_drawdown": 0.2758633182320758,
+    "trade_count": 338,
+    "signal_count": 380,
+    "final_equity": 9953.307781710368,
+    "win_rate": 0.3391304347826087,
+    "rank": 23,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c44",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 55,
+      "breakout_buffer_bps": 30.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c02"
+    ],
+    "sharpe_ratio": 0.09918165963675594,
+    "total_return": -0.02468597771127097,
+    "max_drawdown": 0.3294090965892939,
+    "trade_count": 164,
+    "signal_count": 177,
+    "final_equity": 9753.14022288729,
+    "win_rate": 0.36065573770491804,
+    "rank": 24,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c32",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 23,
+      "slow_window": 120,
+      "entry_threshold": 0.004
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c31"
+    ],
+    "sharpe_ratio": -0.0640217876220586,
+    "total_return": -0.022015492488221208,
+    "max_drawdown": 0.13648542355512291,
+    "trade_count": 284,
+    "signal_count": 12237,
+    "final_equity": 9779.845075117788,
+    "win_rate": 0.30357142857142855,
+    "rank": 25,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c23",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 65,
+      "breakout_buffer_bps": 50.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c46"
+    ],
+    "sharpe_ratio": -0.17082750595156224,
+    "total_return": -0.059924746581774886,
+    "max_drawdown": 0.40466572480487595,
+    "trade_count": 56,
+    "signal_count": 63,
+    "final_equity": 9400.752534182251,
+    "win_rate": 0.21739130434782608,
+    "rank": 26,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c43",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 60,
+      "breakout_buffer_bps": 50.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c46"
+    ],
+    "sharpe_ratio": -0.4015154911701674,
+    "total_return": -0.08963182274112641,
+    "max_drawdown": 0.3678816288154664,
+    "trade_count": 59,
+    "signal_count": 66,
+    "final_equity": 9103.681772588736,
+    "win_rate": 0.24,
+    "rank": 27,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c29",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 24,
+      "reference_ma_period": 50,
+      "spread_threshold_bps": 60.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c04"
+    ],
+    "sharpe_ratio": -0.42832825726668017,
+    "total_return": -0.08592842765808728,
+    "max_drawdown": 0.3183705535223932,
+    "trade_count": 99,
+    "signal_count": 103,
+    "final_equity": 9140.715723419127,
+    "win_rate": 0.35555555555555557,
+    "rank": 28,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c34",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 21,
+      "slow_window": 125,
+      "entry_threshold": 0.0025
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c33"
+    ],
+    "sharpe_ratio": -0.5502186135465702,
+    "total_return": -0.062024735892578245,
+    "max_drawdown": 0.13543330453838515,
+    "trade_count": 370,
+    "signal_count": 16684,
+    "final_equity": 9379.752641074218,
+    "win_rate": 0.32432432432432434,
+    "rank": 29,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c49",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 20,
+      "reference_ma_period": 62,
+      "spread_threshold_bps": 35.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c04"
+    ],
+    "sharpe_ratio": -0.7316986941497183,
+    "total_return": -0.12069177853115307,
+    "max_drawdown": 0.3648807003021628,
+    "trade_count": 103,
+    "signal_count": 105,
+    "final_equity": 8793.08221468847,
+    "win_rate": 0.3333333333333333,
+    "rank": 30,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c33",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 20,
+      "slow_window": 100,
+      "entry_threshold": 0.004
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c32"
+    ],
+    "sharpe_ratio": -0.8245532451713883,
+    "total_return": -0.08742422148345777,
+    "max_drawdown": 0.1514066855753048,
+    "trade_count": 319,
+    "signal_count": 11221,
+    "final_equity": 9125.757785165422,
+    "win_rate": 0.328125,
+    "rank": 31,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c11",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 19,
+      "oversold": 25.0,
+      "overbought": 77.5
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c35"
+    ],
+    "sharpe_ratio": -1.0403452459940041,
+    "total_return": -0.1341280229457925,
+    "max_drawdown": 0.3513981195262521,
+    "trade_count": 333,
+    "signal_count": 1220,
+    "final_equity": 8658.719770542075,
+    "win_rate": 0.6025641025641025,
+    "rank": 32,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c12",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 20,
+      "slow_window": 115,
+      "entry_threshold": 0.0035
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c31"
+    ],
+    "sharpe_ratio": -1.221521847726847,
+    "total_return": -0.11835642049616527,
+    "max_drawdown": 0.17838204855178155,
+    "trade_count": 335,
+    "signal_count": 13390,
+    "final_equity": 8816.435795038347,
+    "win_rate": 0.3283582089552239,
+    "rank": 33,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c48",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 13,
+      "reference_ma_period": 29,
+      "spread_threshold_bps": 35.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c50"
+    ],
+    "sharpe_ratio": -1.364723364730784,
+    "total_return": -0.1924766827257683,
+    "max_drawdown": 0.33098828636224215,
+    "trade_count": 185,
+    "signal_count": 194,
+    "final_equity": 8075.233172742317,
+    "win_rate": 0.2967032967032967,
+    "rank": 34,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c28",
+    "strategy": "multi_timeframe_ma_spread",
+    "params": {
+      "primary_ma_period": 9,
+      "reference_ma_period": 32,
+      "spread_threshold_bps": 30.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c50"
+    ],
+    "sharpe_ratio": -1.374255671369125,
+    "total_return": -0.193384649408125,
+    "max_drawdown": 0.3198367873739539,
+    "trade_count": 218,
+    "signal_count": 223,
+    "final_equity": 8066.15350591875,
+    "win_rate": 0.26732673267326734,
+    "rank": 35,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c13",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 22,
+      "slow_window": 105,
+      "entry_threshold": 0.003
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c32"
+    ],
+    "sharpe_ratio": -1.4309873952680032,
+    "total_return": -0.1355429151942746,
+    "max_drawdown": 0.2023042510610612,
+    "trade_count": 369,
+    "signal_count": 13900,
+    "final_equity": 8644.570848057254,
+    "win_rate": 0.273972602739726,
+    "rank": 36,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c35",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 21,
+      "slow_window": 95,
+      "entry_threshold": 0.0035
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c11"
+    ],
+    "sharpe_ratio": -1.6377294519932635,
+    "total_return": -0.15189163431279684,
+    "max_drawdown": 0.20246393387311262,
+    "trade_count": 364,
+    "signal_count": 11910,
+    "final_equity": 8481.083656872031,
+    "win_rate": 0.3055555555555556,
+    "rank": 37,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c14",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 20,
+      "slow_window": 110,
+      "entry_threshold": 0.0025
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c33"
+    ],
+    "sharpe_ratio": -1.6574707698756976,
+    "total_return": -0.15146522810876395,
+    "max_drawdown": 0.20750768378285084,
+    "trade_count": 413,
+    "signal_count": 15858,
+    "final_equity": 8485.34771891236,
+    "win_rate": 0.3170731707317073,
+    "rank": 38,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c15",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 23,
+      "slow_window": 100,
+      "entry_threshold": 0.0025
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c11"
+    ],
+    "sharpe_ratio": -1.7107723008335927,
+    "total_return": -0.15608700311737667,
+    "max_drawdown": 0.19559195887340858,
+    "trade_count": 417,
+    "signal_count": 14849,
+    "final_equity": 8439.129968826233,
+    "win_rate": 0.3132530120481928,
+    "rank": 39,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c31",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 23,
+      "oversold": 22.5,
+      "overbought": 80.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c35"
+    ],
+    "sharpe_ratio": -1.9067400363442908,
+    "total_return": -0.21244583629775335,
+    "max_drawdown": 0.35590316972942637,
+    "trade_count": 108,
+    "signal_count": 440,
+    "final_equity": 7875.541637022467,
+    "win_rate": 0.4583333333333333,
+    "rank": 40,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c37",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 26,
+      "slow_window": 95,
+      "entry_threshold": 0.0025
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c12"
+    ],
+    "sharpe_ratio": -1.933629292150208,
+    "total_return": -0.17404732708494974,
+    "max_drawdown": 0.22736103242812034,
+    "trade_count": 417,
+    "signal_count": 14206,
+    "final_equity": 8259.526729150502,
+    "win_rate": 0.26506024096385544,
+    "rank": 41,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c16",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 23,
+      "oversold": 37.5,
+      "overbought": 77.5
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c34"
+    ],
+    "sharpe_ratio": -2.081608325182877,
+    "total_return": -0.26406954294942686,
+    "max_drawdown": 0.36831899079988706,
+    "trade_count": 278,
+    "signal_count": 4601,
+    "final_equity": 7359.304570505731,
+    "win_rate": 0.5357142857142857,
+    "rank": 42,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c17",
+    "strategy": "moving_average_cross",
+    "params": {
+      "fast_window": 23,
+      "slow_window": 90,
+      "entry_threshold": 0.003
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c12"
+    ],
+    "sharpe_ratio": -2.2933065645005026,
+    "total_return": -0.20051084762138552,
+    "max_drawdown": 0.2512600834741371,
+    "trade_count": 411,
+    "signal_count": 12566,
+    "final_equity": 7994.891523786145,
+    "win_rate": 0.25609756097560976,
+    "rank": 43,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c36",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 21,
+      "oversold": 40.0,
+      "overbought": 75.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c34"
+    ],
+    "sharpe_ratio": -2.4526333080636764,
+    "total_return": -0.28940243310716596,
+    "max_drawdown": 0.3758248454535119,
+    "trade_count": 569,
+    "signal_count": 6705,
+    "final_equity": 7105.97566892834,
+    "win_rate": 0.5948275862068966,
+    "rank": 44,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c40",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 16,
+      "oversold": 32.5,
+      "overbought": 80.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c15"
+    ],
+    "sharpe_ratio": -2.851265842417252,
+    "total_return": -0.3170345545857057,
+    "max_drawdown": 0.4006611465977681,
+    "trade_count": 547,
+    "signal_count": 3725,
+    "final_equity": 6829.654454142943,
+    "win_rate": 0.5478260869565217,
+    "rank": 45,
+    "selected_for_next_round": true
+  },
+  {
+    "candidate_id": "r4_c18",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 19,
+      "oversold": 35.0,
+      "overbought": 72.5
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c14"
+    ],
+    "sharpe_ratio": -3.261406485193223,
+    "total_return": -0.33182520321409803,
+    "max_drawdown": 0.40932993912441135,
+    "trade_count": 914,
+    "signal_count": 4875,
+    "final_equity": 6681.74796785902,
+    "win_rate": 0.59375,
+    "rank": 46,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c19",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 18,
+      "oversold": 25.0,
+      "overbought": 70.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c39"
+    ],
+    "sharpe_ratio": -3.37551227441243,
+    "total_return": -0.28085225927193314,
+    "max_drawdown": 0.33038452308860583,
+    "trade_count": 597,
+    "signal_count": 2848,
+    "final_equity": 7191.477407280669,
+    "win_rate": 0.5540540540540541,
+    "rank": 47,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c20",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 17,
+      "oversold": 30.0,
+      "overbought": 75.0
+    },
+    "origin": "elite",
+    "parent_ids": [
+      "r3_c15"
+    ],
+    "sharpe_ratio": -3.657697020660524,
+    "total_return": -0.3545856802075877,
+    "max_drawdown": 0.39887494640625026,
+    "trade_count": 732,
+    "signal_count": 3101,
+    "final_equity": 6454.143197924123,
+    "win_rate": 0.5527950310559007,
+    "rank": 48,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c39",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 16,
+      "oversold": 25.0,
+      "overbought": 70.0
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c39"
+    ],
+    "sharpe_ratio": -3.8159800621732867,
+    "total_return": -0.30338835999620123,
+    "max_drawdown": 0.33582414337454597,
+    "trade_count": 783,
+    "signal_count": 3545,
+    "final_equity": 6966.116400037988,
+    "win_rate": 0.5396825396825397,
+    "rank": 49,
+    "selected_for_next_round": false
+  },
+  {
+    "candidate_id": "r4_c38",
+    "strategy": "rsi_reversion",
+    "params": {
+      "period": 21,
+      "oversold": 40.0,
+      "overbought": 67.5
+    },
+    "origin": "mutation",
+    "parent_ids": [
+      "r3_c14"
+    ],
+    "sharpe_ratio": -4.117297289881391,
+    "total_return": -0.39059690282983345,
+    "max_drawdown": 0.42642733823731266,
+    "trade_count": 1186,
+    "signal_count": 8423,
+    "final_equity": 6094.030971701665,
+    "win_rate": 0.532258064516129,
+    "rank": 50,
+    "selected_for_next_round": false
+  }
+]

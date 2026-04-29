@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c39",
+  "strategy": "atr_breakout",
+  "params": {
+    "ma_period": 10,
+    "atr_period": 7,
+    "atr_multiplier": 1.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -5.25875497589412,
+  "total_return": -0.09887005778149206,
+  "max_drawdown": 0.11787396496796264,
+  "trade_count": 650,
+  "signal_count": 1515,
+  "final_equity": 90112.9942218508,
+  "win_rate": 0.345679012345679,
+  "rank": 46,
+  "selected_for_next_round": false
+}

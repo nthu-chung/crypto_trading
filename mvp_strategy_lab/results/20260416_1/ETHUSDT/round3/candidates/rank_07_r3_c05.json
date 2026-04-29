@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r3_c05",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 67,
+    "breakout_buffer_bps": 30.0
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r2_c42"
+  ],
+  "sharpe_ratio": 1.5751868124650068,
+  "total_return": 0.24689221756711158,
+  "max_drawdown": 0.26090682051577263,
+  "trade_count": 211,
+  "signal_count": 217,
+  "final_equity": 12468.922175671116,
+  "win_rate": 0.47435897435897434,
+  "rank": 7,
+  "selected_for_next_round": true
+}

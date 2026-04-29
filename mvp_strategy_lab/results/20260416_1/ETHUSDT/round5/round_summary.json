@@ -1,0 +1,28 @@
+{
+  "round": 5,
+  "population_size": 50,
+  "family_cap": 5,
+  "selected_count": 20,
+  "selected_candidate_ids": [
+    "r5_c01",
+    "r5_c02",
+    "r5_c27",
+    "r5_c03",
+    "r5_c22",
+    "r5_c04",
+    "r5_c05",
+    "r5_c06",
+    "r5_c07",
+    "r5_c25",
+    "r5_c32",
+    "r5_c31",
+    "r5_c11",
+    "r5_c12",
+    "r5_c39",
+    "r5_c13",
+    "r5_c36",
+    "r5_c16",
+    "r5_c17",
+    "r5_c18"
+  ]
+}

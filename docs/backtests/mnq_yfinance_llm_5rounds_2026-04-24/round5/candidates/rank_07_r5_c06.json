@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r5_c06",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 34,
+    "slow_window": 104,
+    "entry_threshold": 0.0
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r4_c03"
+  ],
+  "sharpe_ratio": 4.981200569532182,
+  "total_return": 0.09608898387925248,
+  "max_drawdown": 0.046986638967272336,
+  "trade_count": 142,
+  "signal_count": 13538,
+  "final_equity": 109608.89838792525,
+  "win_rate": 0.36231884057971014,
+  "rank": 7,
+  "selected_for_next_round": true
+}

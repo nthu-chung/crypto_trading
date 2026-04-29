@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c23",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 13,
+    "reference_ma_period": 13,
+    "spread_threshold_bps": 5.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -3.08874173581007,
+  "total_return": -0.07603068530067365,
+  "max_drawdown": 0.10432936666790175,
+  "trade_count": 272,
+  "signal_count": 459,
+  "final_equity": 92396.93146993264,
+  "win_rate": 0.34944237918215615,
+  "rank": 40,
+  "selected_for_next_round": false
+}

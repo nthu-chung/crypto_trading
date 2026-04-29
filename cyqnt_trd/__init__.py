@@ -7,9 +7,10 @@ Cyqnt Trading Package
 - get_data: 数据获取模块，支持从 Binance 获取期货和现货数据
 - trading_signal: 交易信号模块，包含因子计算和信号策略
 - backtesting: 回测框架，支持因子测试和策略回测
+- strategy_cases: 随 package 一起分发的策略案例与 preset 资源
 """
 
-__version__ = "0.1.9.dev"
+__version__ = "0.1.9.dev2"
 
 _OPTIONAL_IMPORT_ERRORS = {}
 
@@ -24,7 +25,7 @@ def _safe_import(module_name: str):
 
 
 # 导入主要模块
-for _module_name in ("get_data", "trading_signal", "backtesting", "standard_bot"):
+for _module_name in ("get_data", "trading_signal", "backtesting", "standard_bot", "strategy_cases"):
     _safe_import(_module_name)
 
 __all__ = [
@@ -32,6 +33,7 @@ __all__ = [
     'trading_signal',
     'backtesting',
     'standard_bot',
+    'strategy_cases',
     'utils',
     '__version__',
     '_OPTIONAL_IMPORT_ERRORS',

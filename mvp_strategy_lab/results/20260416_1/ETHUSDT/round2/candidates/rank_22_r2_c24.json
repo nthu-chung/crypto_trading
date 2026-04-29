@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r2_c24",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 26,
+    "reference_ma_period": 45,
+    "spread_threshold_bps": 5.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c18"
+  ],
+  "sharpe_ratio": -0.7277864993686436,
+  "total_return": -0.16501785065966978,
+  "max_drawdown": 0.3638927823942923,
+  "trade_count": 120,
+  "signal_count": 120,
+  "final_equity": 8349.821493403302,
+  "win_rate": 0.28,
+  "rank": 22,
+  "selected_for_next_round": false
+}

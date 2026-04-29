@@ -1,0 +1,136 @@
+{
+  "request_id": "a4c20255-7377-4c96-880e-cafcf30efad5",
+  "total_return": -0.0009531276632007576,
+  "metrics": {
+    "snapshot_count": 4.0,
+    "trade_count": 1.0,
+    "signal_count": 2.0,
+    "final_equity": 9990.468723367992,
+    "total_return": -0.0009531276632007576,
+    "max_drawdown": 0.0009531276632007576,
+    "sharpe_ratio": -187.18974330876145,
+    "mean_bar_return": -0.0003177092210669234,
+    "bar_return_volatility": 0.0005502885129210435,
+    "ending_position_qty": -4.261121527185955
+  },
+  "equity_curve": [
+    {
+      "timestamp": 1777213499999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1777213799999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1777214099999,
+      "equity": 10000.0,
+      "cash": 10000.0,
+      "drawdown": 0.0
+    },
+    {
+      "timestamp": 1777214399999,
+      "equity": 9990.468723367992,
+      "cash": 19990.0,
+      "drawdown": 0.0009531276632007576
+    }
+  ],
+  "signal_batches": [
+    {
+      "batch_id": "425b4fb7-78e1-56a2-977f-6a10b47913a2",
+      "created_at": 1777214099999,
+      "signals": [
+        {
+          "signal_id": "cb6f2a82-3de3-5f14-81c7-9993be1e8cca",
+          "instrument_id": "ETHUSDT",
+          "side": "sell",
+          "strength": 1.2670074,
+          "payload": {
+            "bar_timestamp": 1777214099999,
+            "decision_price": 2346.8,
+            "execute_at_open_time": 1777214100000,
+            "execution_model": "next_open",
+            "target_position": -1
+          }
+        }
+      ]
+    },
+    {
+      "batch_id": "e831fcca-aa9d-53b7-849d-78767de59363",
+      "created_at": 1777214399999,
+      "signals": [
+        {
+          "signal_id": "7dbf6ac8-6279-5a2e-b228-5e392f45a2eb",
+          "instrument_id": "ETHUSDT",
+          "side": "buy",
+          "strength": 1.1255232000000002,
+          "payload": {
+            "bar_timestamp": 1777214399999,
+            "decision_price": 2346.69,
+            "execute_at_open_time": null,
+            "execution_model": "next_open",
+            "target_position": 1
+          }
+        }
+      ]
+    }
+  ],
+  "trades": [
+    {
+      "timestamp": 1777214100000,
+      "decision_timestamp": 1777214099999,
+      "instrument_id": "ETHUSDT",
+      "side": "sell",
+      "price": 2346.8,
+      "quantity": 4.261121527185955,
+      "fee": 9.999999999999998,
+      "signal_id": "cb6f2a82-3de3-5f14-81c7-9993be1e8cca",
+      "action": "open_short",
+      "execution_model": "next_open",
+      "target_position": -1,
+      "post_trade_position_qty": -4.261121527185955
+    }
+  ],
+  "extras": {
+    "run_id": "92debb79-49ee-586d-b9a6-117faee140e4",
+    "engine": "numba",
+    "execution_assumption": "signal_at_bar_close_fill_next_bar_open",
+    "trades": [
+      {
+        "timestamp": 1777214100000,
+        "decision_timestamp": 1777214099999,
+        "instrument_id": "ETHUSDT",
+        "side": "sell",
+        "price": 2346.8,
+        "quantity": 4.261121527185955,
+        "fee": 9.999999999999998,
+        "signal_id": "cb6f2a82-3de3-5f14-81c7-9993be1e8cca",
+        "action": "open_short",
+        "execution_model": "next_open",
+        "target_position": -1,
+        "post_trade_position_qty": -4.261121527185955
+      }
+    ],
+    "liquidity_model": {
+      "max_bar_volume_fraction": 0.1,
+      "quote_volume_used": true,
+      "contract_multiplier": 1.0,
+      "quantity_step": 0.0,
+      "min_quantity": 0.0
+    },
+    "fee_model": {
+      "taker_fee_bps": 10.0,
+      "fixed_fee_per_contract": 0.0,
+      "funding_rate_per_bar": 0.0,
+      "total_funding_fees": 0.0
+    },
+    "slippage_model": {
+      "slippage_bps": 0.0,
+      "impact_slippage_bps": 0.0
+    }
+  }
+}

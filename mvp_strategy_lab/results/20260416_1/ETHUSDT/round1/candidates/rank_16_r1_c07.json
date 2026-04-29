@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c07",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 10,
+    "reference_ma_period": 20,
+    "spread_threshold_bps": 0.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -2.8529049439938112,
+  "total_return": -0.42627860981875576,
+  "max_drawdown": 0.5346051683423585,
+  "trade_count": 304,
+  "signal_count": 304,
+  "final_equity": 5737.213901812443,
+  "win_rate": 0.1848184818481848,
+  "rank": 16,
+  "selected_for_next_round": false
+}

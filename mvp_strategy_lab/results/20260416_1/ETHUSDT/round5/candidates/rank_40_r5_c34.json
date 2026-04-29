@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r5_c34",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 29,
+    "slow_window": 105,
+    "entry_threshold": 0.003
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r4_c12"
+  ],
+  "sharpe_ratio": -2.3696830097648895,
+  "total_return": -0.26054775905666794,
+  "max_drawdown": 0.34588485113362666,
+  "trade_count": 489,
+  "signal_count": 15416,
+  "final_equity": 7394.522409433321,
+  "win_rate": 0.2839506172839506,
+  "rank": 40,
+  "selected_for_next_round": false
+}

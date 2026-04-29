@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r3_c45",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 62,
+    "breakout_buffer_bps": 5.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r2_c02"
+  ],
+  "sharpe_ratio": -1.6706257166501135,
+  "total_return": -0.23744122609731558,
+  "max_drawdown": 0.3503419031098849,
+  "trade_count": 553,
+  "signal_count": 641,
+  "final_equity": 7625.587739026844,
+  "win_rate": 0.2958579881656805,
+  "rank": 30,
+  "selected_for_next_round": false
+}

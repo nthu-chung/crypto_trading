@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r3_c38",
+  "strategy": "bollinger_mean_reversion",
+  "params": {
+    "period": 15,
+    "stddev_multiplier": 1.25
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r2_c12"
+  ],
+  "sharpe_ratio": -1.157475388929809,
+  "total_return": -0.0395645477575493,
+  "max_drawdown": 0.10904639563035354,
+  "trade_count": 701,
+  "signal_count": 1823,
+  "final_equity": 96043.54522424507,
+  "win_rate": 0.6279411764705882,
+  "rank": 48,
+  "selected_for_next_round": false
+}

@@ -32,6 +32,10 @@ def simulate_target_positions_next_open(
     impact_slippage_bps: float,
     funding_rate_per_bar: float,
     max_bar_volume_fraction: float,
+    contract_multiplier: float,
+    quantity_step: float,
+    min_quantity: float,
+    fixed_fee_per_contract: float,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     bar_count = closes.shape[0]
     equity_curve = np.zeros(bar_count, dtype=np.float64)
@@ -48,25 +52,37 @@ def simulate_target_positions_next_open(
     target_position = 0
     target_quantity = 0.0
     fee_rate = taker_fee_bps / 10_000.0
+    multiplier = contract_multiplier
+    if multiplier <= 0.0:
+        multiplier = 1.0
 
     for index in range(bar_count):
         if index > 0 and target_updates[index - 1] != target_keep:
             target_position = int(target_updates[index - 1])
-            equity_reference = cash + position_qty * opens[index]
+            equity_reference = cash + position_qty * opens[index] * multiplier
             if equity_reference < 0.0:
                 equity_reference = 0.0
             if target_position == 1:
-                target_quantity = equity_reference / opens[index]
+                target_quantity = equity_reference / (opens[index] * multiplier)
             elif target_position == -1:
-                target_quantity = -equity_reference / opens[index]
+                target_quantity = -equity_reference / (opens[index] * multiplier)
             else:
                 target_quantity = 0.0
+            if quantity_step > 0.0:
+                target_sign = 1.0
+                if target_quantity < 0.0:
+                    target_sign = -1.0
+                target_abs = np.floor(abs(target_quantity) / quantity_step) * quantity_step
+                if target_abs < max(min_quantity, quantity_step):
+                    target_quantity = 0.0
+                else:
+                    target_quantity = target_sign * target_abs
 
         if index > 0 and max_bar_volume_fraction > 0.0 and opens[index] > 0.0:
             base_cap_qty = max(volumes[index], 0.0) * max_bar_volume_fraction
             quote_cap_qty = base_cap_qty
             if quote_volumes[index] > 0.0:
-                quote_cap_qty = (quote_volumes[index] * max_bar_volume_fraction) / opens[index]
+                quote_cap_qty = (quote_volumes[index] * max_bar_volume_fraction) / (opens[index] * multiplier)
                 if quote_cap_qty < base_cap_qty:
                     base_cap_qty = quote_cap_qty
             available_qty = max(base_cap_qty, 0.0)
@@ -77,6 +93,16 @@ def simulate_target_positions_next_open(
             elif delta_qty < -available_qty:
                 delta_qty = -available_qty
 
+            if quantity_step > 0.0:
+                delta_sign = 1.0
+                if delta_qty < 0.0:
+                    delta_sign = -1.0
+                delta_abs = np.floor(abs(delta_qty) / quantity_step) * quantity_step
+                if delta_abs < max(min_quantity, quantity_step):
+                    delta_qty = 0.0
+                else:
+                    delta_qty = delta_sign * delta_abs
+
             if abs(delta_qty) > 1e-12:
                 participation = abs(delta_qty) / max(volumes[index], 1e-12)
                 slip = (slippage_bps + impact_slippage_bps * participation) / 10_000.0
@@ -86,8 +112,10 @@ def simulate_target_positions_next_open(
                 else:
                     fill_price = opens[index] * (1.0 - slip)
 
-                fee = abs(delta_qty) * fill_price * fee_rate
-                cash -= delta_qty * fill_price + fee
+                fee = abs(delta_qty) * fill_price * multiplier * fee_rate
+                if fixed_fee_per_contract > 0.0:
+                    fee += abs(delta_qty) * fixed_fee_per_contract
+                cash -= delta_qty * fill_price * multiplier + fee
                 position_qty += delta_qty
                 if abs(position_qty) < 1e-12:
                     position_qty = 0.0
@@ -97,11 +125,11 @@ def simulate_target_positions_next_open(
                 trade_fees[index] = fee
 
         if funding_rate_per_bar != 0.0 and position_qty != 0.0:
-            funding_fee = abs(position_qty) * closes[index] * funding_rate_per_bar
+            funding_fee = abs(position_qty) * closes[index] * multiplier * funding_rate_per_bar
             cash -= funding_fee
             funding_fees[index] = funding_fee
 
-        equity_curve[index] = cash + position_qty * closes[index]
+        equity_curve[index] = cash + position_qty * closes[index] * multiplier
         cash_curve[index] = cash
         position_curve[index] = position_qty
 

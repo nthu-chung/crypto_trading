@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r4_c31",
+  "strategy": "rsi_reversion",
+  "params": {
+    "period": 11,
+    "oversold": 32.5,
+    "overbought": 65.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r3_c11"
+  ],
+  "sharpe_ratio": 1.0086369548490528,
+  "total_return": 0.02206156893579915,
+  "max_drawdown": 0.061942583618760726,
+  "trade_count": 556,
+  "signal_count": 5771,
+  "final_equity": 102206.15689357992,
+  "win_rate": 0.644927536231884,
+  "rank": 42,
+  "selected_for_next_round": false
+}

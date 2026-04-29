@@ -10,13 +10,16 @@ import uuid
 from pathlib import Path
 
 from ..core import BacktestRequest, MarketQuery, SignalPipelineSpec, TimeRange
-from ..data import AlignmentPolicy
+from ..data import AlignmentPolicy, timeframe_to_ms
+from ..data.derivatives import HistoricalBinanceDerivativesDownloader
+from ..data.liquidations import HistoricalBinanceLiquidationRecorder
 from ..data.snapshot import HistoricalSnapshotAssembler
 from .common import (
     add_historical_data_arguments,
     build_market_data_adapter,
     build_strategy_pipeline,
     build_time_range,
+    infer_contract_multiplier,
     make_registry,
 )
 from ..simulation import NumbaBacktestRunner, SnapshotBacktestRunner
@@ -27,7 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--symbol", default="BTCUSDT")
     parser.add_argument("--interval", default="1h")
     parser.add_argument("--limit", type=int, default=300)
-    parser.add_argument("--market-type", choices=["spot", "futures"], default="spot")
+    parser.add_argument("--market-type", choices=["spot", "futures", "cme"], default="spot")
     parser.add_argument("--engine", choices=["python", "numba"], default="numba")
     parser.add_argument(
         "--strategy",
@@ -40,6 +43,8 @@ def build_parser() -> argparse.ArgumentParser:
             "atr_breakout",
             "bollinger_mean_reversion",
             "macd_trend_follow",
+            "oi_funding_breakout",
+            "liquidation_reversal",
             "multi_timeframe_ma_spread",
         ],
         default="moving_average_cross",
@@ -64,6 +69,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--macd-slow-period", type=int, default=26)
     parser.add_argument("--macd-signal-period", type=int, default=9)
     parser.add_argument("--macd-histogram-threshold", type=float, default=0.0)
+    parser.add_argument("--oi-threshold-bps", type=float, default=0.0)
+    parser.add_argument("--max-funding-rate-bps", type=float, default=100.0)
+    parser.add_argument("--long-liquidation-threshold-usd", type=float, default=100_000.0)
+    parser.add_argument("--short-liquidation-threshold-usd", type=float, default=100_000.0)
+    parser.add_argument("--liquidation-imbalance-ratio", type=float, default=0.60)
     parser.add_argument("--primary-ma-period", type=int, default=20)
     parser.add_argument("--reference-ma-period", type=int, default=20)
     parser.add_argument("--spread-threshold-bps", type=float, default=0.0)
@@ -75,8 +85,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--impact-slippage-bps", type=float, default=0.0)
     parser.add_argument("--funding-bps-per-bar", type=float, default=0.0)
     parser.add_argument("--max-bar-volume-fraction", type=float, default=0.10)
+    parser.add_argument("--contract-multiplier", type=float, default=None)
+    parser.add_argument("--quantity-step", type=float, default=0.0)
+    parser.add_argument("--min-quantity", type=float, default=0.0)
+    parser.add_argument("--fixed-fee-per-contract", type=float, default=0.0)
     parser.add_argument("--tail-bars", type=int, default=120)
     parser.add_argument("--output-json", default=None)
+    parser.add_argument("--download-derivatives-missing", action="store_true")
+    parser.add_argument("--record-liquidations-seconds", type=int, default=0)
     return add_historical_data_arguments(parser)
 
 
@@ -109,6 +125,31 @@ def load_market_bundle(args: argparse.Namespace, market_query: MarketQuery):
 
 def main() -> int:
     args = build_parser().parse_args()
+    if args.download_derivatives_missing:
+        if args.start_ts is None or args.end_ts is None:
+            raise ValueError("--download-derivatives-missing requires both --start-ts and --end-ts")
+        if args.strategy == "oi_funding_breakout":
+            HistoricalBinanceDerivativesDownloader(
+                data_root=args.derivatives_dir,
+                market_type=args.market_type,
+            ).download_bundle(
+                instrument_id=args.symbol.upper(),
+                timeframe=args.interval,
+                start_ts=int(args.start_ts),
+                end_ts=int(args.end_ts),
+            )
+    if args.record_liquidations_seconds > 0:
+        if args.strategy != "liquidation_reversal":
+            raise ValueError("--record-liquidations-seconds is currently supported for liquidation_reversal only")
+        HistoricalBinanceLiquidationRecorder(
+            data_root=args.liquidations_dir,
+            market_type=args.market_type,
+        ).record_and_store(
+            duration_sec=int(args.record_liquidations_seconds),
+            timeframe=args.interval,
+            timeframe_ms=timeframe_to_ms(args.interval),
+            instrument_ids=[args.symbol.upper()],
+        )
     policy = AlignmentPolicy(policy_id="bar_close_v1", primary_timeframe=args.interval)
     market_query = build_market_query(args)
     market_bundle = load_market_bundle(args, market_query)
@@ -143,6 +184,11 @@ def main() -> int:
         macd_slow_period=args.macd_slow_period,
         macd_signal_period=args.macd_signal_period,
         macd_histogram_threshold=args.macd_histogram_threshold,
+        oi_threshold_bps=args.oi_threshold_bps,
+        max_funding_rate_bps=args.max_funding_rate_bps,
+        long_liquidation_threshold_usd=args.long_liquidation_threshold_usd,
+        short_liquidation_threshold_usd=args.short_liquidation_threshold_usd,
+        liquidation_imbalance_ratio=args.liquidation_imbalance_ratio,
         primary_ma_period=args.primary_ma_period,
         reference_ma_period=args.reference_ma_period,
         spread_threshold_bps=args.spread_threshold_bps,
@@ -160,6 +206,7 @@ def main() -> int:
             "commission_bps": args.commission_bps,
             "taker_fee_bps": args.taker_fee_bps if args.taker_fee_bps is not None else args.commission_bps,
             "funding_bps_per_bar": args.funding_bps_per_bar,
+            "fixed_fee_per_contract": args.fixed_fee_per_contract,
         },
         slippage_model={
             "slippage_bps": args.slippage_bps,
@@ -169,6 +216,14 @@ def main() -> int:
         extras={
             "engine": args.engine,
             "execution_assumption": "signal_at_bar_close_fill_next_bar_open",
+            "market_type": args.market_type,
+            "contract_multiplier": (
+                args.contract_multiplier
+                if args.contract_multiplier is not None
+                else infer_contract_multiplier(market_type=args.market_type, symbol=args.symbol.upper())
+            ),
+            "quantity_step": args.quantity_step,
+            "min_quantity": args.min_quantity,
         },
     )
 
@@ -201,11 +256,15 @@ def main() -> int:
     if args.engine == "numba":
         print(
             "execution_model=signal_at_bar_close_fill_next_bar_open "
-            "taker_fee_bps=%.4f funding_bps_per_bar=%.4f max_bar_volume_fraction=%.4f"
+            "taker_fee_bps=%.4f funding_bps_per_bar=%.4f max_bar_volume_fraction=%.4f "
+            "contract_multiplier=%.4f quantity_step=%.4f fixed_fee_per_contract=%.4f"
             % (
                 float(request.fee_model.get("taker_fee_bps", 0.0)),
                 float(request.fee_model.get("funding_bps_per_bar", 0.0)),
                 float(request.slippage_model.get("max_bar_volume_fraction", 0.0)),
+                float(request.extras.get("contract_multiplier", 1.0)),
+                float(request.extras.get("quantity_step", 0.0)),
+                float(request.fee_model.get("fixed_fee_per_contract", 0.0)),
             )
         )
     if trades:

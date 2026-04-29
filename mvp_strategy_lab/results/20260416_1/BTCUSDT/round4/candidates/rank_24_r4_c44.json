@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r4_c44",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 55,
+    "breakout_buffer_bps": 30.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r3_c02"
+  ],
+  "sharpe_ratio": 0.09918165963675594,
+  "total_return": -0.02468597771127097,
+  "max_drawdown": 0.3294090965892939,
+  "trade_count": 164,
+  "signal_count": 177,
+  "final_equity": 9753.14022288729,
+  "win_rate": 0.36065573770491804,
+  "rank": 24,
+  "selected_for_next_round": false
+}

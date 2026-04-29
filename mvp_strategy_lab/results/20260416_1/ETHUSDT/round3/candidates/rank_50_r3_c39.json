@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r3_c39",
+  "strategy": "rsi_reversion",
+  "params": {
+    "period": 12,
+    "oversold": 32.5,
+    "overbought": 65.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r2_c16"
+  ],
+  "sharpe_ratio": -9.039509418692699,
+  "total_return": -0.7125797113302283,
+  "max_drawdown": 0.7169737919564977,
+  "trade_count": 2518,
+  "signal_count": 9680,
+  "final_equity": 2874.2028866977166,
+  "win_rate": 0.47928994082840237,
+  "rank": 50,
+  "selected_for_next_round": false
+}

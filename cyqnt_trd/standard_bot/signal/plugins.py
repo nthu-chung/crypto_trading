@@ -31,7 +31,9 @@ from .numba_kernels import (
     atr_breakout_signal_rows,
     bollinger_mean_reversion_signal_rows,
     donchian_breakout_signal_rows,
+    liquidation_reversal_signal_rows,
     macd_trend_follow_signal_rows,
+    oi_funding_breakout_signal_rows,
     SIGNAL_BUY,
     SIGNAL_NONE,
     SIGNAL_SELL,
@@ -121,6 +123,19 @@ def _trim_window(values: List[float], max_length: int) -> List[float]:
     if len(values) <= max_length:
         return values
     return values[-max_length:]
+
+
+def _feature_array_from_bars(bars: Sequence, feature_name: str) -> np.ndarray:
+    values = np.full(len(bars), np.nan, dtype=np.float64)
+    for index, bar in enumerate(bars):
+        raw_value = bar.extras.get(feature_name)
+        if raw_value is None:
+            continue
+        try:
+            values[index] = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+    return values
 
 
 def _with_target_position(payload: Dict[str, object], *, target_position: int) -> Dict[str, object]:
@@ -279,6 +294,45 @@ class MacdTrendFollowConfig:
             raise ValueError("signal_period must be >= 1")
         if self.histogram_threshold < 0.0:
             raise ValueError("histogram_threshold must be >= 0")
+
+
+@dataclass
+class OiFundingBreakoutConfig:
+    instrument_id: str
+    timeframe: str
+    lookback_window: int = 20
+    breakout_buffer_bps: float = 0.0
+    oi_threshold_bps: float = 0.0
+    max_funding_rate_bps: float = 100.0
+    time_horizon: str = "trend"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.lookback_window < 2:
+            raise ValueError("lookback_window must be >= 2")
+        if self.breakout_buffer_bps < 0.0:
+            raise ValueError("breakout_buffer_bps must be >= 0")
+        if self.max_funding_rate_bps < 0.0:
+            raise ValueError("max_funding_rate_bps must be >= 0")
+
+
+@dataclass
+class LiquidationReversalConfig:
+    instrument_id: str
+    timeframe: str
+    long_liquidation_threshold_usd: float = 100_000.0
+    short_liquidation_threshold_usd: float = 100_000.0
+    liquidation_imbalance_ratio: float = 0.60
+    time_horizon: str = "reversal"
+
+    def __post_init__(self) -> None:
+        self.instrument_id = self.instrument_id.upper()
+        if self.long_liquidation_threshold_usd < 0.0:
+            raise ValueError("long_liquidation_threshold_usd must be >= 0")
+        if self.short_liquidation_threshold_usd < 0.0:
+            raise ValueError("short_liquidation_threshold_usd must be >= 0")
+        if self.liquidation_imbalance_ratio <= 0.0 or self.liquidation_imbalance_ratio > 1.0:
+            raise ValueError("liquidation_imbalance_ratio must be within (0, 1]")
 
 
 @dataclass
@@ -1081,6 +1135,418 @@ class DonchianBreakoutPlugin:
         )
 
 
+class OiFundingBreakoutPlugin:
+    plugin_id = "oi_funding_breakout"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: OiFundingBreakoutConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return _build_batch(self.plugin_id, snapshot, [])
+
+        timestamps = np.asarray([int(bar.timestamp) for bar in bars], dtype=np.int64)
+        closes = np.asarray([float(bar.close) for bar in bars], dtype=np.float64)
+        highs = np.asarray([float(bar.high) for bar in bars], dtype=np.float64)
+        lows = np.asarray([float(bar.low) for bar in bars], dtype=np.float64)
+        oi_change_bps = _feature_array_from_bars(bars, "oi_change_bps")
+        funding_rate_bps = _feature_array_from_bars(bars, "funding_rate_bps")
+        (
+            directions,
+            strengths,
+            upper_band_values,
+            lower_band_values,
+            breakout_bps_values,
+            oi_values,
+            funding_values,
+        ) = oi_funding_breakout_signal_rows(
+            closes,
+            highs,
+            lows,
+            oi_change_bps,
+            funding_rate_bps,
+            config.lookback_window,
+            config.breakout_buffer_bps,
+            config.oi_threshold_bps,
+            config.max_funding_rate_bps,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.lookback_window,
+            config.breakout_buffer_bps,
+            config.oi_threshold_bps,
+            config.max_funding_rate_bps,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            target_position = 1 if int(direction) == int(SIGNAL_BUY) else -1
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(timestamps[index]),
+                            "upper_band": float(upper_band_values[index]),
+                            "lower_band": float(lower_band_values[index]),
+                            "breakout_bps": float(breakout_bps_values[index]),
+                            "oi_change_bps": float(oi_values[index]),
+                            "funding_rate_bps": float(funding_values[index]),
+                            "oi_threshold_bps": float(config.oi_threshold_bps),
+                            "max_funding_rate_bps": float(config.max_funding_rate_bps),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=target_position,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={
+                "cursor": None,
+                "last_direction": int(SIGNAL_NONE),
+                "timestamp_window": [],
+                "close_window": [],
+                "high_window": [],
+                "low_window": [],
+                "oi_window": [],
+                "funding_window": [],
+            },
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: OiFundingBreakoutConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        timestamp_window = [int(value) for value in state.values.get("timestamp_window", [])]
+        close_window = [float(value) for value in state.values.get("close_window", [])]
+        high_window = [float(value) for value in state.values.get("high_window", [])]
+        low_window = [float(value) for value in state.values.get("low_window", [])]
+        oi_window = [float(value) for value in state.values.get("oi_window", [])]
+        funding_window = [float(value) for value in state.values.get("funding_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.lookback_window,
+            config.breakout_buffer_bps,
+            config.oi_threshold_bps,
+            config.max_funding_rate_bps,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            timestamp_window.append(int(bar.timestamp))
+            close_window.append(float(bar.close))
+            high_window.append(float(bar.high))
+            low_window.append(float(bar.low))
+            raw_oi = bar.extras.get("oi_change_bps")
+            raw_funding = bar.extras.get("funding_rate_bps")
+            oi_window.append(float(raw_oi) if raw_oi is not None else np.nan)
+            funding_window.append(float(raw_funding) if raw_funding is not None else np.nan)
+            max_length = config.lookback_window + 1
+            if len(timestamp_window) > max_length:
+                timestamp_window = timestamp_window[-max_length:]
+            close_window = _trim_window(close_window, max_length)
+            high_window = _trim_window(high_window, max_length)
+            low_window = _trim_window(low_window, max_length)
+            oi_window = _trim_window(oi_window, max_length)
+            funding_window = _trim_window(funding_window, max_length)
+
+            (
+                directions,
+                strengths,
+                upper_band_values,
+                lower_band_values,
+                breakout_bps_values,
+                oi_values,
+                funding_values,
+            ) = oi_funding_breakout_signal_rows(
+                np.asarray(close_window, dtype=np.float64),
+                np.asarray(high_window, dtype=np.float64),
+                np.asarray(low_window, dtype=np.float64),
+                np.asarray(oi_window, dtype=np.float64),
+                np.asarray(funding_window, dtype=np.float64),
+                config.lookback_window,
+                config.breakout_buffer_bps,
+                config.oi_threshold_bps,
+                config.max_funding_rate_bps,
+            )
+            last_index = len(close_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    target_position = 1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "upper_band": float(upper_band_values[last_index]),
+                                    "lower_band": float(lower_band_values[last_index]),
+                                    "breakout_bps": float(breakout_bps_values[last_index]),
+                                    "oi_change_bps": float(oi_values[last_index]),
+                                    "funding_rate_bps": float(funding_values[last_index]),
+                                    "oi_threshold_bps": float(config.oi_threshold_bps),
+                                    "max_funding_rate_bps": float(config.max_funding_rate_bps),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=target_position,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "timestamp_window": timestamp_window,
+                    "close_window": close_window,
+                    "high_window": high_window,
+                    "low_window": low_window,
+                    "oi_window": oi_window,
+                    "funding_window": funding_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
+class LiquidationReversalPlugin:
+    plugin_id = "liquidation_reversal"
+    plugin_version = "numba/v1"
+
+    def required_inputs(self) -> Dict[str, bool]:
+        return {"market": True, "social": False, "onchain": False}
+
+    def run(
+        self,
+        snapshot: DataSnapshot,
+        config: LiquidationReversalConfig,
+        context: Optional[SignalContext] = None,
+    ) -> SignalBatch:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return _build_batch(self.plugin_id, snapshot, [])
+
+        timestamps = np.asarray([int(bar.timestamp) for bar in bars], dtype=np.int64)
+        long_liq_notional_usd = _feature_array_from_bars(bars, "long_liq_notional_usd")
+        short_liq_notional_usd = _feature_array_from_bars(bars, "short_liq_notional_usd")
+        directions, strengths, total_notional_values, imbalance_values = liquidation_reversal_signal_rows(
+            long_liq_notional_usd,
+            short_liq_notional_usd,
+            config.long_liquidation_threshold_usd,
+            config.short_liquidation_threshold_usd,
+            config.liquidation_imbalance_ratio,
+        )
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.long_liquidation_threshold_usd,
+            config.short_liquidation_threshold_usd,
+            config.liquidation_imbalance_ratio,
+        )
+        signals = []
+        previous_direction = SIGNAL_NONE
+        for index, direction in enumerate(directions):
+            if int(direction) == int(SIGNAL_NONE):
+                previous_direction = SIGNAL_NONE
+                continue
+            if int(direction) == int(previous_direction):
+                previous_direction = direction
+                continue
+            target_position = 1 if int(direction) == int(SIGNAL_BUY) else -1
+            signals.append(
+                _build_signal(
+                    snapshot=snapshot,
+                    plugin_id=self.plugin_id,
+                    plugin_version=self.plugin_version,
+                    instrument_id=config.instrument_id,
+                    timeframe=config.timeframe,
+                    time_horizon=config.time_horizon,
+                    timestamp=int(timestamps[index]),
+                    direction=int(direction),
+                    strength=float(strengths[index]),
+                    payload=_with_target_position(
+                        {
+                            "bar_timestamp": int(timestamps[index]),
+                            "long_liq_notional_usd": float(long_liq_notional_usd[index]),
+                            "short_liq_notional_usd": float(short_liq_notional_usd[index]),
+                            "total_liq_notional_usd": float(total_notional_values[index]),
+                            "liq_imbalance_ratio": float(imbalance_values[index]),
+                            "long_liquidation_threshold_usd": float(config.long_liquidation_threshold_usd),
+                            "short_liquidation_threshold_usd": float(config.short_liquidation_threshold_usd),
+                            "blocked_instruments": blocked,
+                        },
+                        target_position=target_position,
+                    ),
+                    config_hash=config_hash,
+                )
+            )
+            previous_direction = direction
+        return _build_batch(self.plugin_id, snapshot, signals)
+
+    def initialize_state(self) -> SignalState:
+        return SignalState(
+            plugin_id=self.plugin_id,
+            values={
+                "cursor": None,
+                "last_direction": int(SIGNAL_NONE),
+                "timestamp_window": [],
+                "long_window": [],
+                "short_window": [],
+            },
+        )
+
+    def step(
+        self,
+        snapshot: DataSnapshot,
+        state: SignalState,
+        config: LiquidationReversalConfig,
+        context: Optional[SignalContext] = None,
+    ) -> StepSignalResult:
+        bars = series_for(snapshot, config.instrument_id, config.timeframe)
+        if not bars:
+            return StepSignalResult(state=state, signals=[])
+
+        cursor = state.values.get("cursor")
+        last_direction = int(state.values.get("last_direction", int(SIGNAL_NONE)))
+        timestamp_window = [int(value) for value in state.values.get("timestamp_window", [])]
+        long_window = [float(value) for value in state.values.get("long_window", [])]
+        short_window = [float(value) for value in state.values.get("short_window", [])]
+        blocked = _blocked_instruments(context)
+        config_hash = _config_hash(
+            config.instrument_id,
+            config.timeframe,
+            config.long_liquidation_threshold_usd,
+            config.short_liquidation_threshold_usd,
+            config.liquidation_imbalance_ratio,
+        )
+        emitted: List[SignalEnvelope] = []
+
+        for bar in bars:
+            if cursor is not None and bar.timestamp <= cursor:
+                continue
+            timestamp_window.append(int(bar.timestamp))
+            long_window.append(float(bar.extras.get("long_liq_notional_usd") or 0.0))
+            short_window.append(float(bar.extras.get("short_liq_notional_usd") or 0.0))
+            timestamp_window = _trim_window(timestamp_window, 1)
+            long_window = _trim_window(long_window, 1)
+            short_window = _trim_window(short_window, 1)
+
+            directions, strengths, total_notional_values, imbalance_values = liquidation_reversal_signal_rows(
+                np.asarray(long_window, dtype=np.float64),
+                np.asarray(short_window, dtype=np.float64),
+                config.long_liquidation_threshold_usd,
+                config.short_liquidation_threshold_usd,
+                config.liquidation_imbalance_ratio,
+            )
+            last_index = len(long_window) - 1
+            if last_index >= 0 and int(directions[last_index]) != int(SIGNAL_NONE):
+                if int(directions[last_index]) != int(last_direction):
+                    target_position = 1 if int(directions[last_index]) == int(SIGNAL_BUY) else -1
+                    emitted.append(
+                        _build_signal(
+                            snapshot=snapshot,
+                            plugin_id=self.plugin_id,
+                            plugin_version=self.plugin_version,
+                            instrument_id=config.instrument_id,
+                            timeframe=config.timeframe,
+                            time_horizon=config.time_horizon,
+                            timestamp=int(bar.timestamp),
+                            direction=int(directions[last_index]),
+                            strength=float(strengths[last_index]),
+                            payload=_with_target_position(
+                                {
+                                    "bar_timestamp": int(bar.timestamp),
+                                    "long_liq_notional_usd": float(long_window[last_index]),
+                                    "short_liq_notional_usd": float(short_window[last_index]),
+                                    "total_liq_notional_usd": float(total_notional_values[last_index]),
+                                    "liq_imbalance_ratio": float(imbalance_values[last_index]),
+                                    "long_liquidation_threshold_usd": float(config.long_liquidation_threshold_usd),
+                                    "short_liquidation_threshold_usd": float(config.short_liquidation_threshold_usd),
+                                    "blocked_instruments": blocked,
+                                },
+                                target_position=target_position,
+                            ),
+                            config_hash=config_hash,
+                        )
+                    )
+                    last_direction = int(directions[last_index])
+            elif last_index >= 0:
+                last_direction = int(SIGNAL_NONE)
+            cursor = bar.timestamp
+
+        return StepSignalResult(
+            state=SignalState(
+                plugin_id=self.plugin_id,
+                values={
+                    "cursor": cursor,
+                    "last_direction": last_direction,
+                    "timestamp_window": timestamp_window,
+                    "long_window": long_window,
+                    "short_window": short_window,
+                },
+            ),
+            signals=emitted,
+        )
+
+
 class AdxTrendStrengthPlugin:
     plugin_id = "adx_trend_strength"
     plugin_version = "numba/v1"
@@ -1736,6 +2202,8 @@ def register_builtin_plugins(registry) -> None:
     registry.register(PriceMovingAveragePlugin(), lambda raw: PriceMovingAverageConfig(**raw))
     registry.register(RsiReversionPlugin(), lambda raw: RsiReversionConfig(**raw))
     registry.register(DonchianBreakoutPlugin(), lambda raw: DonchianBreakoutConfig(**raw))
+    registry.register(OiFundingBreakoutPlugin(), lambda raw: OiFundingBreakoutConfig(**raw))
+    registry.register(LiquidationReversalPlugin(), lambda raw: LiquidationReversalConfig(**raw))
     registry.register(AdxTrendStrengthPlugin(), lambda raw: AdxTrendStrengthConfig(**raw))
     registry.register(AtrBreakoutPlugin(), lambda raw: AtrBreakoutConfig(**raw))
     registry.register(BollingerMeanReversionPlugin(), lambda raw: BollingerMeanReversionConfig(**raw))

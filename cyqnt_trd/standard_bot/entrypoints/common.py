@@ -23,6 +23,8 @@ def make_registry() -> SignalPluginRegistry:
 def add_historical_data_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("--input-json", default=None)
     parser.add_argument("--historical-dir", default="data/historical")
+    parser.add_argument("--derivatives-dir", default="data/derivatives")
+    parser.add_argument("--liquidations-dir", default="data/liquidations")
     parser.add_argument("--storage-timeframe", default="1m")
     parser.add_argument("--start-ts", type=int, default=None)
     parser.add_argument("--end-ts", type=int, default=None)
@@ -54,6 +56,8 @@ def build_market_data_adapter(
         data_root=args.historical_dir,
         market_type=args.market_type,
         resample_source_timeframe=args.storage_timeframe,
+        derivatives_data_root=getattr(args, "derivatives_dir", None),
+        liquidations_data_root=getattr(args, "liquidations_dir", None),
     )
     remote_adapter = None
     if getattr(args, "allow_remote_api", False):
@@ -70,6 +74,14 @@ def build_market_data_adapter(
         remote_adapter=remote_adapter,
         downloader=downloader,
     )
+
+
+def infer_contract_multiplier(*, market_type: str, symbol: str) -> float:
+    if market_type == "cme":
+        from ..data.cme import cme_contract_multiplier
+
+        return float(cme_contract_multiplier(symbol))
+    return 1.0
 
 
 def build_strategy_pipeline(
@@ -98,6 +110,11 @@ def build_strategy_pipeline(
     macd_slow_period: int = 26,
     macd_signal_period: int = 9,
     macd_histogram_threshold: float = 0.0,
+    oi_threshold_bps: float = 0.0,
+    max_funding_rate_bps: float = 100.0,
+    long_liquidation_threshold_usd: float = 100_000.0,
+    short_liquidation_threshold_usd: float = 100_000.0,
+    liquidation_imbalance_ratio: float = 0.60,
     primary_ma_period: int = 20,
     reference_ma_period: int = 20,
     spread_threshold_bps: float = 0.0,
@@ -185,6 +202,29 @@ def build_strategy_pipeline(
                 "slow_period": macd_slow_period,
                 "signal_period": macd_signal_period,
                 "histogram_threshold": macd_histogram_threshold,
+            },
+        }
+    elif strategy == "oi_funding_breakout":
+        plugin_spec = {
+            "plugin_id": "oi_funding_breakout",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "lookback_window": donchian_window,
+                "breakout_buffer_bps": breakout_buffer_bps,
+                "oi_threshold_bps": oi_threshold_bps,
+                "max_funding_rate_bps": max_funding_rate_bps,
+            },
+        }
+    elif strategy == "liquidation_reversal":
+        plugin_spec = {
+            "plugin_id": "liquidation_reversal",
+            "config": {
+                "instrument_id": symbol,
+                "timeframe": interval,
+                "long_liquidation_threshold_usd": long_liquidation_threshold_usd,
+                "short_liquidation_threshold_usd": short_liquidation_threshold_usd,
+                "liquidation_imbalance_ratio": liquidation_imbalance_ratio,
             },
         }
     elif strategy == "multi_timeframe_ma_spread":

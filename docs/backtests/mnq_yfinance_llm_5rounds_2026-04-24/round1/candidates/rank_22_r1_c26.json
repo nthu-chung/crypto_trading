@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c26",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 8,
+    "reference_ma_period": 21,
+    "spread_threshold_bps": 2.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -0.41695235736422515,
+  "total_return": -0.013565267534924496,
+  "max_drawdown": 0.08453655537179404,
+  "trade_count": 277,
+  "signal_count": 347,
+  "final_equity": 98643.47324650755,
+  "win_rate": 0.315018315018315,
+  "rank": 22,
+  "selected_for_next_round": true
+}

@@ -1,0 +1,44 @@
+{
+  "case_id": "quadruple-filter-breakout",
+  "display_name": "Quadruple Filter Breakout",
+  "source_case": "private-skills-for-ai-pro-main/references/usage_project_cases/quadruple-filter-breakout",
+  "category": "trend_breakout",
+  "summary": "Strict multi-timeframe EMA30 alignment gate with lower-timeframe breakout entry and ATR-based risk management.",
+  "core_logic": [
+    "Require bullish alignment across multiple higher timeframes before considering an entry.",
+    "Use lower-timeframe breakout timing for execution.",
+    "Treat ATR as a risk and trailing-stop input, not a directional alpha source.",
+    "Favor lower position count and conservative leverage."
+  ],
+  "market_bias": {
+    "market_type": "futures",
+    "default_symbol_scope": "USDT perpetual universe",
+    "timeframes": ["15m", "1h", "4h", "1d", "1w"]
+  },
+  "required_features": [
+    "multi-timeframe EMA alignment",
+    "breakout trigger",
+    "volume confirmation",
+    "ATR stop sizing"
+  ],
+  "cyqnt_support": {
+    "status": "partially_mapped",
+    "current_plugins": [
+      "multi_timeframe_ma_spread",
+      "donchian_breakout",
+      "price_moving_average",
+      "atr_breakout"
+    ],
+    "already_available_factors": [
+      "multi-timeframe MA spread",
+      "breakout-style signal families",
+      "ATR regime and breakout support"
+    ],
+    "gaps": [
+      "sequential four-timeframe hard gate",
+      "single bundled preset with higher-timeframe EMA30 strictness",
+      "case-specific rescan exit semantics"
+    ]
+  },
+  "recommended_next_step": "Package it now as a canonical trend-filter bundle, then later add a dedicated plugin that expresses the hard sequential gate explicitly."
+}

@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r4_c20",
+  "strategy": "price_moving_average",
+  "params": {
+    "period": 8,
+    "entry_threshold": 0.0025
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r3_c40"
+  ],
+  "sharpe_ratio": -4.619030753095701,
+  "total_return": -0.4693876222288244,
+  "max_drawdown": 0.5111602535584399,
+  "trade_count": 442,
+  "signal_count": 567,
+  "final_equity": 5306.123777711756,
+  "win_rate": 0.38064516129032255,
+  "rank": 49,
+  "selected_for_next_round": false
+}

@@ -22,10 +22,14 @@ from cyqnt_trd.standard_bot.signal import (
     BollingerMeanReversionPlugin,
     DonchianBreakoutConfig,
     DonchianBreakoutPlugin,
+    LiquidationReversalConfig,
+    LiquidationReversalPlugin,
     MacdTrendFollowConfig,
     MacdTrendFollowPlugin,
     MovingAverageCrossConfig,
     MovingAverageCrossPlugin,
+    OiFundingBreakoutConfig,
+    OiFundingBreakoutPlugin,
     RsiReversionConfig,
     RsiReversionPlugin,
     SignalPluginRegistry,
@@ -34,10 +38,12 @@ from cyqnt_trd.standard_bot.signal.numba_kernels import (
     adx_trend_strength_target_updates,
     atr_breakout_target_updates,
     bollinger_mean_reversion_target_updates,
+    liquidation_reversal_target_updates,
     TARGET_KEEP,
     donchian_breakout_target_updates,
     macd_trend_follow_target_updates,
     moving_average_cross_target_updates,
+    oi_funding_breakout_target_updates,
     rsi_reversion_target_updates,
 )
 from cyqnt_trd.standard_bot.simulation import NumbaBacktestRunner
@@ -81,6 +87,80 @@ def _market_bundle(
     )
 
 
+def _market_bundle_with_derivatives(
+    opens: list[float],
+    closes: list[float],
+    oi_changes: list[float],
+    funding_bps: list[float],
+) -> MarketBundle:
+    bars = []
+    for index, (open_price, close_price) in enumerate(zip(opens, closes)):
+        ts = (index + 1) * 300_000
+        bars.append(
+            Bar(
+                open=open_price,
+                high=max(open_price, close_price) + 1.0,
+                low=min(open_price, close_price) - 1.0,
+                close=close_price,
+                volume=100.0,
+                quote_volume=10_000.0,
+                timestamp=ts,
+                instrument_id="BTCUSDT",
+                timeframe="5m",
+                confirmed=True,
+                extras={
+                    "open_time": ts - 300_000,
+                    "close_time": ts,
+                    "oi_change_bps": oi_changes[index],
+                    "funding_rate_bps": funding_bps[index],
+                },
+            )
+        )
+    return MarketBundle(
+        bars={MarketBundle.key("BTCUSDT", "5m"): bars},
+        meta=BundleMeta(data_source="fixture", fetched_at=bars[-1].timestamp),
+    )
+
+
+def _market_bundle_with_liquidations(
+    opens: list[float],
+    closes: list[float],
+    long_liq_notional_usd: list[float],
+    short_liq_notional_usd: list[float],
+) -> MarketBundle:
+    bars = []
+    for index, (open_price, close_price) in enumerate(zip(opens, closes)):
+        ts = (index + 1) * 300_000
+        total = long_liq_notional_usd[index] + short_liq_notional_usd[index]
+        imbalance = 0.0 if total <= 0.0 else (short_liq_notional_usd[index] - long_liq_notional_usd[index]) / total
+        bars.append(
+            Bar(
+                open=open_price,
+                high=max(open_price, close_price) + 1.0,
+                low=min(open_price, close_price) - 1.0,
+                close=close_price,
+                volume=100.0,
+                quote_volume=10_000.0,
+                timestamp=ts,
+                instrument_id="BTCUSDT",
+                timeframe="5m",
+                confirmed=True,
+                extras={
+                    "open_time": ts - 300_000,
+                    "close_time": ts,
+                    "long_liq_notional_usd": long_liq_notional_usd[index],
+                    "short_liq_notional_usd": short_liq_notional_usd[index],
+                    "total_liq_notional_usd": total,
+                    "liq_imbalance_ratio": imbalance,
+                },
+            )
+        )
+    return MarketBundle(
+        bars={MarketBundle.key("BTCUSDT", "5m"): bars},
+        meta=BundleMeta(data_source="fixture", fetched_at=bars[-1].timestamp),
+    )
+
+
 def _request(
     *,
     strategy: str,
@@ -99,6 +179,20 @@ def _request(
         initial_capital=initial_capital,
         fee_model=fee_model or {"taker_fee_bps": 0.0},
         slippage_model=slippage_model or {"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
+    )
+
+
+def _request_5m(*, strategy: str, config: dict) -> BacktestRequest:
+    return BacktestRequest(
+        request_id=str(uuid.uuid4()),
+        instruments=["BTCUSDT"],
+        primary_timeframe="5m",
+        start_ts=300_000,
+        end_ts=1_800_000,
+        signal_pipeline=SignalPipelineSpec(plugin_chain=[{"plugin_id": strategy, "config": config}]),
+        initial_capital=1000.0,
+        fee_model={"taker_fee_bps": 0.0},
+        slippage_model={"slippage_bps": 0.0, "max_bar_volume_fraction": 1.0},
     )
 
 
@@ -216,6 +310,55 @@ def test_numba_moving_average_cross_matches_incremental_plugin_decisions() -> No
         numba_decisions.append((timestamps[index], "buy" if int(update) == 1 else "sell"))
 
     assert step_decisions == numba_decisions
+
+
+def test_numba_oi_funding_breakout_supports_derivatives_features() -> None:
+    bundle = _market_bundle_with_derivatives(
+        opens=[100.0, 101.0, 102.0, 103.0, 110.0, 112.0],
+        closes=[100.0, 101.0, 102.0, 103.0, 111.0, 113.0],
+        oi_changes=[0.0, 0.0, 50.0, 80.0, 150.0, 100.0],
+        funding_bps=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    )
+    request = _request_5m(
+        strategy="oi_funding_breakout",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "5m",
+            "lookback_window": 3,
+            "breakout_buffer_bps": 0.0,
+            "oi_threshold_bps": 50.0,
+            "max_funding_rate_bps": 5.0,
+        },
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["trade_count"] >= 1.0
+    assert result.signal_batches
+
+
+def test_numba_liquidation_reversal_supports_liquidation_features() -> None:
+    bundle = _market_bundle_with_liquidations(
+        opens=[100.0, 100.0, 99.0, 101.0],
+        closes=[100.0, 99.0, 101.0, 102.0],
+        long_liq_notional_usd=[0.0, 250_000.0, 0.0, 0.0],
+        short_liq_notional_usd=[0.0, 0.0, 0.0, 0.0],
+    )
+    request = _request_5m(
+        strategy="liquidation_reversal",
+        config={
+            "instrument_id": "BTCUSDT",
+            "timeframe": "5m",
+            "long_liquidation_threshold_usd": 100_000.0,
+            "short_liquidation_threshold_usd": 100_000.0,
+            "liquidation_imbalance_ratio": 0.6,
+        },
+    )
+
+    result = NumbaBacktestRunner().run(request=request, market_bundle=bundle)
+
+    assert result.metrics["trade_count"] >= 1.0
+    assert result.signal_batches
 
 
 def test_numba_runner_supports_moving_average_cross_backtests() -> None:

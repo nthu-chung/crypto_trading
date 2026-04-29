@@ -1,0 +1,20 @@
+{
+  "candidate_id": "r1_c05",
+  "strategy": "rsi_reversion",
+  "params": {
+    "period": 14,
+    "oversold": 30.0,
+    "overbought": 70.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -5.536030438670936,
+  "total_return": -0.44394633101968267,
+  "max_drawdown": 0.45175550198183706,
+  "trade_count": 1373,
+  "signal_count": 5699,
+  "final_equity": 5560.536689803173,
+  "win_rate": 0.5205047318611987,
+  "rank": 20,
+  "selected_for_next_round": true
+}

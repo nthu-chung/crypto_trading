@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r4_c19",
+  "strategy": "rsi_reversion",
+  "params": {
+    "period": 18,
+    "oversold": 25.0,
+    "overbought": 70.0
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r3_c39"
+  ],
+  "sharpe_ratio": -3.37551227441243,
+  "total_return": -0.28085225927193314,
+  "max_drawdown": 0.33038452308860583,
+  "trade_count": 597,
+  "signal_count": 2848,
+  "final_equity": 7191.477407280669,
+  "win_rate": 0.5540540540540541,
+  "rank": 47,
+  "selected_for_next_round": false
+}

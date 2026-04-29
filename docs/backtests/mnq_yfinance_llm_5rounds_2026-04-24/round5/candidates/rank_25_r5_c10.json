@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r5_c10",
+  "strategy": "atr_breakout",
+  "params": {
+    "ma_period": 78,
+    "atr_period": 22,
+    "atr_multiplier": 2.5
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r4_c50"
+  ],
+  "sharpe_ratio": 3.1326346728718777,
+  "total_return": 0.09025198157864914,
+  "max_drawdown": 0.06567600688582294,
+  "trade_count": 128,
+  "signal_count": 582,
+  "final_equity": 109025.19815786491,
+  "win_rate": 0.3559322033898305,
+  "rank": 25,
+  "selected_for_next_round": true
+}

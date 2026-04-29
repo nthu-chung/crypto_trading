@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r2_c09",
+  "strategy": "price_moving_average",
+  "params": {
+    "period": 21,
+    "entry_threshold": 0.0005
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r1_c11"
+  ],
+  "sharpe_ratio": 1.9690334032185755,
+  "total_return": 0.046370342314069564,
+  "max_drawdown": 0.053515282807909355,
+  "trade_count": 294,
+  "signal_count": 447,
+  "final_equity": 104637.03423140696,
+  "win_rate": 0.38095238095238093,
+  "rank": 23,
+  "selected_for_next_round": false
+}

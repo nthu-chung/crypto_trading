@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r5_c46",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 20,
+    "reference_ma_period": 75,
+    "spread_threshold_bps": 80.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r4_c05"
+  ],
+  "sharpe_ratio": 0.16115895205793276,
+  "total_return": -0.013200729733833396,
+  "max_drawdown": 0.35516910578353655,
+  "trade_count": 78,
+  "signal_count": 82,
+  "final_equity": 9867.992702661666,
+  "win_rate": 0.2903225806451613,
+  "rank": 28,
+  "selected_for_next_round": false
+}

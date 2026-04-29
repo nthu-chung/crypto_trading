@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r1_c21",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 7,
+    "slow_window": 30,
+    "entry_threshold": 0.001
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c01"
+  ],
+  "sharpe_ratio": -7.1773170277426095,
+  "total_return": -0.5908077585507463,
+  "max_drawdown": 0.5949494038750316,
+  "trade_count": 2207,
+  "signal_count": 19081,
+  "final_equity": 4091.922414492538,
+  "win_rate": 0.24274406332453827,
+  "rank": 30,
+  "selected_for_next_round": false
+}

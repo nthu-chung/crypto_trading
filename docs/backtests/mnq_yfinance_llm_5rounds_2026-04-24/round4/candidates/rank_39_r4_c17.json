@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r4_c17",
+  "strategy": "atr_breakout",
+  "params": {
+    "ma_period": 85,
+    "atr_period": 25,
+    "atr_multiplier": 3.5
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r3_c50"
+  ],
+  "sharpe_ratio": 1.9531438348817691,
+  "total_return": 0.050396359728351235,
+  "max_drawdown": 0.08388891086232121,
+  "trade_count": 88,
+  "signal_count": 481,
+  "final_equity": 105039.63597283512,
+  "win_rate": 0.34523809523809523,
+  "rank": 39,
+  "selected_for_next_round": false
+}

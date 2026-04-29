@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r1_c18",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 25,
+    "reference_ma_period": 55,
+    "spread_threshold_bps": 10.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c08"
+  ],
+  "sharpe_ratio": -1.4699713512759829,
+  "total_return": -0.20068933973184222,
+  "max_drawdown": 0.3834799024681202,
+  "trade_count": 101,
+  "signal_count": 101,
+  "final_equity": 7993.106602681578,
+  "win_rate": 0.2345679012345679,
+  "rank": 10,
+  "selected_for_next_round": false
+}

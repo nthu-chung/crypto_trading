@@ -1,0 +1,21 @@
+{
+  "case_id": "quadruple-filter-breakout",
+  "preferred_plugin_id": null,
+  "mapping_status": "bundle",
+  "preset_name": "quadruple_filter_breakout_reference",
+  "component_plugins": [
+    "multi_timeframe_ma_spread",
+    "donchian_breakout",
+    "atr_breakout"
+  ],
+  "parameters": {
+    "trend_timeframes": ["1h", "4h", "1d", "1w"],
+    "entry_timeframe": "15m",
+    "ema_period": 30,
+    "risk_per_trade_pct": 2.0
+  },
+  "notes": [
+    "This packaged preset describes the intended structure even though the exact hard gate is not yet a dedicated plugin.",
+    "Use it as a bundled strategy spec for future implementation."
+  ]
+}

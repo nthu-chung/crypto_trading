@@ -13,6 +13,7 @@ from typing import Dict, List, Optional
 import requests
 
 from ..core import Bar, BundleMeta, MarketBundle, MarketQuery
+from ._ssl_utils import resolve_ca_bundle
 
 
 _SPOT_KLINES_URL = "https://api.binance.com/api/v3/uiKlines"
@@ -87,7 +88,12 @@ class BinanceRestMarketDataAdapter:
         if market_query.time_range.end_ts is not None:
             params["endTime"] = int(market_query.time_range.end_ts)
 
-        response = requests.get(self.base_url, params=params, timeout=self.timeout)
+        response = requests.get(
+            self.base_url,
+            params=params,
+            timeout=self.timeout,
+            verify=resolve_ca_bundle(),
+        )
         response.raise_for_status()
         return response.json()
 

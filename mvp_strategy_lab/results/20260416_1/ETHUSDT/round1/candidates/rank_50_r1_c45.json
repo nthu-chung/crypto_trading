@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r1_c45",
+  "strategy": "price_moving_average",
+  "params": {
+    "period": 5,
+    "entry_threshold": 0.0005
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c06"
+  ],
+  "sharpe_ratio": -22.98885786781853,
+  "total_return": -0.9507398903100813,
+  "max_drawdown": 0.9507398903100813,
+  "trade_count": 3297,
+  "signal_count": 3819,
+  "final_equity": 492.60109689918676,
+  "win_rate": 0.21267605633802816,
+  "rank": 50,
+  "selected_for_next_round": false
+}

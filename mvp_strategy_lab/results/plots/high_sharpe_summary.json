@@ -1,0 +1,15 @@
+{
+  "symbol": "BTCUSDT",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 69,
+    "breakout_buffer_bps": 30.0
+  },
+  "pnl": 1222.0845534919572,
+  "sharpe_ratio": 1.1151866386875946,
+  "max_drawdown_pct": 32.62433914783351,
+  "returns_pct": 12.220845534919572,
+  "backtest_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/best_strategy_backtest_20260416_142606.json",
+  "plot_png": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/plots/BTCUSDT_donchian_breakout_sharpe_gt_1.png",
+  "plot_svg": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/plots/BTCUSDT_donchian_breakout_sharpe_gt_1.svg"
+}

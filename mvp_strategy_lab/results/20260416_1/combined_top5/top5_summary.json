@@ -1,0 +1,107 @@
+[
+  {
+    "rank": 1,
+    "symbol": "BTCUSDT",
+    "strategy": "donchian_breakout",
+    "candidate_id": "r5_c01",
+    "params": {
+      "lookback_window": 63,
+      "breakout_buffer_bps": 40.0
+    },
+    "date_start": "2026-01-16",
+    "date_end": "2026-04-16",
+    "pnl": 5814.126690951218,
+    "sharpe_ratio": 3.6157153541194726,
+    "max_drawdown_pct": 19.190992439238105,
+    "returns_pct": 58.14126690951218,
+    "trade_count": 95,
+    "signal_count": 101,
+    "plot_png": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_plots/rank_01_BTCUSDT_r5_c01.png",
+    "source_experiment_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/BTCUSDT/experiment_summary.json",
+    "backtest_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_backtests/rank_01_BTCUSDT_r5_c01.json"
+  },
+  {
+    "rank": 2,
+    "symbol": "BTCUSDT",
+    "strategy": "donchian_breakout",
+    "candidate_id": "r5_c02",
+    "params": {
+      "lookback_window": 68,
+      "breakout_buffer_bps": 35.0
+    },
+    "date_start": "2026-01-16",
+    "date_end": "2026-04-16",
+    "pnl": 4727.016834779795,
+    "sharpe_ratio": 3.089926478529085,
+    "max_drawdown_pct": 22.494478227691342,
+    "returns_pct": 47.270168347797956,
+    "trade_count": 114,
+    "signal_count": 126,
+    "plot_png": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_plots/rank_02_BTCUSDT_r5_c02.png",
+    "source_experiment_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/BTCUSDT/experiment_summary.json",
+    "backtest_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_backtests/rank_02_BTCUSDT_r5_c02.json"
+  },
+  {
+    "rank": 3,
+    "symbol": "BTCUSDT",
+    "strategy": "donchian_breakout",
+    "candidate_id": "r5_c44",
+    "params": {
+      "lookback_window": 72,
+      "breakout_buffer_bps": 35.0
+    },
+    "date_start": "2026-01-16",
+    "date_end": "2026-04-16",
+    "pnl": 4726.078540184015,
+    "sharpe_ratio": 3.0894984847857865,
+    "max_drawdown_pct": 22.494478227691364,
+    "returns_pct": 47.26078540184015,
+    "trade_count": 113,
+    "signal_count": 125,
+    "plot_png": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_plots/rank_03_BTCUSDT_r5_c44.png",
+    "source_experiment_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/BTCUSDT/experiment_summary.json",
+    "backtest_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_backtests/rank_03_BTCUSDT_r5_c44.json"
+  },
+  {
+    "rank": 4,
+    "symbol": "BTCUSDT",
+    "strategy": "donchian_breakout",
+    "candidate_id": "r5_c21",
+    "params": {
+      "lookback_window": 73,
+      "breakout_buffer_bps": 35.0
+    },
+    "date_start": "2026-01-16",
+    "date_end": "2026-04-16",
+    "pnl": 4517.204203328854,
+    "sharpe_ratio": 2.985383142008588,
+    "max_drawdown_pct": 22.494478227691364,
+    "returns_pct": 45.17204203328855,
+    "trade_count": 112,
+    "signal_count": 124,
+    "plot_png": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_plots/rank_04_BTCUSDT_r5_c21.png",
+    "source_experiment_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/BTCUSDT/experiment_summary.json",
+    "backtest_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_backtests/rank_04_BTCUSDT_r5_c21.json"
+  },
+  {
+    "rank": 5,
+    "symbol": "BTCUSDT",
+    "strategy": "donchian_breakout",
+    "candidate_id": "r5_c03",
+    "params": {
+      "lookback_window": 60,
+      "breakout_buffer_bps": 40.0
+    },
+    "date_start": "2026-01-16",
+    "date_end": "2026-04-16",
+    "pnl": 4368.975778662934,
+    "sharpe_ratio": 2.917190635921284,
+    "max_drawdown_pct": 22.95392607733232,
+    "returns_pct": 43.68975778662934,
+    "trade_count": 97,
+    "signal_count": 103,
+    "plot_png": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_plots/rank_05_BTCUSDT_r5_c03.png",
+    "source_experiment_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/BTCUSDT/experiment_summary.json",
+    "backtest_json": "/Users/hankchung/Dev/crypto_trading-main/mvp_strategy_lab/results/20260416_1/combined_top5/top5_backtests/rank_05_BTCUSDT_r5_c03.json"
+  }
+]

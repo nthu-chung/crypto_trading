@@ -22,6 +22,14 @@ from cyqnt_trd.standard_bot.core import (  # noqa: E402
 )
 from cyqnt_trd.standard_bot.data import AlignmentPolicy, HistoricalSnapshotAssembler  # noqa: E402
 from cyqnt_trd.standard_bot.data.downloader import HistoricalBinanceDownloader  # noqa: E402
+from cyqnt_trd.standard_bot.data.derivatives import (  # noqa: E402
+    build_derivatives_path,
+    HistoricalBinanceDerivativesDownloader,
+)
+from cyqnt_trd.standard_bot.data.liquidations import (  # noqa: E402
+    aggregate_force_order_records,
+    build_liquidation_path,
+)
 from cyqnt_trd.standard_bot.data.historical import (  # noqa: E402
     HistoricalParquetMarketDataAdapter,
     build_history_path,
@@ -44,12 +52,12 @@ class _FakeResponse:
 
 
 class _FakeSession:
-    def __init__(self, payloads: list[list[list]]) -> None:
+    def __init__(self, payloads) -> None:
         self.payloads = list(payloads)
         self.calls: list[dict] = []
 
-    def get(self, url: str, params: dict, timeout: int) -> _FakeResponse:
-        self.calls.append({"url": url, "params": dict(params), "timeout": timeout})
+    def get(self, url: str, params: dict, timeout: int, **kwargs) -> _FakeResponse:
+        self.calls.append({"url": url, "params": dict(params), "timeout": timeout, **kwargs})
         if not self.payloads:
             return _FakeResponse([])
         return _FakeResponse(self.payloads.pop(0))
@@ -58,6 +66,20 @@ class _FakeSession:
 def _write_parquet_rows(tmp_path, market_type: str, symbol: str, timeframe: str, rows: list[dict]) -> None:
     table = pyarrow.Table.from_pylist(rows)
     path = build_history_path(str(tmp_path), market_type, symbol, timeframe)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pyarrow_parquet.write_table(table, str(path))
+
+
+def _write_derivatives_rows(tmp_path, market_type: str, symbol: str, dataset: str, rows: list[dict]) -> None:
+    table = pyarrow.Table.from_pylist(rows)
+    path = build_derivatives_path(str(tmp_path), market_type, symbol, dataset)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pyarrow_parquet.write_table(table, str(path))
+
+
+def _write_liquidation_rows(tmp_path, market_type: str, symbol: str, timeframe: str, rows: list[dict]) -> None:
+    table = pyarrow.Table.from_pylist(rows)
+    path = build_liquidation_path(str(tmp_path), market_type, symbol, timeframe)
     path.parent.mkdir(parents=True, exist_ok=True)
     pyarrow_parquet.write_table(table, str(path))
 
@@ -98,6 +120,76 @@ def test_historical_binance_downloader_streams_chunked_parquet(tmp_path) -> None
 
     tail_frame = read_parquet_frame(result.path, tail_rows=2)
     assert list(tail_frame["close_time"]) == [119_999, 179_999]
+
+
+def test_historical_binance_derivatives_downloader_writes_open_interest_and_funding(tmp_path) -> None:
+    class _DerivativeSession:
+        def __init__(self) -> None:
+            self.calls = []
+            self.funding_calls = 0
+
+        def get(self, url: str, params: dict, timeout: int, **kwargs) -> _FakeResponse:
+            self.calls.append({"url": url, "params": dict(params), "timeout": timeout, **kwargs})
+            if "openInterestHist" in url:
+                start_time = int(params["startTime"])
+                if start_time == 0:
+                    return _FakeResponse(
+                        [
+                            {
+                                "symbol": "BTCUSDT",
+                                "sumOpenInterest": "1000.0",
+                                "sumOpenInterestValue": "100000.0",
+                                "timestamp": 300_000,
+                            },
+                            {
+                                "symbol": "BTCUSDT",
+                                "sumOpenInterest": "1020.0",
+                                "sumOpenInterestValue": "102000.0",
+                                "timestamp": 600_000,
+                            },
+                        ]
+                    )
+                return _FakeResponse([])
+            self.funding_calls += 1
+            if self.funding_calls > 1:
+                return _FakeResponse([])
+            return _FakeResponse(
+                [
+                    {
+                        "symbol": "BTCUSDT",
+                        "fundingRate": "0.0001",
+                        "fundingTime": 0,
+                        "markPrice": "100.0",
+                    },
+                    {
+                        "symbol": "BTCUSDT",
+                        "fundingRate": "0.0002",
+                        "fundingTime": 28_800_000,
+                        "markPrice": "101.0",
+                    },
+                ]
+            )
+
+    session = _DerivativeSession()
+    downloader = HistoricalBinanceDerivativesDownloader(
+        data_root=str(tmp_path),
+        market_type="futures",
+        session=session,
+    )
+
+    result = downloader.download_bundle(
+        instrument_id="BTCUSDT",
+        timeframe="5m",
+        start_ts=0,
+        end_ts=30_000_000,
+    )
+
+    assert result.open_interest_rows == 2
+    assert result.funding_rate_rows == 2
+    oi_frame = pyarrow_parquet.read_table(result.open_interest_path).to_pandas()
+    funding_frame = pyarrow_parquet.read_table(result.funding_rate_path).to_pandas()
+    assert list(oi_frame["timestamp"]) == [300_000, 600_000]
+    assert list(funding_frame["timestamp"]) == [0, 28_800_000]
 
 
 def test_historical_parquet_adapter_resamples_1m_to_5m(tmp_path) -> None:
@@ -146,6 +238,170 @@ def test_historical_parquet_adapter_resamples_1m_to_5m(tmp_path) -> None:
     min_open, max_close = parquet_time_coverage(build_history_path(str(tmp_path), "futures", "BTCUSDT", "1m"))
     assert min_open == 0
     assert max_close == 599_999
+
+
+def test_historical_parquet_adapter_enriches_bars_with_derivatives_features(tmp_path) -> None:
+    rows = []
+    for index in range(6):
+        open_time = index * 300_000
+        rows.append(
+            {
+                "open_time": open_time,
+                "close_time": open_time + 299_999,
+                "open": 100.0 + index,
+                "high": 101.0 + index,
+                "low": 99.0 + index,
+                "close": 100.5 + index,
+                "volume": 10.0 + index,
+                "quote_volume": 1000.0 + index,
+                "trades": 100 + index,
+                "instrument_id": "BTCUSDT",
+                "timeframe": "5m",
+                "confirmed": True,
+            }
+        )
+    _write_parquet_rows(tmp_path, "futures", "BTCUSDT", "5m", rows)
+    _write_derivatives_rows(
+        tmp_path,
+        "futures",
+        "BTCUSDT",
+        "open_interest_5m",
+        [
+            {
+                "timestamp": 299_999,
+                "instrument_id": "BTCUSDT",
+                "period": "5m",
+                "open_interest": 1_000.0,
+                "open_interest_value": 100_000.0,
+            },
+            {
+                "timestamp": 599_999,
+                "instrument_id": "BTCUSDT",
+                "period": "5m",
+                "open_interest": 1_020.0,
+                "open_interest_value": 102_000.0,
+            },
+            {
+                "timestamp": 899_999,
+                "instrument_id": "BTCUSDT",
+                "period": "5m",
+                "open_interest": 1_050.0,
+                "open_interest_value": 105_000.0,
+            },
+        ],
+    )
+    _write_derivatives_rows(
+        tmp_path,
+        "futures",
+        "BTCUSDT",
+        "funding_rate",
+        [
+            {
+                "timestamp": 0,
+                "instrument_id": "BTCUSDT",
+                "funding_rate": 0.0001,
+                "mark_price": 100.0,
+            }
+        ],
+    )
+
+    adapter = HistoricalParquetMarketDataAdapter(
+        data_root=str(tmp_path),
+        market_type="futures",
+        resample_source_timeframe="1m",
+        derivatives_data_root=str(tmp_path),
+    )
+    bundle = adapter.fetch_market(
+        MarketQuery(
+            instruments=["BTCUSDT"],
+            timeframes=["5m"],
+            time_range=TimeRange(),
+        )
+    )
+
+    bars = bundle.bars[MarketBundle.key("BTCUSDT", "5m")]
+    assert "funding_rate_bps" in bars[0].extras
+    assert bars[0].extras["funding_rate_bps"] == pytest.approx(1.0)
+    assert bars[1].extras["oi_change_bps"] == pytest.approx(200.0)
+
+
+def test_liquidation_aggregation_and_adapter_enrichment(tmp_path) -> None:
+    records = [
+        {
+            "timestamp": 120_000,
+            "instrument_id": "BTCUSDT",
+            "side": "SELL",
+            "filled_qty": 2.0,
+            "notional_usd": 200_000.0,
+        },
+        {
+            "timestamp": 180_000,
+            "instrument_id": "BTCUSDT",
+            "side": "SELL",
+            "filled_qty": 1.0,
+            "notional_usd": 100_000.0,
+        },
+        {
+            "timestamp": 420_000,
+            "instrument_id": "BTCUSDT",
+            "side": "BUY",
+            "filled_qty": 3.0,
+            "notional_usd": 330_000.0,
+        },
+    ]
+    symbol_frames = aggregate_force_order_records(
+        records,
+        timeframe="5m",
+        instrument_ids=["BTCUSDT"],
+        timeframe_ms=300_000,
+    )
+    _write_liquidation_rows(
+        tmp_path,
+        "futures",
+        "BTCUSDT",
+        "5m",
+        symbol_frames["BTCUSDT"].to_dict("records"),
+    )
+
+    rows = []
+    for index in range(4):
+        open_time = index * 300_000
+        rows.append(
+            {
+                "open_time": open_time,
+                "close_time": open_time + 299_999,
+                "open": 100.0 + index,
+                "high": 101.0 + index,
+                "low": 99.0 + index,
+                "close": 100.5 + index,
+                "volume": 10.0 + index,
+                "quote_volume": 1000.0 + index,
+                "trades": 100 + index,
+                "instrument_id": "BTCUSDT",
+                "timeframe": "5m",
+                "confirmed": True,
+            }
+        )
+    _write_parquet_rows(tmp_path, "futures", "BTCUSDT", "5m", rows)
+
+    adapter = HistoricalParquetMarketDataAdapter(
+        data_root=str(tmp_path),
+        market_type="futures",
+        resample_source_timeframe="1m",
+        liquidations_data_root=str(tmp_path),
+    )
+    bundle = adapter.fetch_market(
+        MarketQuery(
+            instruments=["BTCUSDT"],
+            timeframes=["5m"],
+            time_range=TimeRange(),
+        )
+    )
+
+    bars = bundle.bars[MarketBundle.key("BTCUSDT", "5m")]
+    assert bars[0].extras["long_liq_notional_usd"] == pytest.approx(300_000.0)
+    assert bars[0].extras["short_liq_notional_usd"] == pytest.approx(0.0)
+    assert bars[1].extras["short_liq_notional_usd"] == pytest.approx(330_000.0)
 
 
 def test_resampled_multi_timeframe_snapshots_do_not_look_ahead(tmp_path) -> None:

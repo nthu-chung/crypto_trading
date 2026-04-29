@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Curated strategy case bundles packaged with cyqnt-trd.",
+  "cases": [
+    {
+      "case_id": "rsi-mean-reversion",
+      "display_name": "RSI Mean Reversion",
+      "category": "mean_reversion",
+      "integration_status": "partially_mapped"
+    },
+    {
+      "case_id": "btc-multi-factor-trend",
+      "display_name": "BTC Multi-Factor Trend",
+      "category": "trend_following",
+      "integration_status": "factor_bundle"
+    },
+    {
+      "case_id": "bb-squeeze-momentum",
+      "display_name": "BB Squeeze Momentum",
+      "category": "volatility_breakout",
+      "integration_status": "partially_mapped"
+    },
+    {
+      "case_id": "quadruple-filter-breakout",
+      "display_name": "Quadruple Filter Breakout",
+      "category": "trend_breakout",
+      "integration_status": "partially_mapped"
+    },
+    {
+      "case_id": "structure-breakout-priceaction",
+      "display_name": "Structure Breakout Price Action",
+      "category": "price_action_breakout",
+      "integration_status": "concept_bundle"
+    }
+  ]
+}

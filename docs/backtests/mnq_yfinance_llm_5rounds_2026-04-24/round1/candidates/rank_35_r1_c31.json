@@ -1,0 +1,19 @@
+{
+  "candidate_id": "r1_c31",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 55,
+    "breakout_buffer_bps": 10.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -2.6823799835857485,
+  "total_return": -0.06172493692928343,
+  "max_drawdown": 0.07914952445886504,
+  "trade_count": 56,
+  "signal_count": 121,
+  "final_equity": 93827.50630707166,
+  "win_rate": 0.3125,
+  "rank": 35,
+  "selected_for_next_round": false
+}

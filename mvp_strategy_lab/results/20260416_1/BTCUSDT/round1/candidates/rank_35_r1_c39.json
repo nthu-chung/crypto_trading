@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r1_c39",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 10,
+    "breakout_buffer_bps": 5.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c09"
+  ],
+  "sharpe_ratio": -10.639392503536115,
+  "total_return": -0.7835327508725696,
+  "max_drawdown": 0.7879805382375786,
+  "trade_count": 1647,
+  "signal_count": 1742,
+  "final_equity": 2164.672491274305,
+  "win_rate": 0.26458036984352773,
+  "rank": 35,
+  "selected_for_next_round": false
+}

@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r4_c22",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 20,
+    "reference_ma_period": 28,
+    "spread_threshold_bps": 45.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r3_c48"
+  ],
+  "sharpe_ratio": 2.09937303030255,
+  "total_return": 0.3490097240879406,
+  "max_drawdown": 0.23848291156728374,
+  "trade_count": 149,
+  "signal_count": 151,
+  "final_equity": 13490.097240879406,
+  "win_rate": 0.4166666666666667,
+  "rank": 2,
+  "selected_for_next_round": true
+}

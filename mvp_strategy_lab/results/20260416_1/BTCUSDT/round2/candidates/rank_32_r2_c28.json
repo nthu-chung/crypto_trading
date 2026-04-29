@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r2_c28",
+  "strategy": "donchian_breakout",
+  "params": {
+    "lookback_window": 55,
+    "breakout_buffer_bps": 5.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c20"
+  ],
+  "sharpe_ratio": -3.7140685789375962,
+  "total_return": -0.4262909733990801,
+  "max_drawdown": 0.4731538335232788,
+  "trade_count": 605,
+  "signal_count": 684,
+  "final_equity": 5737.090266009199,
+  "win_rate": 0.2623762376237624,
+  "rank": 32,
+  "selected_for_next_round": false
+}

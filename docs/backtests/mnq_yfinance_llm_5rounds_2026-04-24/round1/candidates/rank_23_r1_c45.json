@@ -1,0 +1,19 @@
+{
+  "candidate_id": "r1_c45",
+  "strategy": "bollinger_mean_reversion",
+  "params": {
+    "period": 20,
+    "stddev_multiplier": 2.0
+  },
+  "origin": "seed",
+  "parent_ids": [],
+  "sharpe_ratio": -0.5579848730442386,
+  "total_return": -0.02096469743949041,
+  "max_drawdown": 0.09526689994811487,
+  "trade_count": 296,
+  "signal_count": 822,
+  "final_equity": 97903.53025605096,
+  "win_rate": 0.6254295532646048,
+  "rank": 23,
+  "selected_for_next_round": false
+}

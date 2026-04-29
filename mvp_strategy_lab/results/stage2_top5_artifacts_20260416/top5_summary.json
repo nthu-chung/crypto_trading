@@ -1,0 +1,82 @@
+[
+  {
+    "rank": 1,
+    "candidate_id": "r5_c01",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 64,
+      "breakout_buffer_bps": 35.0
+    },
+    "sharpe_ratio": 3.118040080577203,
+    "pnl": 4768.026524122479,
+    "max_drawdown_pct": 16.778916976763767,
+    "returns_pct": 47.68026524122479,
+    "symbol": "BTCUSDT",
+    "plot_png": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_plots/rank_01_r5_c01.png",
+    "backtest_json": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_backtests/rank_01_r5_c01.json"
+  },
+  {
+    "rank": 2,
+    "candidate_id": "r5_c02",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 63,
+      "breakout_buffer_bps": 40.0
+    },
+    "sharpe_ratio": 3.092541174201671,
+    "pnl": 4684.27292407057,
+    "max_drawdown_pct": 19.190992439238137,
+    "returns_pct": 46.84272924070571,
+    "symbol": "BTCUSDT",
+    "plot_png": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_plots/rank_02_r5_c02.png",
+    "backtest_json": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_backtests/rank_02_r5_c02.json"
+  },
+  {
+    "rank": 3,
+    "candidate_id": "r5_c03",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 64,
+      "breakout_buffer_bps": 40.0
+    },
+    "sharpe_ratio": 3.092541174201671,
+    "pnl": 4684.27292407057,
+    "max_drawdown_pct": 19.190992439238137,
+    "returns_pct": 46.84272924070571,
+    "symbol": "BTCUSDT",
+    "plot_png": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_plots/rank_03_r5_c03.png",
+    "backtest_json": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_backtests/rank_03_r5_c03.json"
+  },
+  {
+    "rank": 4,
+    "candidate_id": "r5_c04",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 65,
+      "breakout_buffer_bps": 35.0
+    },
+    "sharpe_ratio": 3.091799852780509,
+    "pnl": 4717.66780717716,
+    "max_drawdown_pct": 18.827075775978624,
+    "returns_pct": 47.176678071771605,
+    "symbol": "BTCUSDT",
+    "plot_png": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_plots/rank_04_r5_c04.png",
+    "backtest_json": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_backtests/rank_04_r5_c04.json"
+  },
+  {
+    "rank": 5,
+    "candidate_id": "r5_c05",
+    "strategy": "donchian_breakout",
+    "params": {
+      "lookback_window": 63,
+      "breakout_buffer_bps": 35.0
+    },
+    "sharpe_ratio": 2.7699812206617636,
+    "pnl": 4080.3417264692944,
+    "max_drawdown_pct": 20.654172316116906,
+    "returns_pct": 40.80341726469294,
+    "symbol": "BTCUSDT",
+    "plot_png": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_plots/rank_05_r5_c05.png",
+    "backtest_json": "mvp_strategy_lab/results/stage2_top5_artifacts_20260416/top5_backtests/rank_05_r5_c05.json"
+  }
+]

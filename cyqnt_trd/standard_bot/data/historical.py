@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from numbers import Integral, Real
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -13,6 +14,8 @@ import pandas as pd
 
 from ..core import Bar, BundleMeta, MarketBundle, MarketQuery
 from .alignment import timeframe_to_ms
+from .derivatives import enrich_market_frame_with_derivatives
+from .liquidations import enrich_market_frame_with_liquidations
 
 try:
     import polars as pl
@@ -27,7 +30,7 @@ except ImportError:  # pragma: no cover - exercised in environments without pyar
     pq = None
 
 
-SUPPORTED_RESAMPLE_TIMEFRAMES = {"5m", "1h"}
+SUPPORTED_RESAMPLE_TIMEFRAMES = {"5m", "15m", "1h"}
 PARQUET_COLUMNS = [
     "open_time",
     "close_time",
@@ -332,6 +335,42 @@ def _row_to_bar(row: pd.Series) -> Bar:
     timeframe = str(row.get("timeframe") or "")
     close_time = int(row["close_time"])
     open_time = int(row.get("open_time", close_time))
+    extras = {
+        "open_time": open_time,
+        "close_time": close_time,
+        "trades": int(row.get("trades", 0)),
+    }
+    standard_columns = {
+        "open_time",
+        "close_time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "trades",
+        "instrument_id",
+        "timeframe",
+        "confirmed",
+    }
+    for column, value in row.items():
+        if column in standard_columns:
+            continue
+        if pd.isna(value):
+            continue
+        if isinstance(value, bool):
+            extras[column] = bool(value)
+        elif isinstance(value, Integral):
+            extras[column] = int(value)
+        elif isinstance(value, Real):
+            extras[column] = float(value)
+        elif hasattr(value, "item"):
+            normalized = value.item()
+            if normalized is not None:
+                extras[column] = normalized
+        else:
+            extras[column] = value
     return Bar(
         open=float(row["open"]),
         high=float(row["high"]),
@@ -343,11 +382,7 @@ def _row_to_bar(row: pd.Series) -> Bar:
         instrument_id=instrument_id,
         timeframe=timeframe,
         confirmed=bool(row.get("confirmed", True)),
-        extras={
-            "open_time": open_time,
-            "close_time": close_time,
-            "trades": int(row.get("trades", 0)),
-        },
+        extras=extras,
     )
 
 
@@ -356,6 +391,8 @@ class HistoricalParquetMarketDataAdapter:
     data_root: str
     market_type: str = "spot"
     resample_source_timeframe: str = "1m"
+    derivatives_data_root: Optional[str] = None
+    liquidations_data_root: Optional[str] = None
 
     def fetch_market(self, market_query: MarketQuery) -> MarketBundle:
         series: Dict[str, List[Bar]] = {}
@@ -403,6 +440,20 @@ class HistoricalParquetMarketDataAdapter:
             source_description = "resampled"
 
         frame = self._apply_time_range(frame, market_query)
+        frame = enrich_market_frame_with_derivatives(
+            frame,
+            derivatives_root=self.derivatives_data_root,
+            market_type=self.market_type,
+            instrument_id=instrument_id,
+            timeframe=timeframe,
+        )
+        frame = enrich_market_frame_with_liquidations(
+            frame,
+            liquidations_root=self.liquidations_data_root,
+            market_type=self.market_type,
+            instrument_id=instrument_id,
+            timeframe=timeframe,
+        )
         if frame.empty:
             return []
 

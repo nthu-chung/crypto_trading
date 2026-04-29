@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r2_c04",
+  "strategy": "multi_timeframe_ma_spread",
+  "params": {
+    "primary_ma_period": 25,
+    "reference_ma_period": 55,
+    "spread_threshold_bps": 10.0
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r1_c18"
+  ],
+  "sharpe_ratio": 1.027678937822426,
+  "total_return": 0.12230755234904209,
+  "max_drawdown": 0.32788370019474133,
+  "trade_count": 93,
+  "signal_count": 93,
+  "final_equity": 11223.07552349042,
+  "win_rate": 0.3484848484848485,
+  "rank": 9,
+  "selected_for_next_round": true
+}

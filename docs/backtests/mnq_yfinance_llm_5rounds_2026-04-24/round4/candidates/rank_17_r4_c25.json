@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r4_c25",
+  "strategy": "moving_average_cross",
+  "params": {
+    "fast_window": 34,
+    "slow_window": 114,
+    "entry_threshold": 0.0005
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r3_c02"
+  ],
+  "sharpe_ratio": 4.445558671286113,
+  "total_return": 0.09566601955399062,
+  "max_drawdown": 0.05302402134048562,
+  "trade_count": 101,
+  "signal_count": 11609,
+  "final_equity": 109566.60195539906,
+  "win_rate": 0.32,
+  "rank": 17,
+  "selected_for_next_round": false
+}

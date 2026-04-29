@@ -415,6 +415,201 @@ def donchian_breakout_target_updates(
 
 
 @njit(cache=True)
+def oi_funding_breakout_signal_rows(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    oi_change_bps: np.ndarray,
+    funding_rate_bps: np.ndarray,
+    lookback_window: int,
+    breakout_buffer_bps: float,
+    oi_threshold_bps: float,
+    max_funding_rate_bps: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(closes.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(closes.shape[0], dtype=np.float64)
+    upper_band_values = np.zeros(closes.shape[0], dtype=np.float64)
+    lower_band_values = np.zeros(closes.shape[0], dtype=np.float64)
+    breakout_bps_values = np.zeros(closes.shape[0], dtype=np.float64)
+    oi_values = np.zeros(closes.shape[0], dtype=np.float64)
+    funding_values = np.zeros(closes.shape[0], dtype=np.float64)
+    if closes.shape[0] == 0 or lookback_window < 1:
+        return (
+            directions,
+            strengths,
+            upper_band_values,
+            lower_band_values,
+            breakout_bps_values,
+            oi_values,
+            funding_values,
+        )
+
+    upper_multiplier = 1.0 + breakout_buffer_bps / 10_000.0
+    lower_multiplier = 1.0 - breakout_buffer_bps / 10_000.0
+
+    for index in range(closes.shape[0]):
+        if index < lookback_window:
+            continue
+
+        oi_value = oi_change_bps[index]
+        funding_value = funding_rate_bps[index]
+        if np.isnan(oi_value) or np.isnan(funding_value):
+            continue
+
+        oi_values[index] = oi_value
+        funding_values[index] = funding_value
+        if oi_value < oi_threshold_bps:
+            continue
+
+        upper_band = highs[index - lookback_window]
+        lower_band = lows[index - lookback_window]
+        for window_index in range(index - lookback_window + 1, index):
+            if highs[window_index] > upper_band:
+                upper_band = highs[window_index]
+            if lows[window_index] < lower_band:
+                lower_band = lows[window_index]
+
+        upper_band_values[index] = upper_band
+        lower_band_values[index] = lower_band
+
+        upper_trigger = upper_band * upper_multiplier
+        lower_trigger = lower_band * lower_multiplier
+        close_value = closes[index]
+
+        if upper_trigger > 0.0 and close_value > upper_trigger and funding_value <= max_funding_rate_bps:
+            breakout_bps = ((close_value - upper_trigger) / upper_trigger) * 10_000.0
+            directions[index] = SIGNAL_BUY
+            breakout_bps_values[index] = breakout_bps
+            strengths[index] = abs(breakout_bps) + max(oi_value - oi_threshold_bps, 0.0) / 100.0
+        elif lower_trigger > 0.0 and close_value < lower_trigger and funding_value >= -max_funding_rate_bps:
+            breakout_bps = ((lower_trigger - close_value) / lower_trigger) * 10_000.0
+            directions[index] = SIGNAL_SELL
+            breakout_bps_values[index] = -breakout_bps
+            strengths[index] = abs(breakout_bps) + max(oi_value - oi_threshold_bps, 0.0) / 100.0
+    return (
+        directions,
+        strengths,
+        upper_band_values,
+        lower_band_values,
+        breakout_bps_values,
+        oi_values,
+        funding_values,
+    )
+
+
+@njit(cache=True)
+def oi_funding_breakout_target_updates(
+    closes: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    oi_change_bps: np.ndarray,
+    funding_rate_bps: np.ndarray,
+    lookback_window: int,
+    breakout_buffer_bps: float,
+    oi_threshold_bps: float,
+    max_funding_rate_bps: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _, _, _, _ = oi_funding_breakout_signal_rows(
+        closes,
+        highs,
+        lows,
+        oi_change_bps,
+        funding_rate_bps,
+        lookback_window,
+        breakout_buffer_bps,
+        oi_threshold_bps,
+        max_funding_rate_bps,
+    )
+    target_updates = np.full(closes.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(closes.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
+def liquidation_reversal_signal_rows(
+    long_liq_notional_usd: np.ndarray,
+    short_liq_notional_usd: np.ndarray,
+    long_liquidation_threshold_usd: float,
+    short_liquidation_threshold_usd: float,
+    liquidation_imbalance_ratio: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    directions = np.full(long_liq_notional_usd.shape[0], SIGNAL_NONE, dtype=np.int8)
+    strengths = np.zeros(long_liq_notional_usd.shape[0], dtype=np.float64)
+    total_notional_values = np.zeros(long_liq_notional_usd.shape[0], dtype=np.float64)
+    imbalance_values = np.zeros(long_liq_notional_usd.shape[0], dtype=np.float64)
+    if long_liq_notional_usd.shape[0] == 0:
+        return directions, strengths, total_notional_values, imbalance_values
+
+    for index in range(long_liq_notional_usd.shape[0]):
+        long_notional = long_liq_notional_usd[index]
+        short_notional = short_liq_notional_usd[index]
+        if np.isnan(long_notional):
+            long_notional = 0.0
+        if np.isnan(short_notional):
+            short_notional = 0.0
+        total_notional = long_notional + short_notional
+        total_notional_values[index] = total_notional
+        if total_notional <= 0.0:
+            continue
+
+        imbalance = (short_notional - long_notional) / total_notional
+        imbalance_values[index] = imbalance
+        long_ratio = long_notional / total_notional
+        short_ratio = short_notional / total_notional
+        if long_notional >= long_liquidation_threshold_usd and long_ratio >= liquidation_imbalance_ratio:
+            directions[index] = SIGNAL_BUY
+            strengths[index] = (long_notional / max(long_liquidation_threshold_usd, 1.0)) * long_ratio
+        elif short_notional >= short_liquidation_threshold_usd and short_ratio >= liquidation_imbalance_ratio:
+            directions[index] = SIGNAL_SELL
+            strengths[index] = (short_notional / max(short_liquidation_threshold_usd, 1.0)) * short_ratio
+    return directions, strengths, total_notional_values, imbalance_values
+
+
+@njit(cache=True)
+def liquidation_reversal_target_updates(
+    long_liq_notional_usd: np.ndarray,
+    short_liq_notional_usd: np.ndarray,
+    long_liquidation_threshold_usd: float,
+    short_liquidation_threshold_usd: float,
+    liquidation_imbalance_ratio: float,
+) -> Tuple[np.ndarray, np.ndarray]:
+    directions, strengths, _, _ = liquidation_reversal_signal_rows(
+        long_liq_notional_usd,
+        short_liq_notional_usd,
+        long_liquidation_threshold_usd,
+        short_liquidation_threshold_usd,
+        liquidation_imbalance_ratio,
+    )
+    target_updates = np.full(long_liq_notional_usd.shape[0], TARGET_KEEP, dtype=np.int8)
+    previous_direction = SIGNAL_NONE
+    for index in range(long_liq_notional_usd.shape[0]):
+        current_direction = directions[index]
+        if current_direction == SIGNAL_NONE:
+            previous_direction = SIGNAL_NONE
+            continue
+        if current_direction == previous_direction:
+            continue
+        if current_direction == SIGNAL_BUY:
+            target_updates[index] = TARGET_LONG
+        elif current_direction == SIGNAL_SELL:
+            target_updates[index] = TARGET_SHORT
+        previous_direction = current_direction
+    return target_updates, strengths
+
+
+@njit(cache=True)
 def adx_trend_strength_signal_rows(
     closes: np.ndarray,
     highs: np.ndarray,

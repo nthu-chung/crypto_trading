@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r2_c16",
+  "strategy": "rsi_reversion",
+  "params": {
+    "period": 14,
+    "oversold": 30.0,
+    "overbought": 70.0
+  },
+  "origin": "elite",
+  "parent_ids": [
+    "r1_c05"
+  ],
+  "sharpe_ratio": -5.235344177700051,
+  "total_return": -0.542027038384472,
+  "max_drawdown": 0.5477097199216533,
+  "trade_count": 1541,
+  "signal_count": 5873,
+  "final_equity": 4579.72961615528,
+  "win_rate": 0.5362776025236593,
+  "rank": 42,
+  "selected_for_next_round": true
+}

@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r3_c27",
+  "strategy": "price_moving_average",
+  "params": {
+    "period": 55,
+    "entry_threshold": 0.002
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r2_c21"
+  ],
+  "sharpe_ratio": -0.3830670736142677,
+  "total_return": -0.012077223202832683,
+  "max_drawdown": 0.09300679052255903,
+  "trade_count": 19,
+  "signal_count": 33,
+  "final_equity": 98792.27767971673,
+  "win_rate": 0.4444444444444444,
+  "rank": 45,
+  "selected_for_next_round": false
+}

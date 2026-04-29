@@ -1,0 +1,21 @@
+{
+  "candidate_id": "r2_c49",
+  "strategy": "price_moving_average",
+  "params": {
+    "period": 24,
+    "entry_threshold": 0.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r1_c11"
+  ],
+  "sharpe_ratio": 1.2469367634729693,
+  "total_return": 0.02066121940441255,
+  "max_drawdown": 0.06349058639957951,
+  "trade_count": 1407,
+  "signal_count": 1413,
+  "final_equity": 102066.12194044125,
+  "win_rate": 0.24466571834992887,
+  "rank": 31,
+  "selected_for_next_round": false
+}

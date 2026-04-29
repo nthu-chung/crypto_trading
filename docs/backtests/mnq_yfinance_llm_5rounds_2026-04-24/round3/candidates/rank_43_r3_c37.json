@@ -1,0 +1,22 @@
+{
+  "candidate_id": "r3_c37",
+  "strategy": "atr_breakout",
+  "params": {
+    "ma_period": 62,
+    "atr_period": 19,
+    "atr_multiplier": 2.0
+  },
+  "origin": "mutation",
+  "parent_ids": [
+    "r2_c31"
+  ],
+  "sharpe_ratio": 0.25943566646762667,
+  "total_return": 0.004107786592961783,
+  "max_drawdown": 0.06297089480798292,
+  "trade_count": 177,
+  "signal_count": 675,
+  "final_equity": 100410.77865929618,
+  "win_rate": 0.3352601156069364,
+  "rank": 43,
+  "selected_for_next_round": false
+}
