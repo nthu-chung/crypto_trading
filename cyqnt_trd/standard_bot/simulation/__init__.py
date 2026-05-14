@@ -3,7 +3,8 @@ Simulation layer exports for the standard bot architecture.
 """
 
 from .interfaces import BacktestEngine, FeeModel, FillModel, SlippageModel
-from .numba_runner import NumbaBacktestRunner
+from .live_paper_session import NumbaLivePaperSession, PaperFill, PaperPosition, PendingOrder
+from .numba_runner import NumbaBacktestRunner, NumbaKernelArgSpec, NumbaKernelSpec
 from .runner import SnapshotBacktestRunner
 
 __all__ = [
@@ -11,6 +12,12 @@ __all__ = [
     "FeeModel",
     "FillModel",
     "NumbaBacktestRunner",
+    "NumbaKernelArgSpec",
+    "NumbaKernelSpec",
+    "NumbaLivePaperSession",
+    "PaperFill",
+    "PaperPosition",
+    "PendingOrder",
     "SnapshotBacktestRunner",
     "SlippageModel",
 ]

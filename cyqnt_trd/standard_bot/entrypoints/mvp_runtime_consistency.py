@@ -47,21 +47,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--secondary-interval", default="1h")
     parser.add_argument("--limit", type=int, default=240)
     parser.add_argument("--market-type", choices=["spot", "futures"], default="futures")
-    parser.add_argument(
-        "--strategy",
-        choices=[
-            "moving_average_cross",
-            "price_moving_average",
-            "rsi_reversion",
-            "donchian_breakout",
-            "adx_trend_strength",
-            "atr_breakout",
-            "bollinger_mean_reversion",
-            "macd_trend_follow",
-            "multi_timeframe_ma_spread",
-        ],
-        default="multi_timeframe_ma_spread",
-    )
+    parser.add_argument("--strategy", default="multi_timeframe_ma_spread")
+    parser.add_argument("--strategy-module", default=None, help="Python module to import for external strategy registration")
+    parser.add_argument("--extra-params", default=None, help="JSON dict of extra strategy config params")
     parser.add_argument("--fast-window", type=int, default=5)
     parser.add_argument("--slow-window", type=int, default=20)
     parser.add_argument("--ma-period", type=int, default=5)
@@ -147,6 +135,10 @@ def _batch_delta_trade_signals(batch, previous_decision_as_of: int | None):
 
 def main() -> int:
     args = build_parser().parse_args()
+    if args.strategy_module:
+        import importlib
+        importlib.import_module(args.strategy_module)
+    extra_params = json.loads(args.extra_params) if args.extra_params else None
     load_env_file(args.env_file)
 
     registry = make_registry()
@@ -178,6 +170,7 @@ def main() -> int:
         primary_ma_period=args.primary_ma_period,
         reference_ma_period=args.reference_ma_period,
         spread_threshold_bps=args.spread_threshold_bps,
+        extra_params=extra_params,
     )
     timeframes = [args.interval]
     if args.strategy == "multi_timeframe_ma_spread" and args.secondary_interval not in timeframes:

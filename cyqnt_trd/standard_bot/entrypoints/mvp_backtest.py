@@ -32,23 +32,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--limit", type=int, default=300)
     parser.add_argument("--market-type", choices=["spot", "futures", "cme"], default="spot")
     parser.add_argument("--engine", choices=["python", "numba"], default="numba")
-    parser.add_argument(
-        "--strategy",
-        choices=[
-            "moving_average_cross",
-            "price_moving_average",
-            "rsi_reversion",
-            "donchian_breakout",
-            "adx_trend_strength",
-            "atr_breakout",
-            "bollinger_mean_reversion",
-            "macd_trend_follow",
-            "oi_funding_breakout",
-            "liquidation_reversal",
-            "multi_timeframe_ma_spread",
-        ],
-        default="moving_average_cross",
-    )
+    parser.add_argument("--strategy", default="moving_average_cross")
+    parser.add_argument("--strategy-module", default=None, help="Python module to import for external strategy registration")
+    parser.add_argument("--extra-params", default=None, help="JSON dict of extra strategy config params")
     parser.add_argument("--secondary-interval", default="1h")
     parser.add_argument("--fast-window", type=int, default=5)
     parser.add_argument("--slow-window", type=int, default=20)
@@ -125,6 +111,10 @@ def load_market_bundle(args: argparse.Namespace, market_query: MarketQuery):
 
 def main() -> int:
     args = build_parser().parse_args()
+    if args.strategy_module:
+        import importlib
+        importlib.import_module(args.strategy_module)
+    extra_params = json.loads(args.extra_params) if args.extra_params else None
     if args.download_derivatives_missing:
         if args.start_ts is None or args.end_ts is None:
             raise ValueError("--download-derivatives-missing requires both --start-ts and --end-ts")
@@ -192,6 +182,7 @@ def main() -> int:
         primary_ma_period=args.primary_ma_period,
         reference_ma_period=args.reference_ma_period,
         spread_threshold_bps=args.spread_threshold_bps,
+        extra_params=extra_params,
     )
 
     request = BacktestRequest(

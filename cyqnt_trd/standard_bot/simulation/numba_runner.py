@@ -13,8 +13,9 @@ Design choices in this runner follow a conservative bar-based execution model:
 from __future__ import annotations
 
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Any, Callable, ClassVar, Dict, List, Sequence, Tuple
 
 import numpy as np
 
@@ -52,6 +53,55 @@ from .metrics_kernels import compute_equity_statistics
 SIMULATION_NAMESPACE = uuid.UUID("0bf7f6fd-3ca7-57aa-8266-4f22048d8bf8")
 SIGNAL_NAMESPACE = uuid.UUID("6d011acb-2b89-5dc5-bd38-fa9f903e6495")
 
+BUILTIN_NUMBA_STRATEGIES = {
+    "adx_trend_strength",
+    "atr_breakout",
+    "bollinger_mean_reversion",
+    "donchian_breakout",
+    "macd_trend_follow",
+    "moving_average_cross",
+    "oi_funding_breakout",
+    "liquidation_reversal",
+    "price_moving_average",
+    "rsi_reversion",
+    "multi_timeframe_ma_spread",
+}
+
+
+@dataclass(frozen=True)
+class NumbaKernelArgSpec:
+    """One positional argument for a registered external Numba kernel.
+
+    ``source`` supports:
+    - ``series``: read ``name`` from the encoded primary market series
+    - ``config``: read ``name`` from raw strategy config, with optional dtype/default
+    - ``literal``: pass ``value`` as-is
+    """
+
+    source: str
+    name: str = ""
+    dtype: str = ""
+    default: Any = None
+    has_default: bool = False
+    value: Any = None
+
+
+@dataclass(frozen=True)
+class NumbaKernelSpec:
+    """Declarative adapter for externally registered Numba strategy kernels.
+
+    The kernel must return ``(target_updates, strengths)`` arrays with the same
+    length as the primary market series. Prefer ``arg_map`` for new strategies:
+    it declares the exact positional arguments passed to ``kernel_fn``. The
+    older ``input_fields`` + ``param_names`` form remains supported.
+    """
+
+    strategy_id: str
+    kernel_fn: Callable
+    input_fields: Tuple[str, ...]
+    param_names: Tuple[str, ...] = ()
+    arg_map: Tuple[NumbaKernelArgSpec, ...] = ()
+
 
 @dataclass
 class EncodedSeries:
@@ -69,6 +119,189 @@ class EncodedSeries:
     short_liq_notional_usd: np.ndarray
 
 class NumbaBacktestRunner:
+    _custom_kernels: ClassVar[Dict[str, NumbaKernelSpec]] = {}
+
+    @classmethod
+    def register_kernel(
+        cls,
+        strategy_id: str,
+        kernel_fn: Callable,
+        *,
+        input_fields: Sequence[str] | None = None,
+        param_names: Sequence[str] = (),
+        arg_map: Sequence[Any] | None = None,
+    ) -> NumbaKernelSpec:
+        """Register an external Numba-compatible target-update kernel.
+
+        External modules can call this at import time, then use the same
+        ``BacktestRequest`` flow with ``plugin_id`` set to ``strategy_id``.
+        New strategies should prefer ``arg_map`` so the kernel's exact
+        positional arguments can be declared without a wrapper adapter.
+        ``input_fields`` + ``param_names`` remains supported for compatibility.
+        """
+        normalized_strategy_id = str(strategy_id).strip()
+        if not normalized_strategy_id:
+            raise ValueError("strategy_id is required for custom numba kernels")
+        if normalized_strategy_id in BUILTIN_NUMBA_STRATEGIES:
+            raise ValueError("cannot register custom numba kernel over built-in strategy '%s'" % normalized_strategy_id)
+        if not callable(kernel_fn):
+            raise ValueError("kernel_fn must be callable")
+
+        if arg_map is not None:
+            normalized_arg_map = cls._normalize_arg_map(arg_map)
+            normalized_input_fields = tuple(arg.name for arg in normalized_arg_map if arg.source == "series")
+            normalized_param_names = tuple(arg.name for arg in normalized_arg_map if arg.source == "config")
+        else:
+            normalized_arg_map = ()
+            normalized_input_fields = tuple(str(field).strip() for field in (input_fields or ()))
+            normalized_param_names = tuple(str(param).strip() for param in param_names)
+            if not normalized_input_fields:
+                raise ValueError("input_fields must include at least one EncodedSeries field")
+            if any(not field for field in normalized_input_fields):
+                raise ValueError("input_fields cannot contain blank names")
+            if any(not param for param in normalized_param_names):
+                raise ValueError("param_names cannot contain blank names")
+
+        spec = NumbaKernelSpec(
+            strategy_id=normalized_strategy_id,
+            kernel_fn=kernel_fn,
+            input_fields=normalized_input_fields,
+            param_names=normalized_param_names,
+            arg_map=normalized_arg_map,
+        )
+        cls._custom_kernels[normalized_strategy_id] = spec
+        return spec
+
+    @classmethod
+    def _normalize_arg_map(cls, arg_map: Sequence[Any]) -> Tuple[NumbaKernelArgSpec, ...]:
+        normalized = tuple(cls._normalize_arg_spec(arg) for arg in arg_map)
+        if not normalized:
+            raise ValueError("arg_map must include at least one kernel argument")
+        return normalized
+
+    @classmethod
+    def _normalize_arg_spec(cls, arg: Any) -> NumbaKernelArgSpec:
+        if isinstance(arg, NumbaKernelArgSpec):
+            return cls._validate_arg_spec(arg)
+
+        if isinstance(arg, Mapping):
+            source = str(arg.get("source", "")).strip().lower()
+            name = str(arg.get("name", arg.get("field", ""))).strip()
+            dtype = cls._normalize_dtype(arg.get("dtype", arg.get("type", "")))
+            has_default = "default" in arg
+            return cls._validate_arg_spec(
+                NumbaKernelArgSpec(
+                    source=source,
+                    name=name,
+                    dtype=dtype,
+                    default=arg.get("default"),
+                    has_default=has_default,
+                    value=arg.get("value"),
+                )
+            )
+
+        if isinstance(arg, tuple):
+            if len(arg) < 2:
+                raise ValueError("arg_map tuple entries must contain at least source and name/value")
+            source = str(arg[0]).strip().lower()
+            if source in {"literal", "const", "constant"}:
+                return cls._validate_arg_spec(NumbaKernelArgSpec(source="literal", value=arg[1]))
+            name = str(arg[1]).strip()
+            dtype = cls._normalize_dtype(arg[2]) if len(arg) >= 3 else ""
+            has_default = len(arg) >= 4
+            default = arg[3] if has_default else None
+            return cls._validate_arg_spec(
+                NumbaKernelArgSpec(
+                    source=source,
+                    name=name,
+                    dtype=dtype,
+                    default=default,
+                    has_default=has_default,
+                )
+            )
+
+        raise ValueError("arg_map entries must be NumbaKernelArgSpec, dict, or tuple")
+
+    @classmethod
+    def _validate_arg_spec(cls, arg: NumbaKernelArgSpec) -> NumbaKernelArgSpec:
+        source = arg.source.strip().lower()
+        if source in {"input", "field"}:
+            source = "series"
+        elif source in {"param", "params", "parameter"}:
+            source = "config"
+        elif source in {"const", "constant"}:
+            source = "literal"
+
+        if source not in {"series", "config", "literal"}:
+            raise ValueError("arg_map source must be 'series', 'config', or 'literal'")
+        name = arg.name.strip() if arg.name else ""
+        if source in {"series", "config"} and not name:
+            raise ValueError("arg_map %s entries must include name/field" % source)
+
+        return NumbaKernelArgSpec(
+            source=source,
+            name=name,
+            dtype=cls._normalize_dtype(arg.dtype),
+            default=arg.default,
+            has_default=arg.has_default,
+            value=arg.value,
+        )
+
+    @staticmethod
+    def _normalize_dtype(dtype: Any) -> str:
+        if dtype in (None, ""):
+            return ""
+        if dtype is int:
+            return "int"
+        if dtype is float:
+            return "float"
+        if dtype is bool:
+            return "bool"
+        if dtype is str:
+            return "str"
+        normalized = str(dtype).strip().lower()
+        if normalized in {"integer", "int64", "int32"}:
+            return "int"
+        if normalized in {"float64", "float32", "double"}:
+            return "float"
+        if normalized in {"boolean"}:
+            return "bool"
+        if normalized in {"string"}:
+            return "str"
+        if normalized not in {"", "int", "float", "bool", "str"}:
+            raise ValueError("unsupported arg_map dtype '%s'" % dtype)
+        return normalized
+
+    @staticmethod
+    def _coerce_arg_value(value: Any, dtype: str) -> Any:
+        if dtype == "int":
+            return int(value)
+        if dtype == "float":
+            return float(value)
+        if dtype == "bool":
+            if isinstance(value, str):
+                return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+            return bool(value)
+        if dtype == "str":
+            return str(value)
+        return value
+
+    @classmethod
+    def unregister_kernel(cls, strategy_id: str) -> None:
+        cls._custom_kernels.pop(strategy_id, None)
+
+    @classmethod
+    def clear_custom_kernels(cls) -> None:
+        cls._custom_kernels.clear()
+
+    @classmethod
+    def list_custom_kernels(cls) -> Tuple[str, ...]:
+        return tuple(sorted(cls._custom_kernels))
+
+    @classmethod
+    def registered_kernels(cls) -> Dict[str, NumbaKernelSpec]:
+        return dict(cls._custom_kernels)
+
     def run(
         self,
         *,
@@ -215,20 +448,11 @@ class NumbaBacktestRunner:
             raise ValueError("numba backtest runner currently supports exactly one signal plugin")
         strategy_id = plugin_chain[0]["plugin_id"]
         raw_config = dict(plugin_chain[0].get("config", {}))
-        if strategy_id not in {
-            "adx_trend_strength",
-            "atr_breakout",
-            "bollinger_mean_reversion",
-            "donchian_breakout",
-            "macd_trend_follow",
-            "moving_average_cross",
-            "oi_funding_breakout",
-            "liquidation_reversal",
-            "price_moving_average",
-            "rsi_reversion",
-            "multi_timeframe_ma_spread",
-        }:
-            raise ValueError("numba backtest runner does not support strategy '%s' yet" % strategy_id)
+        if strategy_id not in BUILTIN_NUMBA_STRATEGIES and strategy_id not in self._custom_kernels:
+            raise ValueError(
+                "numba backtest runner does not support strategy '%s' yet; "
+                "register external kernels with NumbaBacktestRunner.register_kernel(...)" % strategy_id
+            )
         return strategy_id, raw_config
 
     def _encode_series(self, *, market_bundle: MarketBundle, instrument_id: str, timeframe: str) -> EncodedSeries:
@@ -399,24 +623,114 @@ class NumbaBacktestRunner:
                 float(raw_config["overbought"]),
             )
 
-        secondary_key = market_bundle.key(instrument_id, str(raw_config["reference_timeframe"]))
-        secondary_bars = sorted(
-            [bar for bar in market_bundle.bars.get(secondary_key, []) if bar.confirmed],
-            key=lambda bar: bar.timestamp,
-        )
-        if not secondary_bars:
-            raise ValueError("no confirmed secondary bars found for %s" % secondary_key)
-        secondary_timestamps = np.asarray([int(bar.timestamp) for bar in secondary_bars], dtype=np.int64)
-        secondary_closes = np.asarray([float(bar.close) for bar in secondary_bars], dtype=np.float64)
-        return multi_timeframe_ma_spread_target_updates(
-            primary_series.timestamps,
-            primary_series.closes,
-            secondary_timestamps,
-            secondary_closes,
-            int(raw_config["primary_ma_period"]),
-            int(raw_config["reference_ma_period"]),
-            float(raw_config.get("spread_threshold_bps", 0.0)),
-        )
+        if strategy_id == "multi_timeframe_ma_spread":
+            secondary_key = market_bundle.key(instrument_id, str(raw_config["reference_timeframe"]))
+            secondary_bars = sorted(
+                [bar for bar in market_bundle.bars.get(secondary_key, []) if bar.confirmed],
+                key=lambda bar: bar.timestamp,
+            )
+            if not secondary_bars:
+                raise ValueError("no confirmed secondary bars found for %s" % secondary_key)
+            secondary_timestamps = np.asarray([int(bar.timestamp) for bar in secondary_bars], dtype=np.int64)
+            secondary_closes = np.asarray([float(bar.close) for bar in secondary_bars], dtype=np.float64)
+            return multi_timeframe_ma_spread_target_updates(
+                primary_series.timestamps,
+                primary_series.closes,
+                secondary_timestamps,
+                secondary_closes,
+                int(raw_config["primary_ma_period"]),
+                int(raw_config["reference_ma_period"]),
+                float(raw_config.get("spread_threshold_bps", 0.0)),
+            )
+
+        if strategy_id in self._custom_kernels:
+            return self._build_custom_signal_targets(
+                strategy_id=strategy_id,
+                raw_config=raw_config,
+                primary_series=primary_series,
+            )
+
+        raise ValueError("unsupported numba strategy '%s'" % strategy_id)
+
+    def _build_custom_signal_targets(
+        self,
+        *,
+        strategy_id: str,
+        raw_config: dict,
+        primary_series: EncodedSeries,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        spec = self._custom_kernels[strategy_id]
+        if spec.arg_map:
+            kernel_args = self._build_custom_kernel_args_from_arg_map(
+                strategy_id=strategy_id,
+                spec=spec,
+                raw_config=raw_config,
+                primary_series=primary_series,
+            )
+        else:
+            kernel_args = []
+            for field_name in spec.input_fields:
+                if not hasattr(primary_series, field_name):
+                    raise ValueError(
+                        "custom numba strategy '%s' requested unknown input field '%s'" % (strategy_id, field_name)
+                    )
+                kernel_args.append(getattr(primary_series, field_name))
+
+            for param_name in spec.param_names:
+                if param_name not in raw_config:
+                    raise ValueError(
+                        "custom numba strategy '%s' missing required config parameter '%s'" % (strategy_id, param_name)
+                    )
+                kernel_args.append(raw_config[param_name])
+
+        result = spec.kernel_fn(*kernel_args)
+        if not isinstance(result, tuple) or len(result) != 2:
+            raise ValueError("custom numba strategy '%s' must return (target_updates, strengths)" % strategy_id)
+
+        target_updates = np.asarray(result[0], dtype=np.int8)
+        strengths = np.asarray(result[1], dtype=np.float64)
+        expected_length = primary_series.closes.shape[0]
+        if target_updates.shape[0] != expected_length or strengths.shape[0] != expected_length:
+            raise ValueError(
+                "custom numba strategy '%s' returned arrays with invalid lengths: expected %s" % (
+                    strategy_id,
+                    expected_length,
+                )
+            )
+        return target_updates, strengths
+
+    def _build_custom_kernel_args_from_arg_map(
+        self,
+        *,
+        strategy_id: str,
+        spec: NumbaKernelSpec,
+        raw_config: dict,
+        primary_series: EncodedSeries,
+    ) -> List[Any]:
+        kernel_args: List[Any] = []
+        for arg in spec.arg_map:
+            if arg.source == "series":
+                if not hasattr(primary_series, arg.name):
+                    raise ValueError(
+                        "custom numba strategy '%s' requested unknown input field '%s'" % (strategy_id, arg.name)
+                    )
+                value = getattr(primary_series, arg.name)
+            elif arg.source == "config":
+                if arg.name in raw_config:
+                    value = raw_config[arg.name]
+                elif arg.has_default:
+                    value = arg.default
+                else:
+                    raise ValueError(
+                        "custom numba strategy '%s' missing required config parameter '%s'" % (strategy_id, arg.name)
+                    )
+                value = self._coerce_arg_value(value, arg.dtype)
+            elif arg.source == "literal":
+                value = self._coerce_arg_value(arg.value, arg.dtype)
+            else:
+                raise ValueError("custom numba strategy '%s' has unsupported arg source '%s'" % (strategy_id, arg.source))
+            kernel_args.append(value)
+        return kernel_args
 
     def _build_trade_rows(
         self,
