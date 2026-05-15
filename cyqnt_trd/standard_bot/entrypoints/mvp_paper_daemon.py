@@ -238,6 +238,9 @@ class PaperDaemon:
         fee_bps: float,
         slippage_bps: float,
         market_type: str,
+        jarvis_user_id: str = "",
+        jarvis_thread_id: str = "",
+        session_end_at: str = "",
     ) -> None:
         self.symbol = symbol.upper()
         self.interval = interval
@@ -251,6 +254,9 @@ class PaperDaemon:
         self.fee_bps = fee_bps
         self.slippage_bps = slippage_bps
         self.market_type = market_type
+        self.jarvis_user_id = jarvis_user_id
+        self.jarvis_thread_id = jarvis_thread_id
+        self.session_end_at = session_end_at
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.state_path = self.state_dir / "state.json"
@@ -610,6 +616,14 @@ class PaperDaemon:
         except Exception:
             pass
 
+        # Inject daemon-level jarvis / session_end_at (CLI args take precedence)
+        if self.jarvis_user_id:
+            state["jarvis_user_id"] = self.jarvis_user_id
+        if self.jarvis_thread_id:
+            state["jarvis_thread_id"] = self.jarvis_thread_id
+        if self.session_end_at:
+            state["session_end_at"] = self.session_end_at
+
         _atomic_write_json(self.state_path, state)
 
     def _handle_signal(self, signum, frame):
@@ -664,6 +678,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--market-type", choices=["spot", "futures"], default="futures"
     )
+    parser.add_argument(
+        "--jarvis-user-id", default="",
+        help="Jarvis user ID for trade notifications"
+    )
+    parser.add_argument(
+        "--jarvis-thread-id", default="",
+        help="Jarvis thread ID for trade notifications"
+    )
+    parser.add_argument(
+        "--session-end-at", default="",
+        help="ISO8601 UTC time to stop the session (e.g. 2026-05-15T12:00:00Z)"
+    )
     return parser
 
 
@@ -687,6 +713,9 @@ def main() -> int:
         fee_bps=args.fee_bps,
         slippage_bps=args.slippage_bps,
         market_type=args.market_type,
+        jarvis_user_id=args.jarvis_user_id,
+        jarvis_thread_id=args.jarvis_thread_id,
+        session_end_at=args.session_end_at,
     )
 
     return daemon.start()
